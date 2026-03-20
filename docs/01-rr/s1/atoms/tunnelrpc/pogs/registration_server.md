@@ -1,0 +1,127 @@
+# Behavior Atom: tunnelrpc/pogs/registration_server.go
+
+## Source Anchor
+
+- Go source: [cloudflare/cloudflared@2026.3.0/tunnelrpc/pogs/registration_server.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/tunnelrpc/pogs/registration_server.go)
+- Package: pogs
+- Module group: tunnelrpc
+
+## Behavioral Responsibility
+
+Core package behavior anchored to this source file.
+
+## Entry Points
+
+- RegistrationServer_ServerToClient(s RegistrationServer) proto.RegistrationServer (line 34)
+- (RegistrationServer_PogsImpl) RegisterConnection(p proto.RegistrationServer_registerConnection) error (line 38)
+- (RegistrationServer_PogsImpl) UnregisterConnection(p proto.RegistrationServer_unregisterConnection) error (line 95)
+- (RegistrationServer_PogsImpl) UpdateLocalConfiguration(p proto.RegistrationServer_updateLocalConfiguration) error (line 103)
+- NewRegistrationServer_PogsClient(client capnp.Client, conn *rpc.Conn) RegistrationServer_PogsClient (line 123)
+- (RegistrationServer_PogsClient) Close() error (line 130)
+- (RegistrationServer_PogsClient) RegisterConnection(ctx context.Context, auth TunnelAuth, tunnelID uuid.UUID, connIndex byte, options *ConnectionOptions) (*ConnectionDetails, error) (line 135)
+- (RegistrationServer_PogsClient) SendLocalConfiguration(ctx context.Context, config []byte) error (line 200)
+- (RegistrationServer_PogsClient) UnregisterConnection(ctx context.Context) error (line 218)
+- (*ConnectionOptions) MarshalCapnproto(s proto.ConnectionOptions) error (line 250)
+- (*ConnectionOptions) UnmarshalCapnproto(s proto.ConnectionOptions) error (line 254)
+- (*TunnelAuth) MarshalCapnproto(s proto.TunnelAuth) error (line 258)
+- (*TunnelAuth) UnmarshalCapnproto(s proto.TunnelAuth) error (line 262)
+- (*ConnectionDetails) MarshalCapnproto(s proto.ConnectionDetails) error (line 272)
+- (*ConnectionDetails) UnmarshalCapnproto(s proto.ConnectionDetails) error (line 284)
+- MarshalError(s proto.ConnectionError, err error) error (line 302)
+
+## Internal Function Surface
+
+- (RegistrationServer_PogsImpl) registerConnection(p proto.RegistrationServer_registerConnection) error (line 42)
+- (RegistrationServer_PogsImpl) updateLocalConfiguration(c proto.RegistrationServer_updateLocalConfiguration) error (line 107)
+
+## Input Contract
+
+- func-param:auth TunnelAuth
+- func-param:c proto.RegistrationServer_updateLocalConfiguration
+- func-param:client capnp.Client
+- func-param:config []byte
+- func-param:conn *rpc.Conn
+- func-param:connIndex byte
+- func-param:ctx context.Context
+- func-param:err error
+- func-param:options *ConnectionOptions
+- func-param:p proto.RegistrationServer_registerConnection
+- func-param:p proto.RegistrationServer_unregisterConnection
+- func-param:p proto.RegistrationServer_updateLocalConfiguration
+- func-param:s RegistrationServer
+- func-param:s proto.ConnectionDetails
+- func-param:s proto.ConnectionError
+- func-param:s proto.ConnectionOptions
+- func-param:s proto.TunnelAuth
+- func-param:tunnelID uuid.UUID
+
+## Output Contract
+
+- metrics emission
+- return:*ConnectionDetails
+- return:RegistrationServer_PogsClient
+- return:error
+- return:proto.RegistrationServer
+
+## Side Effects and State Transitions
+
+- network I/O
+
+## Branching and Failure Semantics
+
+- Branch density: if=33, switch=1, select=0
+- error-return paths
+
+## Import and Dependency Surface
+
+- context
+- errors
+- github.com/cloudflare/cloudflared/tunnelrpc/metrics
+- github.com/cloudflare/cloudflared/tunnelrpc/proto
+- github.com/google/uuid
+- net
+- time
+- zombiezen.com/go/capnproto2
+- zombiezen.com/go/capnproto2/pogs
+- zombiezen.com/go/capnproto2/rpc
+- zombiezen.com/go/capnproto2/server
+
+## Go-Impl Flow (Intra-file)
+
+```mermaid
+flowchart TD
+    F1["RegistrationServer_ServerToClient"]
+    F2["RegistrationServer_PogsImpl.RegisterConnection"]
+    F3["RegistrationServer_PogsImpl.registerConnection"]
+    F4["RegistrationServer_PogsImpl.UnregisterConnection"]
+    F5["RegistrationServer_PogsImpl.UpdateLocalConfiguration"]
+    F6["RegistrationServer_PogsImpl.updateLocalConfiguration"]
+    F7["NewRegistrationServer_PogsClient"]
+    F8["RegistrationServer_PogsClient.Close"]
+    F9["RegistrationServer_PogsClient.RegisterConnection"]
+    F10["RegistrationServer_PogsClient.SendLocalConfiguration"]
+    F11["RegistrationServer_PogsClient.UnregisterConnection"]
+    F12["*ConnectionOptions.MarshalCapnproto"]
+    F13["*ConnectionOptions.UnmarshalCapnproto"]
+    F14["*TunnelAuth.MarshalCapnproto"]
+    F15["*TunnelAuth.UnmarshalCapnproto"]
+    F16["*ConnectionDetails.MarshalCapnproto"]
+    F17["*ConnectionDetails.UnmarshalCapnproto"]
+    F18["MarshalError"]
+    F3 --> F18
+```
+
+## Accuracy Notes
+
+- Generated from Go AST parsing and source text pattern extraction.
+- Source link is authoritative for disputed semantics; keep this atom synchronized with the linked file.
+
+## Rust Porting Notes
+
+- **Cap'n Proto server**: `RegistrationServer_PogsImpl` implementing Cap'n Proto server methods → implement the `registration_server::Server` trait generated by `capnpc-rust`.
+- **Pogs marshal/unmarshal**: Manual field copying between Go structs and Cap'n Proto → implement `From<Reader>` and `Into<Builder>` traits for `ConnectionOptions`, `TunnelAuth`, `ConnectionDetails`.
+- **UUID wire format**: `uuid.UUID` serialized as raw bytes in Cap'n Proto → `uuid::Uuid::as_bytes()` / `from_bytes()` for `Data(16)` field compatibility.
+- **Error marshaling**: `MarshalError` serializes error to Cap'n Proto `ConnectionError` → implement `From<ConnectionError> for capnp::Error` or use typed conversion.
+- **Client close**: `PogsClient.Close()` tears down the RPC connection → `Drop` impl or explicit `shutdown().await`.
+- **Quirk — 33 if-branches**: Dense field-by-field validation in marshal/unmarshal — in Rust, use `?` operator with `From` impls for clean field extraction.
+- **Quirk — capnproto2/pogs reflection**: Go pogs package uses reflection for auto-marshaling — Rust Cap'n Proto does not have a pogs equivalent; manual conversion is required.
