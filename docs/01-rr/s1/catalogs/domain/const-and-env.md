@@ -71,7 +71,7 @@ gantt
 ## Environment Variable Inventory
 
 | Env var | Surface | Behavior contract | Cadence |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `CFDPATH` | config directory resolution | Windows config directory selection path in default config lookup logic. | startup sampled |
 | `ProgramFiles(x86)` | config directory fallback | Windows default directory fallback when `CFDPATH` is unset. | startup sampled |
 | `HOME` | access SSH config generation | Used when rendering SSH config template output. | command invocation |
@@ -85,7 +85,7 @@ Primary evidence: [config/configuration](../../atoms/config/configuration.md), [
 ## Constant Domains
 
 | Domain | Description | Representative constants and surfaces |
-|---|---|---|
+| --- | --- | --- |
 | Flag and key namespace constants | Stable CLI and config flag keys used across command and runtime construction. | [cmd/cloudflared/flags/flags](../../atoms/cmd/cloudflared/flags/flags.md), [cmd/cloudflared/main](../../atoms/cmd/cloudflared/main.md), [cmd/cloudflared/tunnel/configuration](../../atoms/cmd/cloudflared/tunnel/configuration.md) |
 | Config path and file defaults | Default config filenames and search directories, plus OS-specific fallback path constants. | [config/configuration](../../atoms/config/configuration.md), [token/path](../../atoms/token/path.md) |
 | Protocol selection constants | Auto-select token, server-name constants, protocol list ordering, and protocol refresh TTL. | [connection/protocol](../../atoms/connection/protocol.md), [features/selector](../../atoms/features/selector.md) |
@@ -97,7 +97,7 @@ Primary evidence: [config/configuration](../../atoms/config/configuration.md), [
 ## Notable Constant Contracts
 
 | Surface | Contracted behavior |
-|---|---|
+| --- | --- |
 | Config defaults | Default config filenames and search roots provide deterministic fallback ordering for config discovery. |
 | Protocol autoselect | `auto` protocol mode and `ResolveTTL` timing govern when protocol percentages are refreshed and reevaluated. |
 | Feature refresh cadence | Feature selector constants define lookup timeout and periodic refresh frequency; startup fetch occurs before steady-state loop. |
@@ -145,7 +145,7 @@ _Cross-referenced against [cmd/cloudflared/tunnel/cmd.go](https://github.com/clo
 ### Tunnel CLI Flag Defaults
 
 | Flag | Default value | Env var | Source |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `--ha-connections` | `4` | — | [cmd/cloudflared/tunnel/cmd.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/cmd/cloudflared/tunnel/cmd.go) |
 | `--retries` | `5` | `TUNNEL_RETRIES` | [cmd/cloudflared/tunnel/cmd.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/cmd/cloudflared/tunnel/cmd.go) |
 | `--max-edge-addr-retries` | `8` | — | [cmd/cloudflared/tunnel/cmd.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/cmd/cloudflared/tunnel/cmd.go) |
@@ -164,14 +164,14 @@ _Cross-referenced against [cmd/cloudflared/tunnel/cmd.go](https://github.com/clo
 ### QUIC Flow Control Constants
 
 | Constant | Value | Env var | Source |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `--quic-conn-level-flow-control-limit` | 30 MB (`30 * (1 << 20)`) | `TUNNEL_QUIC_CONN_LEVEL_FLOW_CONTROL_LIMIT` | [cmd/cloudflared/tunnel/cmd.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/cmd/cloudflared/tunnel/cmd.go) |
 | `--quic-stream-level-flow-control-limit` | 6 MB (`6 * (1 << 20)`) | `TUNNEL_QUIC_STREAM_LEVEL_FLOW_CONTROL_LIMIT` | [cmd/cloudflared/tunnel/cmd.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/cmd/cloudflared/tunnel/cmd.go) |
 
 ### Metrics Server Constants
 
 | Constant | Value | Source |
-|---|---|---|
+| --- | --- | --- |
 | `startupTime` | 500 ms | [metrics/metrics.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/metrics/metrics.go) |
 | `defaultShutdownTimeout` | 15 s | [metrics/metrics.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/metrics/metrics.go) |
 | `ReadTimeout` / `WriteTimeout` | 10 s each | [metrics/metrics.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/metrics/metrics.go) |
@@ -217,7 +217,7 @@ flowchart TD
 The 5-layer resolution applies differently across cloudflared subsystems:
 
 | Layer | Mechanism | Timing | Examples |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | CLI flag | `urfave/cli` flag parsing with env binding | Process startup | `--ha-connections`, `--retries`, `--edge-ip-version` |
 | Environment variable | `os.Getenv` or `EnvVar` in flag registration | Process startup | `TUNNEL_RETRIES`, `DIAL_EDGE_TIMEOUT`, `CFDPATH` |
 | Config file | YAML config loaded via `config/configuration` or remote push | Startup or hot-reload | ingress rules, origin request settings, warp-routing config |
@@ -227,7 +227,7 @@ The 5-layer resolution applies differently across cloudflared subsystems:
 ### Rust Const and Static Mapping
 
 | Go pattern | Rust equivalent | Porting note |
-|---|---|---|
+| --- | --- | --- |
 | Package-level `const` block | `const` or `static` items | Rust `const` is always compile-time; no package-level init |
 | `var` with computed init value | `lazy_static!` or `std::sync::LazyLock` | Required when value needs runtime computation |
 | `init()` for Prometheus registration | Module-level `LazyLock` or explicit init function | Go `init()` has no Rust equivalent; must be called explicitly |

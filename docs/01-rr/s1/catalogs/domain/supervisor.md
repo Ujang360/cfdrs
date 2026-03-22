@@ -56,7 +56,7 @@ flowchart LR
 ## Controlling Object Inventory
 
 | Object | Kind | Responsibility | Primary evidence |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `Supervisor` | struct | Owns multi-connection lifecycle, startup sequencing, retry scheduling, and next-connection coordination. | [atoms/supervisor/supervisor](../../atoms/supervisor/supervisor.md) |
 | `TunnelConfig` | struct | Carries all control knobs for protocol, retries, edge addressing, transport limits, and service dependencies. | [atoms/supervisor/tunnel](../../atoms/supervisor/tunnel.md) |
 | `EdgeTunnelServer` | struct | Runs serving loop per connection, drives transport mode, reconnect handling, and edge registration flow. | [atoms/supervisor/tunnel](../../atoms/supervisor/tunnel.md) |
@@ -97,7 +97,7 @@ sequenceDiagram
 ## Supervisor Run-Loop Contracts
 
 | Surface | Contract |
-|---|---|
+| --- | --- |
 | Construction | `NewSupervisor` resolves static/dynamic edge addresses, allocates trackers/managers, and wires `EdgeTunnelServer`. |
 | Initialization | `initialize` caps HA connections to available addresses and seeds per-connection `protocolFallback` states. |
 | First tunnel gating | `startFirstTunnel` blocks rollout of additional HA connections until one successful registration signal is observed. |
@@ -124,7 +124,7 @@ stateDiagram-v2
 ```
 
 | Mechanism | Contracted behavior |
-|---|---|
+| --- | --- |
 | `selectNextProtocol` | Switches to selector fallback when backoff is exhausted or QUIC-broken condition is detected and fallback exists. |
 | QUIC-broken classifier | Treats idle-timeout/transport variants and selected network errors as fallback triggers. |
 | `listenReconnect` | Waits on reconnect channel, graceful shutdown, or context completion; reconnect signal behaves as typed error path. |
@@ -136,7 +136,7 @@ Primary evidence: [atoms/supervisor/tunnel](../../atoms/supervisor/tunnel.md), [
 ## Address Rotation and Connectivity Policy
 
 | Error class | Address rotation | Connectivity classification |
-|---|---|---|
+| --- | --- | --- |
 | `nil` | no | none |
 | duplicate registration / QUIC idle timeout | yes | non-connectivity error |
 | edge dial / edge QUIC dial | yes | `ConnectivityError(false)` until retry budget exhausted |
@@ -148,7 +148,7 @@ Primary evidence: [atoms/supervisor/tunnel](../../atoms/supervisor/tunnel.md).
 ## Transport Control Contracts
 
 | Transport surface | Control contract |
-|---|---|
+| --- | --- |
 | `serveConnection` | Routes per selected protocol (`quic`/`http2`) and shapes connection options using local-origin address metadata. |
 | `serveHTTP2` | Runs serving and reconnect listener in errgroup; reconnect path can force break for deterministic restart behavior. |
 | `serveQUIC` | Applies curve preference policy, configures QUIC flow/idle/datagram windows, dials edge, and chooses datagram session manager variant. |
@@ -159,17 +159,17 @@ Primary evidence: [atoms/supervisor/tunnel](../../atoms/supervisor/tunnel.md), [
 ## PQ Curve Preference Policy
 
 | PQ mode | FIPS disabled | FIPS enabled |
-|---|---|---|
+| --- | --- | --- |
 | `PostQuantumStrict` | hybrid-only non-FIPS list (`X25519MLKEM768`) | strict FIPS list (`P256Kyber768Draft00`) |
 | `PostQuantumPrefer` | PQ-first list plus caller curves with deduplication | PQ-first FIPS list with classical fallback (`CurveP256`) |
-| default/unknown | error |
+| default/unknown | error | error |
 
 Primary evidence: [atoms/supervisor/pqtunnels](../../atoms/supervisor/pqtunnels.md).
 
 ## Observability and Tracking Contracts
 
 | Surface | Contract |
-|---|---|
+| --- | --- |
 | `haConnections` gauge | Incremented/decremented around `EdgeTunnelServer.Serve`, representing active HA tunnel connections. |
 | `tunnelsForHA` | Maintains HA connection index to tunnel ID map and reconciles old/new label values in metrics. |
 | `ConnAwareLogger` | Chooses error-level when zero active connections exist, warn-level otherwise. |
@@ -193,7 +193,7 @@ Primary evidence: [atoms/supervisor/metrics](../../atoms/supervisor/metrics.md),
 ### Retry and Timing Constants
 
 | Constant | Value | Source |
-|---|---|---|
+| --- | --- | --- |
 | `tunnelRetryDuration` | `10 seconds` | [supervisor/supervisor.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/supervisor/supervisor.go) |
 | `registrationInterval` | `1 second` | [supervisor/supervisor.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/supervisor/supervisor.go) |
 
@@ -204,7 +204,7 @@ HA connections beyond index 0 are started sequentially with `registrationInterva
 The first-tunnel retry loop classifies errors into three buckets:
 
 | Bucket | Error types | Behavior |
-|---|---|---|
+| --- | --- | --- |
 | Always retry | `DupConnRegisterTunnelError`, `*quic.IdleTimeoutError`, `*quic.ApplicationError`, `edgediscovery.DialError`, `*connection.EdgeQuicDialError`, `*connection.ControlStreamError`, `*connection.StreamListenerError`, `*connection.DatagramManagerError` | Re-enter serve loop after backoff |
 | Conditionally retry | `edgediscovery.ErrNoAddressesLeft` | Retry only when static edge addresses are configured; bail otherwise |
 | Bail | All other error types | Return error, terminate tunnel index |
@@ -222,7 +222,7 @@ The first tunnel (index 0) connects and blocks the supervisor run loop. Only aft
 The supervisor's `Run` method uses Go `select` over `tunnelErrors`, `reconnect`, and context cancellation channels. In Rust:
 
 | Go pattern | Rust equivalent |
-|---|---|
+| --- | --- |
 | `select { case err := <-tunnelErrors }` | `tokio::select! { err = tunnel_errors.recv() => }` |
 | `ReconnectSignal` channel | `tokio::sync::mpsc` channel with typed signal |
 | `gracefulShutdownC` | `tokio_util::sync::CancellationToken` or `tokio::sync::watch` |
@@ -234,7 +234,7 @@ The supervisor's `Run` method uses Go `select` over `tunnelErrors`, `reconnect`,
 The supervisor classifies errors into always-retry, conditional-retry, and bail buckets via type-switch. In Rust, this maps to an enum-based error taxonomy:
 
 | Go pattern | Rust pattern |
-|---|---|
+| --- | --- |
 | `errors.As(err, &target)` type matching | `match err { SupervisorError::DupConn(..) => retry }` |
 | String-contains "Unauthorized" check | `err.to_string().contains("Unauthorized")` or dedicated variant |
 | `ConnectivityError{HasNoAddress: bool}` | `ConnectivityError { has_no_address: bool }` struct variant |

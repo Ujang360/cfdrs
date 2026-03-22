@@ -69,7 +69,7 @@ sequenceDiagram
 ## Platform Capability Matrix
 
 | Surface | Linux | macOS | Windows | Container nuance |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | File watch and config reload | Supported through watcher notifier and file manager callbacks. | Supported through same watcher abstraction. | Supported through same watcher abstraction. | Behavior depends on mounted volume semantics and file-event propagation latency. |
 | Service install and lifecycle | systemd or sysv branch with template generation and command execution. | launchd branch with root-vs-user install path split. | SCM registration and Execute control loop with recovery settings. | Containerized deployments usually skip host service-manager paths. |
 | Host diagnostics command collection | Uses host command execution and filesystem artifact writes. | Uses host command execution and parser variants. | Uses Windows command execution and parser variants. | Alternative collectors for Docker/Kubernetes logs are available. |
@@ -81,7 +81,7 @@ sequenceDiagram
 ## Host Interaction Domains
 
 | Domain | Description | Representative atoms |
-|---|---|---|
+| --- | --- | --- |
 | Watchers and mutable config | File-watcher notification and file-manager reload contract for runtime config mutation. | [watcher/file](../../atoms/watcher/file.md), [watcher/notify](../../atoms/watcher/notify.md), [config/manager](../../atoms/config/manager.md), [config/configuration](../../atoms/config/configuration.md) |
 | Host service manager integration | Installation, uninstallation, and service runtime control across systemd/sysv, launchd, and Windows SCM. | [cmd/cloudflared/linux_service](../../atoms/cmd/cloudflared/linux_service.md), [cmd/cloudflared/macos_service](../../atoms/cmd/cloudflared/macos_service.md), [cmd/cloudflared/windows_service](../../atoms/cmd/cloudflared/windows_service.md), [cmd/cloudflared/service_template](../../atoms/cmd/cloudflared/service_template.md), [cmd/cloudflared/common_service](../../atoms/cmd/cloudflared/common_service.md), [cmd/cloudflared/generic_service](../../atoms/cmd/cloudflared/generic_service.md) |
 | Tunnel CLI host I/O surfaces | Credentials/config file lookup, writes, pid/service signaling, and process shutdown signal handling. | [cmd/cloudflared/tunnel/cmd](../../atoms/cmd/cloudflared/tunnel/cmd.md), [cmd/cloudflared/tunnel/subcommands](../../atoms/cmd/cloudflared/tunnel/subcommands.md), [cmd/cloudflared/tunnel/subcommand_context](../../atoms/cmd/cloudflared/tunnel/subcommand_context.md), [cmd/cloudflared/tunnel/credential_finder](../../atoms/cmd/cloudflared/tunnel/credential_finder.md), [cmd/cloudflared/tunnel/filesystem](../../atoms/cmd/cloudflared/tunnel/filesystem.md), [cmd/cloudflared/tunnel/signal](../../atoms/cmd/cloudflared/tunnel/signal.md), [cmd/cloudflared/tunnel/login](../../atoms/cmd/cloudflared/tunnel/login.md) |
@@ -93,7 +93,7 @@ sequenceDiagram
 ## Host Contract Matrix
 
 | Contract area | From platform | To runtime behavior |
-|---|---|---|
+| --- | --- | --- |
 | Config file mutation | Host filesystem events from watched paths. | File manager reloads, parses config, and notifies listeners through callback interfaces. |
 | Service bootstrap context | OS service manager and privilege context (root/user/admin). | Install/uninstall path and generated service template location/commands branch by platform and privileges. |
 | Signal delivery | Host signal subsystem and service-control messages. | Graceful shutdown channels and service status transitions coordinate process stop behavior. |
@@ -105,7 +105,7 @@ sequenceDiagram
 ## Host Nuances and Support Boundaries
 
 | Feature | Supported | Not supported or constrained | Nuance |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Watcher-driven config hot update | Supported when host file events are delivered. | Not reliable on all remote/network filesystems or unusual volume mounts. | Runtime still depends on successful parse and manager callback chain. |
 | Linux service management | Supported for systemd and sysv branches. | Other init systems are outside explicit branch logic. | Install path and command invocation branch at runtime based on detection. |
 | macOS service management | Supported via launchd templates. | Non-standard launch environments may bypass expected behavior. | Root vs user install path selection changes file destination and launch context. |
@@ -174,7 +174,7 @@ The Linux service installer hardcodes `/etc/cloudflared/config.yml` as the servi
 ### SysV Init Compatibility
 
 | Runlevel | Script action |
-|---|---|
+| --- | --- |
 | 2, 3, 4, 5 | Start (symlink `S50et`) |
 | 0, 1, 6 | Stop (symlink `K02et`) |
 

@@ -17,7 +17,7 @@ documentation stratum set. The repo is designed to outlive all three.
 ## Phases
 
 | # | Code | Name | Status |
-|---|------|------|--------|
+| --- | ------ | ------ | -------- |
 | 1 | [RR](01-rr/README.md) | Rust Rewrite | Active — S2/SUBSTRATE next |
 | 2 | [FC](02-fc/README.md) | Feature Complete | TBD |
 | 3 | [UM](03-um/README.md) | Upstream Maintenance | TBD |

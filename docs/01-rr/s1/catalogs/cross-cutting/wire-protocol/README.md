@@ -91,7 +91,7 @@ flowchart TB
 ## Communication Class Summary
 
 | Class | Transport | Wire mechanism | Primary atoms |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | **Admin/Control** | HTTP/2 control stream, QUIC RPC stream | Cap'n Proto RPC (RegisterConnection, SendLocalConfiguration, GracefulShutdown) | [connection/control](../../../atoms/connection/control.md), [tunnelrpc/registration_client](../../../atoms/tunnelrpc/registration_client.md), [tunnelrpc/registration_server](../../../atoms/tunnelrpc/registration_server.md) |
 | **Configuration** | HTTP/2 config update, QUIC RPC | JSON body (HTTP/2) or Cap'n Proto UpdateConfiguration (QUIC) | [connection/http2](../../../atoms/connection/http2.md), [tunnelrpc/quic/cloudflared_client](../../../atoms/tunnelrpc/quic/cloudflared_client.md), [tunnelrpc/pogs/configuration_manager](../../../atoms/tunnelrpc/pogs/configuration_manager.md) |
 | **Session management** | QUIC RPC (v2) or datagram frame (v3) | Cap'n Proto Register/UnregisterUdpSession (v2), binary registration datagram (v3) | [tunnelrpc/quic/session_client](../../../atoms/tunnelrpc/quic/session_client.md), [quic/v3/datagram](../../../atoms/quic/v3/datagram.md), [quic/v3/muxer](../../../atoms/quic/v3/muxer.md) |
@@ -105,7 +105,7 @@ flowchart TB
 ## Intentional Catalog Overlap
 
 | Overlap catalog | Why overlap exists | Representative overlap atoms |
-|---|---|---|
+| --- | --- | --- |
 | [edge-interactions](../edge-interactions.md) | Edge interaction lifecycle covers registration and discovery from an interaction-topology perspective; this catalog covers the same from a wire-format and state-machine perspective. | [connection/control](../../../atoms/connection/control.md), [tunnelrpc/registration_client](../../../atoms/tunnelrpc/registration_client.md), [edgediscovery/edgediscovery](../../../atoms/edgediscovery/edgediscovery.md) |
 | [tunnels-transport](../tunnels-transport.md) | Transport catalog covers protocol family differences; this catalog covers wire-level framing and state machines within each family. | [connection/http2](../../../atoms/connection/http2.md), [connection/quic_connection](../../../atoms/connection/quic_connection.md), [connection/protocol](../../../atoms/connection/protocol.md) |
 | [capnp-rpc](../capnp-rpc.md) | Cap'n Proto catalog covers schema-to-implementation mapping; this catalog covers Cap'n Proto as wire framing within the broader protocol stack. | [tunnelrpc/quic/protocol](../../../atoms/tunnelrpc/quic/protocol.md), [tunnelrpc/pogs/quic_metadata_protocol](../../../atoms/tunnelrpc/pogs/quic_metadata_protocol.md) |

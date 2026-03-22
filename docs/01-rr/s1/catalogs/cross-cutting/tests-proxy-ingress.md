@@ -18,7 +18,7 @@ Source: [proxy/proxy\_test.go](https://github.com/cloudflare/cloudflared/blob/20
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestProxySingleOrigin` | HTTP, WebSocket, and SSE sub-tests verify single-origin proxy behavior |
 | `TestProxySSEAllData` | Regression: SSE stream delivers all data even when origin closes without final delimiter |
 | `TestProxyMultipleOrigins` | Hostname-based routing dispatches to `api`/`hello-world`/`health`/wildcard origins |
@@ -30,7 +30,7 @@ Source: [proxy/proxy\_test.go](https://github.com/cloudflare/cloudflared/blob/20
 The `TestConnections` test is the most comprehensive proxy test. It validates all supported connection type combinations:
 
 | Sub-Test | Eyeball → cfd | cfd → Origin | Key Assertion |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `ws-ws` | WebSocket | WebSocket | Bidirectional echo |
 | `tcp-tcp` | TCP | TCP | Bidirectional echo |
 | `tcp-ws` | TCP | WebSocket | Cross-protocol proxying |
@@ -43,7 +43,7 @@ The `TestConnections` test is the most comprehensive proxy test. It validates al
 ### Mock Types
 
 | Type | Purpose |
-|---|---|
+| --- | --- |
 | `mockHTTPRespWriter` | Captures HTTP response for assertion |
 | `mockWSRespWriter` | Captures WebSocket upgrade response |
 | `mockSSERespWriter` | Captures SSE event stream |
@@ -82,7 +82,7 @@ Source: [ingress/ingress\_test.go](https://github.com/cloudflare/cloudflared/blo
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestParseUnixSocket` | Unix socket service parsed with `http` scheme |
 | `TestParseUnixSocketTLS` | Unix+TLS socket service parsed with `https` scheme |
 | `TestParseIngressNilConfig` | Nil config returns error |
@@ -102,7 +102,7 @@ Source: [ingress/ingress\_test.go](https://github.com/cloudflare/cloudflared/blo
 **Service type mapping**: The test validates that CLI flags correctly map to internal service types:
 
 | URL/Flag | Internal Service Type |
-|---|---|
+| --- | --- |
 | `http://localhost` | `httpService` |
 | `https://localhost` | `httpService` (with TLS) |
 | `ssh://localhost` | `tcpOverWSService` (port 22) |
@@ -125,7 +125,7 @@ Source: [ingress/rule\_test.go](https://github.com/cloudflare/cloudflared/blob/2
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `Test_rule_matches` | 12 cases: hostname matching, unicode/punycode equivalence, wildcard patterns, path regex, multi-subdomain wildcards, wildcard dot requirement |
 | `TestStaticHTTPStatus` | Static HTTP status service returns configured status code |
 | `TestMarshalJSON` | Rule serializes to JSON correctly |
@@ -135,7 +135,7 @@ Source: [ingress/rule\_test.go](https://github.com/cloudflare/cloudflared/blob/2
 **Wildcard matching rules**:
 
 | Pattern | Input | Matches? |
-|---|---|---|
+| --- | --- | --- |
 | `*.example.com` | `foo.example.com` | Yes |
 | `*.example.com` | `example.com` | No (dot required) |
 | `*.example.com` | `foo.bar.example.com` | Yes (multi-subdomain) |
@@ -157,7 +157,7 @@ Source: [ingress/origin\_proxy\_test.go](https://github.com/cloudflare/cloudflar
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestRawTCPServiceEstablishConnection` | rawTCPService fails when origin not listening |
 | `TestTCPOverWSServiceEstablishConnection` | Table-driven: specific TCP service connects; bastion connects via header; bastion without header fails; all fail when origin stops |
 | `TestHTTPServiceHostHeaderOverride` | `HTTPHostHeader` config overrides request Host; `X-Forwarded-Host` preserves original |
@@ -182,7 +182,7 @@ Source: [ingress/origin\_icmp\_proxy\_test.go](https://github.com/cloudflare/clo
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestICMPRouterEcho` | ICMP echo request/reply round-trip via ICMPRouter for both IPv4 and IPv6 |
 | `TestTraceICMPRouterEcho` | Traced ICMP produces request span + reply + reply span; second request NOT traced |
 | `TestConcurrentRequestsToSameDst` | 5 concurrent ping flows to same destination with different echo IDs all succeed |
@@ -197,7 +197,7 @@ Source: [ingress/origin\_icmp\_proxy\_test.go](https://github.com/cloudflare/clo
 ### Mock Types
 
 | Type | Purpose |
-|---|---|
+| --- | --- |
 | `mockMuxer` | Channels for capturing packets sent from cfd to edge |
 
 ### Atom Links
@@ -213,7 +213,7 @@ Source: [ingress/origin\_connection\_test.go](https://github.com/cloudflare/clou
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestStreamTCPConnection` | TCP connection streams data bidirectionally between eyeball and origin with echo |
 | `TestDefaultStreamWSOverTCPConnection` | WebSocket-over-TCP streams using DefaultStreamHandler |
 | `TestSocksStreamWSOverTCPConnection` | SOCKS5 proxying wraps HTTP requests through WS-over-TCP across multiple status codes |
@@ -222,7 +222,7 @@ Source: [ingress/origin\_connection\_test.go](https://github.com/cloudflare/clou
 ### Mock Types
 
 | Type | Purpose |
-|---|---|
+| --- | --- |
 | `wsEyeball` | Wraps `net.Conn` with WebSocket read/write |
 | `readWriter` | Simple I/O adapter |
 | `echoWSOrigin` | WebSocket echo server via `httptest.NewServer` |
@@ -241,7 +241,7 @@ Source: [ingress/origin\_service\_test.go](https://github.com/cloudflare/cloudfl
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestAddPortIfMissing` | Appends default SSH port (22) to URL host when port is absent |
 
 ### Atom Links
@@ -281,13 +281,13 @@ Source: [ingress/packet\_router\_test.go](https://github.com/cloudflare/cloudfla
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestRouterReturnTTLExceed` | Router replies with ICMP Time Exceeded for both IPv4 and IPv6 packets with TTL=1 |
 
 ### Mock Types
 
 | Type | Purpose |
-|---|---|
+| --- | --- |
 | `mockMuxer` | Channels for `cfdToEdge`/`edgeToCfd` with `SendPacket`/`ReceivePacket` |
 | `routerEnabledChecker` | Atomic bool controlling router enable state |
 
@@ -352,7 +352,7 @@ Source: [orchestration/orchestrator\_test.go](https://github.com/cloudflare/clou
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestUpdateConfiguration` | JSON config deserialization, proxy update, version check, noop for old version, invalid JSON handling |
 | `TestUpdateConfiguration_FromMigration` | Version 0 for local→remote config migration |
 | `TestUpdateConfiguration_WithoutIngressRule` | Empty config → default rule generated |
@@ -383,7 +383,7 @@ Source: [orchestration/config\_test.go](https://github.com/cloudflare/cloudflare
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestNewLocalConfig_MarshalJSON` | LocalConfig JSON round-trip preserves ingress rules and warp-routing defaults |
 
 ### Atom Links
@@ -399,7 +399,7 @@ Source: [supervisor/tunnel\_test.go](https://github.com/cloudflare/cloudflared/b
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestWaitForBackoffFallback` | Protocol fallback state machine: QUIC→HTTP2 after max retries, reset behavior, `quic.IdleTimeoutError` immediate fallback, no-fallback-available exhaustion |
 
 ### Key Behavioral Details
@@ -427,7 +427,7 @@ Source: [supervisor/pqtunnels\_test.go](https://github.com/cloudflare/cloudflare
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestCurvePreferences` | 8 cases: FIPS/non-FIPS × Prefer/Strict PQ × various current curves → resolved curve preference |
 | `TestSupportedCurvesNegotiation` | Actual TLS handshake verifies that the selected curve preferences work end-to-end |
 
@@ -436,7 +436,7 @@ Source: [supervisor/pqtunnels\_test.go](https://github.com/cloudflare/cloudflare
 **Post-quantum curve matrix**:
 
 | Mode | Current Curve | FIPS | Expected |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Prefer | P256 | No | [X25519Kyber768, P256] |
 | Prefer | P256 | Yes | [P256Kyber768, P256] |
 | Strict | P256 | No | [X25519Kyber768] |
@@ -459,7 +459,7 @@ Source: [socks/request\_test.go](https://github.com/cloudflare/cloudflared/blob/
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestValidConnectRequest` | Well-formed SOCKS5 connect request (IPv4) parses successfully |
 | `TestValidBindRequest` | Well-formed SOCKS5 bind request (IPv6) parses successfully |
 | `TestValidAssociateRequest` | Well-formed SOCKS5 associate request parses successfully |
@@ -483,7 +483,7 @@ Source: [socks/request\_handler\_test.go](https://github.com/cloudflare/cloudfla
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestUnsupportedBind` | BIND command → `commandNotSupported` |
 | `TestUnsupportedAssociate` | ASSOCIATE command → `commandNotSupported` |
 | `TestHandleConnect` | CONNECT to unreachable host → `connectionRefused` |
@@ -502,7 +502,7 @@ Source: [socks/connection\_handler\_test.go](https://github.com/cloudflare/cloud
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestSocksConnection` | End-to-end integration: SOCKS5 proxy routes HTTP GET through to backend, returns valid JSON response |
 
 ### Atom Links
@@ -518,7 +518,7 @@ Source: [carrier/carrier\_test.go](https://github.com/cloudflare/cloudflared/blo
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestStartClient` | Client connects to WebSocket server, round-trips a message |
 | `TestStartServer` | Server accepts TCP connection, proxies data through WebSocket, echoes back |
 | `TestIsAccessResponse` | Identifies Cloudflare Access redirect responses (valid `/cdn-cgi/access/login/` location header) |
@@ -527,7 +527,7 @@ Source: [carrier/carrier\_test.go](https://github.com/cloudflare/cloudflared/blo
 ### Mock Types
 
 | Type | Purpose |
-|---|---|
+| --- | --- |
 | `testStreamer` | Locked `bytes.Buffer` implementing `io.ReadWriter` |
 
 ### Atom Links
@@ -543,7 +543,7 @@ Source: [carrier/websocket\_test.go](https://github.com/cloudflare/cloudflared/b
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestWebsocketHeaders` | websocketHeaders strips protocol-level WS headers but preserves application headers |
 | `TestServe` | Full TLS WebSocket connection to hello-world server echoes 1000 random-sized binary messages |
 | `TestWebsocketWrapper` | GorillaConn wrapper supports full and partial reads (1 byte + 2 bytes from 3-byte message) |
@@ -561,7 +561,7 @@ Source: [carrier/websocket\_test.go](https://github.com/cloudflare/cloudflared/b
 ## Contract Density Summary
 
 | File | Tests | Benchmarks | Fuzz | Key Contracts |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | proxy/proxy\_test.go | ~10 | 0 | 0 | 8 connection type permutations, SSE regression, error propagation |
 | ingress/ingress\_test.go | ~11 | 1 | 0 | Rule parsing, service type mapping, YAML deserialization |
 | ingress/rule\_test.go | 3 | 0 | 0 | Wildcard matching, punycode normalization |

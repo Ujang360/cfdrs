@@ -77,7 +77,7 @@ sequenceDiagram
 ## Transport Families
 
 | Family | Primary behavior | Representative atoms |
-|---|---|---|
+| --- | --- | --- |
 | HTTP2 edge transport | Stream-based serving using HTTP2 request/response semantics, websocket/control upgrade handling, and config update path integration. | [connection/http2](../../atoms/connection/http2.md), [connection/control](../../atoms/connection/control.md), [connection/header](../../atoms/connection/header.md), [connection/json](../../atoms/connection/json.md) |
 | QUIC stream transport | QUIC connection dial and stream accept loop with request dispatch and control stream handling. | [connection/quic](../../atoms/connection/quic.md), [connection/quic_connection](../../atoms/connection/quic_connection.md), [connection/control](../../atoms/connection/control.md), [quic/safe_stream](../../atoms/quic/safe_stream.md) |
 | QUIC datagram v2 | Datagram sessions with per-session origin dial and explicit registration/unregistration through tunnelrpc session control. | [connection/quic_datagram_v2](../../atoms/connection/quic_datagram_v2.md), [datagramsession/session](../../atoms/datagramsession/session.md), [tunnelrpc/quic/session_client](../../atoms/tunnelrpc/quic/session_client.md) |
@@ -87,7 +87,7 @@ sequenceDiagram
 ## Transport Difference Matrix
 
 | Aspect | HTTP2 path | QUIC stream path | QUIC datagram v2 | QUIC datagram v3 |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | Session model | Request/response stream with upgrade handling | Bidirectional QUIC streams + control stream | Datagram session object per registered UDP session | Request-ID session-manager/muxer model |
 | Startup entrypoint | `serveHTTP2` and HTTP2 connection server | `serveQUIC` and `quicConnection.Serve` | `NewDatagramV2Connection` with session serve loops | `NewDatagramV3Connection` backed by v3 manager/muxer |
 | Control-plane coupling | Control stream upgrade and configuration update route | QUIC control stream and request stream APIs | tunnelrpc session client manages register/unregister | v3 manager + datagram registration semantics |
@@ -100,7 +100,7 @@ Primary evidence: [supervisor/tunnel](../../atoms/supervisor/tunnel.md), [connec
 ## Protocol Selection and Policy Contracts
 
 | Surface | Contracted behavior |
-|---|---|
+| --- | --- |
 | Static selector | Honors explicit protocol choice from operator config/flags and uses deterministic fallback mapping rules. |
 | Remote/default selector | Uses edge percentage fetch and switch threshold to choose current protocol dynamically. |
 | PQ-aware path | `needPQ` modifies selector path and curve preference behavior toward PQ-capable transport profiles. |
@@ -112,7 +112,7 @@ Primary evidence: [connection/protocol](../../atoms/connection/protocol.md), [ed
 ## CLI and Config Overlap (Intentional)
 
 | Overlap surface | Transport relevance | Representative atoms |
-|---|---|---|
+| --- | --- | --- |
 | Transport flag ingestion | CLI/config layer maps operator intent (`protocol`, resolver and bind options, ingress transport tuning) into runtime transport configuration. | [cmd/cloudflared/tunnel/cmd](../../atoms/cmd/cloudflared/tunnel/cmd.md), [cmd/cloudflared/tunnel/configuration](../../atoms/cmd/cloudflared/tunnel/configuration.md) |
 | Tunnel startup orchestration | `StartServer` path creates supervisor and runtime transport handlers from merged config and token context. | [cmd/cloudflared/tunnel/cmd](../../atoms/cmd/cloudflared/tunnel/cmd.md), [supervisor/tunnel](../../atoms/supervisor/tunnel.md) |
 | Quick-tunnel shaping | Quick mode biases runtime defaults (for example QUIC defaulting when unset) and constrains HA transport behavior. | [cmd/cloudflared/tunnel/quick_tunnel](../../atoms/cmd/cloudflared/tunnel/quick_tunnel.md), [tunnels](tunnels.md) |
@@ -120,7 +120,7 @@ Primary evidence: [connection/protocol](../../atoms/connection/protocol.md), [ed
 ## PQ and FIPS Transport Constraints
 
 | Mode | Transport implication |
-|---|---|
+| --- | --- |
 | Non-FIPS strict/prefer PQ | PQ-capable curve sets prefer hybrid paths that bias QUIC-compatible transport behavior. |
 | FIPS strict/prefer PQ | Curve preference uses FIPS-constrained PQ/classical choices and still feeds transport negotiation policy. |
 | Non-PQ/default | Selector and fallback can include HTTP2-first/default decisions depending on account and edge policy inputs. |
@@ -171,7 +171,7 @@ Primary evidence: [supervisor/pqtunnels](../../atoms/supervisor/pqtunnels.md), [
 ## Upstream-Verified Transport Constants and Quirks
 
 | Constant or parameter | Value | Source | Significance |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `edgeH2TLSServerName` | `h2.cftunnel.com` | [connection/protocol.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/connection/protocol.go) | HTTP2 edge TLS SNI |
 | `edgeQUICServerName` | `quic.cftunnel.com` | [connection/protocol.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/connection/protocol.go) | QUIC edge TLS SNI |
 | QUIC ALPN next-protos | `["argotunnel"]` | [connection/protocol.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/connection/protocol.go) | Required ALPN for QUIC handshake |
@@ -185,7 +185,7 @@ Primary evidence: [supervisor/pqtunnels](../../atoms/supervisor/pqtunnels.md), [
 Three distinct protocol selector implementations exist at runtime:
 
 | Mode | Trigger | Behavior | Fallback |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Static | Explicit `--protocol quic` or `--protocol http2` | Fixed protocol, no fallback | None |
 | Default | `--protocol auto` with `--token` provided | Starts QUIC, runtime fallback to HTTP2 | QUIC → HTTP2 |
 | Remote | `--protocol auto` without `--token` | Percentage-based selection with FNV32a hash of account tag as switch threshold; refreshes at `ResolveTTL` cadence | Pool order: QUIC first, HTTP2 second |

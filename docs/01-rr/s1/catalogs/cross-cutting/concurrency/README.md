@@ -128,7 +128,7 @@ flowchart TB
 For a typical cloudflared process with `HAConnections = 4`, QUIC protocol, datagram v3, and M active UDP sessions:
 
 | Layer | Count formula | Typical (M=10) |
-|---|---|---|
+| --- | --- | --- |
 | Main + signal + systemd | 3 | 3 |
 | ICMP Router (ipv4 + ipv6) | 2 | 2 |
 | Supervisor loop | 1 | 1 |

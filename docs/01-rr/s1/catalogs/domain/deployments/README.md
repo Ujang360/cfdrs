@@ -97,7 +97,7 @@ flowchart LR
 ## Domain Map
 
 | Domain | Description | Representative atoms |
-|---|---|---|
+| --- | --- | --- |
 | Build and version embedding | Binary compilation, version linker vars, build info, FIPS gating | [cmd/cloudflared/main](../../../atoms/cmd/cloudflared/main.md), [cmd/cloudflared/cliutil/build_info](../../../atoms/cmd/cloudflared/cliutil/build_info.md), [fips/fips](../../../atoms/fips/fips.md), [fips/nofips](../../../atoms/fips/nofips.md) |
 | Service template engine | Common template generation, path resolution, service arg building | [cmd/cloudflared/service_template](../../../atoms/cmd/cloudflared/service_template.md), [cmd/cloudflared/common_service](../../../atoms/cmd/cloudflared/common_service.md), [cmd/cloudflared/generic_service](../../../atoms/cmd/cloudflared/generic_service.md) |
 | Linux service lifecycle | Systemd and SysV install/uninstall, config conflict detection, update timer | [cmd/cloudflared/linux_service](../../../atoms/cmd/cloudflared/linux_service.md) |
@@ -114,7 +114,7 @@ flowchart LR
 ## Key Deployment Contracts
 
 | Contract area | Deployment behavior |
-|---|---|
+| --- | --- |
 | Package-managed install sentinel | `postinst.sh` creates `.installedFromPackageManager`; `postrm.sh` removes it. Auto-updater checks both the sentinel file and the linker variable `BuiltForPackageManager`. |
 | Config file copy on service install | Linux `service install` copies user config to `/etc/cloudflared/config.yml` if paths differ; rejects install if a conflicting config already exists at the target path. |
 | Credential search order | Both origin cert and tunnel credentials iterate `DefaultConfigSearchDirectories()` with fixed filenames (`cert.pem`, `<uuid>.json`), falling back to error if not found in any location. |

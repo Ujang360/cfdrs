@@ -18,13 +18,13 @@ Source: [connection/connection\_test.go](https://github.com/cloudflare/cloudflar
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestShouldFlushHeaders` | Content-type determines header flushing: `text/event-stream`, `application/grpc`, `text/html; charset=utf-8` → flush; `application/json` → no flush |
 
 ### Mock Types
 
 | Type | Purpose |
-|---|---|
+| --- | --- |
 | `mockOriginProxy` | Configurable origin proxy returning static responses for HTTP, WebSocket, and TCP calls |
 | `mockOrchestrator` | Returns `mockOriginProxy` for any ingress rule lookup |
 | `mockConnectedFuse` | No-op connected/disconnected fuse for tunnel state |
@@ -32,7 +32,7 @@ Source: [connection/connection\_test.go](https://github.com/cloudflare/cloudflar
 ### Test Infrastructure
 
 | Helper | Purpose |
-|---|---|
+| --- | --- |
 | `wsEchoEndpoint` | WebSocket endpoint that echoes messages back |
 | `wsFlakyEndpoint` | WebSocket endpoint that randomly errors (for regression TUN-5184) |
 | `originRespEndpoint` | HTTP endpoint returning static status and body |
@@ -53,7 +53,7 @@ Source: [connection/http2\_test.go](https://github.com/cloudflare/cloudflared/bl
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestHTTP2ConfigurationSet` | Config update pushed via HTTP/2 PUT with JSON body; new version applied; old version rejected as no-op |
 | `TestServeHTTP` | HTTP/2 server handles ok/large\_file/400/500/error endpoints with correct status codes and bodies |
 | `TestServeWS` | WebSocket upgrade via HTTP/2 echoes messages; status 101 rewritten to 200 for HTTP/2 compliance |
@@ -88,7 +88,7 @@ Source: [connection/quic\_connection\_test.go](https://github.com/cloudflare/clo
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestQUICServer` | Table-driven: QUIC server correctly proxies HTTP (body echo), body streaming, WebSocket (echo), and TCP proxy types |
 | `TestBuildHTTPRequest` | Content-length, chunked transfer-encoding, and WebSocket body handling are correctly set in built requests |
 | `TestServeUDPSession` | V2 datagram sessions: closedByOrigin, closedByTimeout, and closedByRemote each produce correct close signals |
@@ -112,7 +112,7 @@ Source: [connection/quic\_connection\_test.go](https://github.com/cloudflare/clo
 ### Mock Types
 
 | Type | Purpose |
-|---|---|
+| --- | --- |
 | `mockOriginProxyWithRequest` | Captures HTTP requests for assertion |
 | `mockSessionRPCServer` | Configurable register/unregister UDP session handler |
 | `fakeControlStream` | No-op control stream for QUIC server |
@@ -133,7 +133,7 @@ Source: [connection/header\_test.go](https://github.com/cloudflare/cloudflared/b
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestSerializeHeaders` | HTTP headers round-trip through serialize → deserialize, preserving control characters, empty keys, special delimiters |
 | `TestSerializeNoHeaders` | Empty header set serializes/deserializes to empty |
 | `TestDeserializeMalformed` | Four malformed serialized headers (missing value, control chars in key, truncated) are rejected with errors |
@@ -157,7 +157,7 @@ Source: [connection/observer\_test.go](https://github.com/cloudflare/cloudflared
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestSendUrl` | Observer URL notification increments a Prometheus counter for the hostname |
 | `TestRegisterServerLocation` | Concurrent writes (20 goroutines) to server location map are safe |
 | `TestObserverEventsDontBlock` | Sending more events than the channel buffer never blocks the caller |
@@ -169,7 +169,7 @@ Source: [connection/observer\_test.go](https://github.com/cloudflare/cloudflared
 ### Mock Types
 
 | Type | Purpose |
-|---|---|
+| --- | --- |
 | `eventCollectorSink` | Collects events in a mutex-guarded slice |
 | `EventSinkFunc` | Inline callback adapter to create a blocking sink |
 
@@ -187,7 +187,7 @@ Source: [connection/protocol\_test.go](https://github.com/cloudflare/cloudflared
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestNewProtocolSelector` | Table-driven: protocol selection respects user choice, auto-selects QUIC, forces PQ to QUIC, falls back to HTTP2, rejects unknown protocols |
 | `TestAutoProtocolSelectorRefresh` | Auto-mode dynamically switches QUIC ↔ HTTP2 as remote percentage fetcher changes; sticks to last value on error |
 | `TestHTTP2ProtocolSelectorRefresh` | Explicit HTTP2 selection never switches away, regardless of remote fetcher |
@@ -208,7 +208,7 @@ This is important for the Rust port because the selector affects supervisor retr
 ### Mock Types
 
 | Type | Purpose |
-|---|---|
+| --- | --- |
 | `dynamicMockFetcher` | Mutable percentage + error for testing state transitions |
 | `mockFetcher` function | Returns configurable `PercentageFetcher` closure |
 
@@ -225,7 +225,7 @@ Source: [connection/quic\_datagram\_v2\_test.go](https://github.com/cloudflare/c
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestRateLimitOnNewDatagramV2UDPSession` | Flow limiter `ErrTooManyActiveFlows` rejects session registration; `Release()` is never called on failure |
 
 ### Key Behavioral Details
@@ -235,7 +235,7 @@ Source: [connection/quic\_datagram\_v2\_test.go](https://github.com/cloudflare/c
 ### Mock Types
 
 | Type | Purpose |
-|---|---|
+| --- | --- |
 | `mockQuicConnection` | Manual mock of full `quic.Connection` interface |
 | `mocks.NewMockLimiter` | gomock-generated flow limiter mock |
 
@@ -252,7 +252,7 @@ Source: [quic/datagram\_test.go](https://github.com/cloudflare/cloudflared/blob/
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestSuffixThenRemoveSessionID` | Session ID appended to / extracted from message payload round-trips correctly |
 | `TestRemoveSessionIDError` | Too-short message rejects session ID extraction |
 | `TestSuffixSessionIDError` | Max-sized payload accepts suffix; one byte over max fails |
@@ -278,7 +278,7 @@ Source: [quic/safe\_stream\_test.go](https://github.com/cloudflare/cloudflared/b
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestSafeStreamClose` | 1000 concurrent exchanges of 10 messages each over SafeStreamCloser-wrapped QUIC streams; half-closed streams must not break other streams in the session |
 
 ### Key Behavioral Details
@@ -298,7 +298,7 @@ Source: [tunnelrpc/pogs/registration\_server\_test.go](https://github.com/cloudf
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestMarshalConnectionOptions` | Cap'n Proto round-trip: marshal → unmarshal `ConnectionOptions` preserves all fields |
 | `TestConnectionRegistrationRPC` | Full RPC flow: success returns `ConnectionDetails`; error propagates; `RetryableError` includes delay |
 
@@ -315,7 +315,7 @@ Source: [tunnelrpc/pogs/registration\_server\_test.go](https://github.com/cloudf
 ### Mock Types
 
 | Type | Purpose |
-|---|---|
+| --- | --- |
 | `testConnectionRegistrationServer` | Configurable `RegisterConnection`/`UnregisterConnection` returning preset details/errors |
 
 ### Atom Links
@@ -331,7 +331,7 @@ Source: [tunnelrpc/quic/request\_server\_stream\_test.go](https://github.com/clo
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestConnectRequestData` | Write + read connect request preserves hostname, connection type, and metadata |
 | `TestConnectResponseMeta` | Write + read connect response preserves metadata; error clears other fields |
 | `TestRegisterUdpSession` | Full RPC: register/unregister UDP sessions; wrong sessionID rejected; with/without trace context |
@@ -340,7 +340,7 @@ Source: [tunnelrpc/quic/request\_server\_stream\_test.go](https://github.com/clo
 ### Mock Types
 
 | Type | Purpose |
-|---|---|
+| --- | --- |
 | `mockSessionRPCServer` | Validates sessionID, IP, port, trace context fields |
 | `mockConfigRPCServer` | Validates version and config bytes |
 | `mockRPCStream` | `io.Pipe` pair simulating bidirectional stream |
@@ -359,7 +359,7 @@ Source: [tlsconfig/tlsconfig\_test.go](https://github.com/cloudflare/cloudflared
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestGetFromEmptyConfig` | Empty TLS parameters yield config with no certs, no CAs, CurveP256 default |
 | `TestGetConfig` | Full parameters produce matching certs, client/root CA pools, and custom curve |
 | `TestCertReloader` | CertReloader dynamically returns correct cert via `GetCertificate` callback |
@@ -377,7 +377,7 @@ Source: [websocket/websocket\_test.go](https://github.com/cloudflare/cloudflared
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestGenerateAcceptKey` | RFC 6455 `Sec-WebSocket-Accept` key generation produces correct value from standard test vector |
 
 ### Key Behavioral Details
@@ -393,7 +393,7 @@ Uses the RFC 6455 test vector: key `dGhlIHNhbXBsZSBub25jZQ==` must produce accep
 ## Contract Density Summary
 
 | File | Tests | Benchmarks | Fuzz | Key Contracts |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | connection/connection\_test.go | 1 | 0 | 0 | Header flush decision |
 | connection/http2\_test.go | 7 | 2 | 0 | Registration lifecycle, config update, graceful shutdown, TUN-5184 regression |
 | connection/quic\_connection\_test.go | 7 | 0 | 0 | 4 proxy types via QUIC, UDP port reuse, session close semantics |

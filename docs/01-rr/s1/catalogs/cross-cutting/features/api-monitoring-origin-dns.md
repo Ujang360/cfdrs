@@ -11,7 +11,7 @@ The dashboard and API gateway interact with cloudflared through two channels: th
 All tunnel-management operations go through the cfapi client which wraps Cloudflare's v4 API.
 
 | Resource | Operations | Atoms |
-|---|---|---|
+| --- | --- | --- |
 | Tunnel | Create, Get, List, Delete, Token, ManagementToken, CleanupConnections | [cfapi/tunnel](../../../atoms/cfapi/tunnel.md), [cfapi/tunnel_filter](../../../atoms/cfapi/tunnel_filter.md) |
 | IP Route | Add, Delete, List, Get | [cfapi/ip_route](../../../atoms/cfapi/ip_route.md), [cfapi/ip_route_filter](../../../atoms/cfapi/ip_route_filter.md) |
 | Virtual Network | Create, Delete, List, Update | [cfapi/virtual_network](../../../atoms/cfapi/virtual_network.md), [cfapi/virtual_network_filter](../../../atoms/cfapi/virtual_network_filter.md) |
@@ -25,7 +25,7 @@ Deeper API contract documentation: [upstream-api-contracts](../upstream-api-cont
 The management service is an HTTP server embedded in each connector, accessible through the edge management tunnel on a configurable hostname (default: `management.argotunnel.com`). Requests are authenticated via scoped JWT tokens obtained from the cfapi management-token endpoint.
 
 | Endpoint | Method | Purpose | Authentication |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `/ping` | GET, HEAD | Liveness check. | Access token query param. |
 | `/logs` | GET (WebSocket) | Live log streaming with filters. | Access token → JWT claims → actor. |
 | `/host_details` | GET | Returns connector ID, private IP, hostname/label. | Access token query param. |
@@ -46,7 +46,7 @@ Primary evidence: [management/service](../../../atoms/management/service.md), [m
 When `TunnelIsRemotelyManaged` is `true` in the registration response, the edge can push configuration updates to the connector via the orchestrator.
 
 | Contract | Detail | Atoms |
-|---|---|---|
+| --- | --- | --- |
 | Config update channel | `Orchestrator.UpdateConfig(version, configBytes)` | [orchestration/orchestrator](../../../atoms/orchestration/orchestrator.md), [orchestration/config](../../../atoms/orchestration/config.md) |
 | Local config export | Serialized JSON sent to edge via `SendLocalConfiguration` | [tunnelrpc/pogs/configuration_manager](../../../atoms/tunnelrpc/pogs/configuration_manager.md) |
 | Config change watch | File watcher for local YAML changes | [watcher/file](../../../atoms/watcher/file.md) |
@@ -60,7 +60,7 @@ External monitoring systems interact with cloudflared through Prometheus-compati
 The metrics listener exposes a Prometheus `/metrics` endpoint on a configurable address (default: `localhost:` with known-port fallback).
 
 | Aspect | Detail | Atoms |
-|---|---|---|
+| --- | --- | --- |
 | Listener setup | `CreateMetricsListener` with known-address fallback | [metrics/metrics](../../../atoms/metrics/metrics.md), [metrics/config](../../../atoms/metrics/config.md) |
 | Connection metrics | Tunnel registration counts, protocol distribution, server locations | [connection/metrics](../../../atoms/connection/metrics.md) |
 | Supervisor metrics | Tunnel active/reconnecting counts | [supervisor/metrics](../../../atoms/supervisor/metrics.md) |
@@ -76,7 +76,7 @@ The metrics listener exposes a Prometheus `/metrics` endpoint on a configurable 
 The readiness server provides health-check endpoints that report whether at least one tunnel connection is active.
 
 | Endpoint | Behavior | Atom |
-|---|---|---|
+| --- | --- | --- |
 | `/ready` | Returns 200 when connected, 503 when not. Uses `ConnTracker` state. | [metrics/readiness](../../../atoms/metrics/readiness.md) |
 | ConnTracker | Observes connection events and maintains active-connection state. | [tunnelstate/conntracker](../../../atoms/tunnelstate/conntracker.md) |
 
@@ -85,7 +85,7 @@ The readiness server provides health-check endpoints that report whether at leas
 The diagnostic subsystem exposes structured data about system state, tunnel state, and CLI configuration.
 
 | Handler | Path | Response | Atom |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | System information | `/diag/system` | OS version, memory, disk info (platform-specific collector). | [diagnostic/handlers](../../../atoms/diagnostic/handlers.md), [diagnostic/diagnostic](../../../atoms/diagnostic/diagnostic.md) |
 | Tunnel state | `/diag/tunnel` | Tunnel ID, connector ID, active connections, ICMP sources. | [diagnostic/handlers](../../../atoms/diagnostic/handlers.md) |
 | Configuration | `/diag/configuration` | Non-secret CLI flags as JSON. | [diagnostic/handlers](../../../atoms/diagnostic/handlers.md) |
@@ -106,7 +106,7 @@ Origin services are the local applications that cloudflared proxies traffic to. 
 Incoming requests from the edge are matched against an ordered list of ingress rules. Each rule specifies a hostname pattern, path regex, and an origin service target.
 
 | Concept | Detail | Atoms |
-|---|---|---|
+| --- | --- | --- |
 | Rule set | Ordered list with hostname glob + path regex → service | [ingress/ingress](../../../atoms/ingress/ingress.md), [ingress/rule](../../../atoms/ingress/rule.md) |
 | Origin service types | HTTP(S), WebSocket, TCP, Unix socket, hello-world, bastion | [ingress/origin_service](../../../atoms/ingress/origin_service.md) |
 | Origin config | `originRequest` block with timeouts, TLS, headers, proxy settings | [ingress/config](../../../atoms/ingress/config.md) |
@@ -118,7 +118,7 @@ Deeper ingress documentation: [ingress](../ingress.md).
 The proxy layer handles request/response forwarding between the tunnel connection and origin services.
 
 | Protocol | Behavior | Atoms |
-|---|---|---|
+| --- | --- | --- |
 | HTTP proxy | Standard request/response with header canonicalization, flushing for SSE/gRPC | [proxy/proxy](../../../atoms/proxy/proxy.md) |
 | WebSocket proxy | Protocol upgrade → bidirectional byte stream | [websocket/websocket](../../../atoms/websocket/websocket.md), [websocket/connection](../../../atoms/websocket/connection.md) |
 | TCP proxy | Raw TCP byte stream via `ReadWriteAcker` | [connection/connection](../../../atoms/connection/connection.md), [stream/stream](../../../atoms/stream/stream.md) |
@@ -134,7 +134,7 @@ Primary evidence: [hello/hello](../../../atoms/hello/hello.md).
 ### Origin Connection Management
 
 | Aspect | Detail | Atoms |
-|---|---|---|
+| --- | --- | --- |
 | Origin dialing | HTTP transport with configurable timeouts, keep-alive, happy-eyeballs | [ingress/origin_dialer](../../../atoms/ingress/origin_dialer.md) |
 | Connection pooling | Idle connection limits and timeout management | [ingress/origin_connection](../../../atoms/ingress/origin_connection.md) |
 | Origin TLS | Custom CA pool, server-name override, TLS verification toggle | [ingress/origin_proxy](../../../atoms/ingress/origin_proxy.md) |
@@ -149,13 +149,13 @@ DNS interactions drive both feature-flag rollout and edge-address discovery. clo
 Feature rollout is controlled via a DNS TXT record at `cfd-features.argotunnel.com`. The record payload is a JSON object parsed into `featuresRecord`.
 
 | Field | Type | Meaning |
-|---|---|---|
+| --- | --- | --- |
 | `dv3_2` | `uint32` | Percentage of accounts (0–100) that should use datagram v3. |
 
 The feature selector hashes the account tag with FNV-32a and compares `hash % 100 < percentage` to determine eligibility. Deprecated fields (`pq`, `dv3`, `dv3_1`) are ignored.
 
 | Aspect | Detail | Atoms |
-|---|---|---|
+| --- | --- | --- |
 | DNS resolver | `net.DefaultResolver.LookupTXT` with 10-second timeout | [features/selector](../../../atoms/features/selector.md) |
 | Refresh cadence | Every `defaultLookupFreq` (1 hour) via background goroutine | [features/selector](../../../atoms/features/selector.md) |
 | Feature dedup | `dedupAndRemoveFeatures` strips deprecated and duplicate entries | [features/features](../../../atoms/features/features.md) |
@@ -165,7 +165,7 @@ The feature selector hashes the account tag with FNV-32a and compares `hash % 10
 Edge IP addresses are resolved via DNS SRV records to discover available Cloudflare edge servers for tunnel connections.
 
 | Aspect | Detail | Atoms |
-|---|---|---|
+| --- | --- | --- |
 | SRV resolution | Queries for edge server addresses by region and IP version | [edgediscovery/edgediscovery](../../../atoms/edgediscovery/edgediscovery.md), [edgediscovery/allregions/discovery](../../../atoms/edgediscovery/allregions/discovery.md) |
 | Region management | Address pools organized by region with used-by tracking | [edgediscovery/allregions/region](../../../atoms/edgediscovery/allregions/region.md), [edgediscovery/allregions/regions](../../../atoms/edgediscovery/allregions/regions.md) |
 | Address selection | Connectivity-aware address rotation with error tracking | [edgediscovery/allregions/address](../../../atoms/edgediscovery/allregions/address.md), [edgediscovery/allregions/usedby](../../../atoms/edgediscovery/allregions/usedby.md) |

@@ -18,7 +18,7 @@ Observability for this catalog includes:
 ## Observability Domains
 
 | Domain | Description | Representative atoms |
-|---|---|---|
+| --- | --- | --- |
 | Logging | Logger construction, formatting, and specialized logging facades. | [logger/create](../../atoms/logger/create.md), [logger/configuration](../../atoms/logger/configuration.md), [proxy/logger](../../atoms/proxy/logger.md), [management/logger](../../atoms/management/logger.md), [supervisor/conn_aware_logger](../../atoms/supervisor/conn_aware_logger.md) |
 | Tracing | Trace context parsing, identity handling, and OTEL exporter/propagation paths. | [tracing/tracing](../../atoms/tracing/tracing.md), [tracing/client](../../atoms/tracing/client.md), [tracing/identity](../../atoms/tracing/identity.md) |
 | Diagnostics | System, network, and log collection orchestration and diagnostic handlers. | [diagnostic/diagnostic](../../atoms/diagnostic/diagnostic.md), [diagnostic/handlers](../../atoms/diagnostic/handlers.md), [diagnostic/system_collector](../../atoms/diagnostic/system_collector.md), [diagnostic/network/collector](../../atoms/diagnostic/network/collector.md), [diagnostic/log_collector](../../atoms/diagnostic/log_collector.md) |
@@ -71,7 +71,7 @@ flowchart LR
 Upstream/logstream behavior has explicit contracts and output formats in the covered atoms:
 
 | Contract surface | Evidence atom | Contract and format specifics |
-|---|---|---|
+| --- | --- | --- |
 | Writer contract | [management/logger](../../atoms/management/logger.md) | Implements `Write(p []byte)` and `WriteLevel(level, p)` with structured event parsing via `parseZerologEvent(p []byte) -> (*Log, error)`. |
 | Stream payload type | [cmd/cloudflared/tail/cmd](../../atoms/cmd/cloudflared/tail/cmd.md) | Tail stream handlers consume `*management.Log`; rendering functions split output into `printLine` (human-readable line format) and `printJSON` (JSON format). |
 | Filter contract | [cmd/cloudflared/tail/cmd](../../atoms/cmd/cloudflared/tail/cmd.md) | `parseFilters(c *cli.Context) -> (*management.StreamingFilters, error)` defines CLI-to-stream filter shaping before upstream subscription. |
@@ -91,7 +91,7 @@ Trace context enters cloudflared via incoming request headers (W3C `traceparent`
 Primary evidence atoms: [tracing/tracing](../../atoms/tracing/tracing.md), [tracing/identity](../../atoms/tracing/identity.md).
 
 | Surface | Contract |
-|---|---|
+| --- | --- |
 | Identity extraction | `tracing/identity` parses trace context from HTTP headers and materializes a `TracingIdentity` with span context and attribute propagation. |
 | Propagation scope | Trace context is forwarded through proxy request chains and RPC session registration calls (session register carries trace context as a parameter). |
 | Exporter lifecycle | `tracing/client` manages OTEL exporter construction and shutdown with context-bounded flush semantics. |
@@ -121,7 +121,7 @@ Diagnostic collection orchestrates system, network, and log artifact gathering i
 ### Collection Orchestration
 
 | Collector | Scope | Platform adaptation |
-|---|---|---|
+| --- | --- | --- |
 | System collector | OS version, memory, disk, CPU info | Linux (`/proc`), macOS (`sysctl`), Windows (WMI) — see [diagnostic/system_collector_linux](../../atoms/diagnostic/system_collector_linux.md), [diagnostic/system_collector_macos](../../atoms/diagnostic/system_collector_macos.md), [diagnostic/system_collector_windows](../../atoms/diagnostic/system_collector_windows.md) |
 | Network collector | Connectivity checks, traceroute, DNS probes | Unix vs Windows socket strategies — see [diagnostic/network/collector_unix](../../atoms/diagnostic/network/collector_unix.md), [diagnostic/network/collector_windows](../../atoms/diagnostic/network/collector_windows.md) |
 | Log collector | Recent cloudflared log lines from runtime or container/host sources | Host files, Docker API, Kubernetes API — see [diagnostic/log_collector_host](../../atoms/diagnostic/log_collector_host.md), [diagnostic/log_collector_docker](../../atoms/diagnostic/log_collector_docker.md), [diagnostic/log_collector_kubernetes](../../atoms/diagnostic/log_collector_kubernetes.md) |
@@ -153,7 +153,7 @@ Primary evidence atoms: [diagnostic/diagnostic](../../atoms/diagnostic/diagnosti
 ### Collection Utility Contracts
 
 | Utility | Role |
-|---|---|
+| --- | --- |
 | [diagnostic/diagnostic_utils](../../atoms/diagnostic/diagnostic_utils.md) | Shared helpers for artifact naming, zip entry construction, and timeout-bounded collection. |
 | [diagnostic/system_collector_utils](../../atoms/diagnostic/system_collector_utils.md) | Cross-platform system info normalization (memory units, disk format, CPU model extraction). |
 | [diagnostic/log_collector_utils](../../atoms/diagnostic/log_collector_utils.md) | Log source detection heuristics and line-count bounded tail extraction. |

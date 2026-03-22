@@ -18,7 +18,7 @@ Source: [quic/v3/datagram\_test.go](https://github.com/cloudflare/cloudflared/bl
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestSessionRegistration_MarshalUnmarshal` | 8 cases: IPv4/IPv6/traced/max-values/payloads round-trip through marshal/unmarshal |
 | `TestSessionRegistration_MarshalBinary` | Idle hint overflow detection |
 | `TestTypeUnmarshalErrors` | Invalid length and invalid types rejected for all 4 datagram types |
@@ -44,7 +44,7 @@ Source: [quic/v3/datagram\_test.go](https://github.com/cloudflare/cloudflared/bl
 **Registration datagram encoding**:
 
 | Field | Size | Details |
-|---|---|---|
+| --- | --- | --- |
 | Type byte | 1 | `UDPSessionRegistrationType` |
 | RequestID | 16 | 128-bit identifier |
 | Destination | 6 (IPv4) or 18 (IPv6) | Address + port |
@@ -64,7 +64,7 @@ Source: [quic/v3/session\_test.go](https://github.com/cloudflare/cloudflared/blo
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestSessionNew` | Session construction initializes all fields correctly |
 | `TestSessionWrite` | 1280 iterations × 16 payloads each — session writes payload to origin correctly |
 | `TestSessionRead` | 1280 iterations × 16 payloads — session reads payload from origin, wraps in datagram format, sends to eyeball |
@@ -114,7 +114,7 @@ Source: [quic/v3/muxer\_test.go](https://github.com/cloudflare/cloudflared/blob/
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestDatagramConn_New` | DatagramConn construction with session manager, ICMP router, metrics |
 | `TestDatagramConn_SendUDPSessionDatagram` | Datagram sent via conn reaches the QUIC connection |
 | `TestDatagramConn_SendUDPSessionResponse` | Registration response reaches the QUIC connection with correct fields |
@@ -172,7 +172,7 @@ flowchart TD
 ### Mock Types
 
 | Type | Purpose |
-|---|---|
+| --- | --- |
 | `noopEyeball` | No-op DatagramConn for construction tests |
 | `mockEyeball` | Channels for capturing sent datagrams and responses |
 | `mockQuicConn` | Channels for send/receive datagram simulation |
@@ -194,7 +194,7 @@ Source: [quic/v3/manager\_test.go](https://github.com/cloudflare/cloudflared/blo
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestRegisterSession` | Register → retrieve → duplicate returns `ErrSessionAlreadyRegistered` → cross-conn duplicate returns `ErrSessionBoundToOtherConn` → unregister succeeds |
 | `TestGetSession_Empty` | Empty manager returns `ErrSessionNotFound` |
 | `TestRegisterSessionRateLimit` | Flow limiter `ErrTooManyActiveFlows` → returns `ErrSessionRegistrationRateLimited` |
@@ -204,7 +204,7 @@ Source: [quic/v3/manager\_test.go](https://github.com/cloudflare/cloudflared/blo
 **Registration error taxonomy**:
 
 | Error | Condition |
-|---|---|
+| --- | --- |
 | `ErrSessionAlreadyRegistered` | Same RequestID re-registered on same connection |
 | `ErrSessionBoundToOtherConn` | Same RequestID registered on different connection |
 | `ErrSessionNotFound` | GetSession for unknown RequestID |
@@ -223,7 +223,7 @@ Source: [quic/v3/request\_test.go](https://github.com/cloudflare/cloudflared/blo
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestRequestIDParsing` | Random 16-byte slice round-trips through `RequestIDFromSlice` → `MarshalBinaryTo` |
 | `TestRequestID_MarshalBinary` | `MarshalBinaryTo` + `UnmarshalBinary` round-trips to same `RequestID` |
 
@@ -256,7 +256,7 @@ Source: [datagramsession/session\_test.go](https://github.com/cloudflare/cloudfl
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestSessionCtxDone` | Session stops after context cancellation |
 | `TestCloseSession` | Session stops after `close()` method called |
 | `TestCloseIdle` | Session stops after idle timeout (100ms) with no read/write |
@@ -270,7 +270,7 @@ Source: [datagramsession/session\_test.go](https://github.com/cloudflare/cloudfl
 **Three session close paths**: The shared `testSessionReturns` helper tests:
 
 | Close Method | closedByRemote | Error |
-|---|---|---|
+| --- | --- | --- |
 | Context cancellation | `false` | `context.Canceled` |
 | Explicit `close()` | `false` | `errClosedSession` |
 | Idle timeout | `false` | `SessionIdleErr(duration)` |
@@ -292,7 +292,7 @@ Source: [datagramsession/manager\_test.go](https://github.com/cloudflare/cloudfl
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestManagerServe` | Full integration: manager registers sessions, bidirectionally relays messages, cleanly unregisters with remote-close reporting |
 | `TestTimeout` | Operations timeout with `context.DeadlineExceeded` when event loop not running |
 | `TestUnregisterSessionCloseSession` | Unregistering while serving causes `closedByRemote=true` |
@@ -301,7 +301,7 @@ Source: [datagramsession/manager\_test.go](https://github.com/cloudflare/cloudfl
 ### Mock Types
 
 | Type | Purpose |
-|---|---|
+| --- | --- |
 | `mockOrigin` | Read-echo loop validating expected payloads |
 | `mockQUICTransport` | Maps session IDs to payload channels |
 | `mockEyeballSession` | Sends N packets, receives N responses |
@@ -319,7 +319,7 @@ Source: [packet/packet\_test.go](https://github.com/cloudflare/cloudflared/blob/
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestNewICMPTTLExceedPacket` | TTL-exceeded ICMP packet: router IP as src, original src as dst, DefaultTTL, truncation at MTU, round-trip encode→decode |
 | `TestChecksum` | ICMPv6 echo encodes with correct checksum value (`0xff96`) |
 
@@ -340,7 +340,7 @@ Source: [packet/decoder\_test.go](https://github.com/cloudflare/cloudflared/blob
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestDecodeIP` | IP decoder decodes IPv4 and IPv6 UDP packets; ICMP decoder rejects them |
 | `TestDecodeICMP` | ICMP decoder handles ICMPv4 time-exceeded, ICMPv4 echo, ICMPv6 dest-unreachable, ICMPv6 echo; validates checksum |
 | `TestDecodeBadPackets` | Both decoders reject wrong IP version, non-packet bytes, zero-length input |
@@ -350,7 +350,7 @@ Source: [packet/decoder\_test.go](https://github.com/cloudflare/cloudflared/blob
 ### Mock Types
 
 | Type | Purpose |
-|---|---|
+| --- | --- |
 | `UDP` struct | Test-only type with `SrcPort`/`DstPort` + `EncodeLayers()` |
 
 ### Atom Links
@@ -366,14 +366,14 @@ Source: [packet/funnel\_test.go](https://github.com/cloudflare/cloudflared/blob/
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestFunnelRegistration` | `GetOrRegister` creates new funnels, returns existing on no-replace, replaces and closes old on replace, propagates factory errors |
 | `TestFunnelUnregister` | `Unregister` closes and removes funnels; unregistering replaced funnel returns false; unregistering current funnel returns true |
 
 ### Mock Types
 
 | Type | Purpose |
-|---|---|
+| --- | --- |
 | `mockFunnelUniPipe` | Channel-based unidirectional pipe |
 | `testFunnelID` | Type/String identifier |
 | `testFunnel` | Close/Equal/LastActive/UpdateLastActive with `closed` flag |
@@ -391,7 +391,7 @@ Source: [flow/limiter\_test.go](https://github.com/cloudflare/cloudflared/blob/2
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestFlowLimiter_Unlimited` | Limiter with limit=0 allows unlimited acquisitions |
 | `TestFlowLimiter_Limited` | Limiter with limit=N rejects (N+1)th acquire with `ErrTooManyActiveFlows` |
 | `TestFlowLimiter_AcquireAndReleaseFlow` | Release allows re-acquisition; over-release does not grant extra capacity |
@@ -416,7 +416,7 @@ Source: [stream/stream\_test.go](https://github.com/cloudflare/cloudflared/blob/
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestPipeBidirectionalFinishBothSides` | Closing both reader sides → clean exit |
 | `TestPipeBidirectionalFinishOneSideTimeout` | Closing only one reader side → timeout error |
 | `TestPipeBidirectionalClosingWriteBothSidesAlsoExists` | CloseWrite both sides + write to readers → clean exit |
@@ -436,7 +436,7 @@ This is critical for the Rust port's `tokio::io::copy_bidirectional` equivalent.
 ### Mock Types
 
 | Type | Purpose |
-|---|---|
+| --- | --- |
 | `mockedStream` | Channel-based `Read`/`Write`/`CloseWrite` with helpers |
 
 ### Atom Links
@@ -448,7 +448,7 @@ This is critical for the Rust port's `tokio::io::copy_bidirectional` equivalent.
 ## Contract Density Summary
 
 | File | Tests | Benchmarks | Fuzz | Key Contracts |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | quic/v3/datagram\_test.go | 6 | 0 | 4 | Wire format for 4 datagram types, boundary detection |
 | quic/v3/session\_test.go | 10 | 0 | 0 | 20K-operation throughput, migration, idle timeout |
 | quic/v3/muxer\_test.go | 17 | 0 | 0 | Central dispatch matrix, parallel ICMP, in-order delivery |

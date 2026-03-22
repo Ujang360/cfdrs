@@ -38,7 +38,7 @@ Proxying scope modules tracked by this catalog:
 ## Proxying Classes by Destination Boundary
 
 | Class | Boundary | Description | Representative atoms |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | In-Process Proxying | Same process/runtime | Proxy and target handler live in the same running process and communicate through in-memory or internal stream abstractions. | [stream/stream](../../atoms/stream/stream.md), [stream/debug](../../atoms/stream/debug.md), [proxy/proxy](../../atoms/proxy/proxy.md) |
 | Host-Service Proxying | Same host/OS, different process | Proxy forwards to another local process or OS service through local sockets/interfaces. | [socks/connection_handler](../../atoms/socks/connection_handler.md), [ingress/origin_dialer](../../atoms/ingress/origin_dialer.md), [cmd/cloudflared/proxydns/cmd](../../atoms/cmd/cloudflared/proxydns/cmd.md) |
 | Remote-Service Proxying | Different host/network endpoint | Proxy forwards to edge or upstream services across network transport boundaries (HTTP2/QUIC/WebSocket/TunnelRPC). | [connection/http2](../../atoms/connection/http2.md), [connection/quic](../../atoms/connection/quic.md), [carrier/websocket](../../atoms/carrier/websocket.md), [tunnelrpc/quic/protocol](../../atoms/tunnelrpc/quic/protocol.md), [ingress/origin_proxy](../../atoms/ingress/origin_proxy.md) |
@@ -47,7 +47,7 @@ Proxying scope modules tracked by this catalog:
 ## Session Orientation
 
 | Class | Definition | Representative atoms |
-|---|---|---|
+| --- | --- | --- |
 | Session-Based Proxying | Proxying that explicitly allocates, tracks, or tears down session identifiers/state over time. | [datagramsession/session](../../atoms/datagramsession/session.md), [datagramsession/manager](../../atoms/datagramsession/manager.md), [connection/quic_datagram_v2](../../atoms/connection/quic_datagram_v2.md), [connection/quic_datagram_v3](../../atoms/connection/quic_datagram_v3.md), [quic/v3/session](../../atoms/quic/v3/session.md), [tunnelrpc/quic/session_client](../../atoms/tunnelrpc/quic/session_client.md), [tunnelrpc/quic/session_server](../../atoms/tunnelrpc/quic/session_server.md) |
 | Session-Less Proxying | Proxying that operates per request/stream without an explicit long-lived session registry in the behavior atom contract. | [connection/http2](../../atoms/connection/http2.md), [ingress/origin_proxy](../../atoms/ingress/origin_proxy.md), [proxy/proxy](../../atoms/proxy/proxy.md), [stream/stream](../../atoms/stream/stream.md), [socks/connection_handler](../../atoms/socks/connection_handler.md), [carrier/websocket](../../atoms/carrier/websocket.md) |
 
@@ -70,7 +70,7 @@ flowchart LR
 ## Crypto Involvement by Proxying Boundary
 
 | Proxying boundary class | Crypto observed in linked proxy paths | Evidence atoms |
-|---|---|---|
+| --- | --- | --- |
 | In-Process Proxying | No explicit crypto imports in representative in-process relay atoms; crypto appears mainly at transport/auth boundaries rather than internal relay glue. | [stream/stream](../../atoms/stream/stream.md), [stream/debug](../../atoms/stream/debug.md), [proxy/proxy](../../atoms/proxy/proxy.md) |
 | Host-Service Proxying | Limited direct crypto in local-host forwarding paths; `crypto/rand` appears in DNS-origin path handling. | [ingress/origins/dns](../../atoms/ingress/origins/dns.md), [socks/connection_handler](../../atoms/socks/connection_handler.md), [ingress/origin_dialer](../../atoms/ingress/origin_dialer.md) |
 | Remote-Service Proxying | TLS-heavy transport and origin forwarding with handshake/hash/random primitives. | [connection/quic](../../atoms/connection/quic.md), [carrier/carrier](../../atoms/carrier/carrier.md), [ingress/origin_proxy](../../atoms/ingress/origin_proxy.md), [ingress/origin_service](../../atoms/ingress/origin_service.md), [hello/hello](../../atoms/hello/hello.md), [websocket/websocket](../../atoms/websocket/websocket.md) |
@@ -78,7 +78,7 @@ flowchart LR
 ## Crypto Involvement by Session Orientation
 
 | Session orientation | Crypto observed | Evidence atoms |
-|---|---|---|
+| --- | --- | --- |
 | Session-Based Proxying | Session constructs are mostly transport/session-state orchestration; crypto is primarily inherited from underlying remote transports (not from session manager contracts directly). | [datagramsession/session](../../atoms/datagramsession/session.md), [connection/quic_datagram_v2](../../atoms/connection/quic_datagram_v2.md), [connection/quic_datagram_v3](../../atoms/connection/quic_datagram_v3.md), [tunnelrpc/quic/session_client](../../atoms/tunnelrpc/quic/session_client.md), [tunnelrpc/quic/session_server](../../atoms/tunnelrpc/quic/session_server.md), [connection/quic](../../atoms/connection/quic.md) |
 | Session-Less Proxying | Crypto concentrated in request/stream transport and handshake layers (`crypto/tls`, `crypto/sha1`, and selected `crypto/rand` paths). | [connection/http2](../../atoms/connection/http2.md), [carrier/websocket](../../atoms/carrier/websocket.md), [websocket/websocket](../../atoms/websocket/websocket.md), [ingress/origin_proxy](../../atoms/ingress/origin_proxy.md), [ingress/origin_service](../../atoms/ingress/origin_service.md), [ingress/origins/dns](../../atoms/ingress/origins/dns.md) |
 
@@ -101,7 +101,7 @@ flowchart TD
 ## Coverage Summary
 
 | Area | Module | Atom count | Coverage links |
-|---|---|---:|---|
+| --- | --- | ---: | --- |
 | Core proxy surface | carrier | 2 | [carrier/carrier](../../atoms/carrier/carrier.md), [carrier/websocket](../../atoms/carrier/websocket.md) |
 | Core proxy surface | proxy | 3 | [proxy/proxy](../../atoms/proxy/proxy.md), [proxy/metrics](../../atoms/proxy/metrics.md), [proxy/logger](../../atoms/proxy/logger.md) |
 | Ingress and origin dispatch | ingress | 19 | [ingress/ingress](../../atoms/ingress/ingress.md), [ingress/rule](../../atoms/ingress/rule.md), [ingress/origin_service](../../atoms/ingress/origin_service.md), [ingress/origin_proxy](../../atoms/ingress/origin_proxy.md), [ingress/origin_connection](../../atoms/ingress/origin_connection.md), [ingress/origin_dialer](../../atoms/ingress/origin_dialer.md), [ingress/packet_router](../../atoms/ingress/packet_router.md), [ingress/origin_icmp_proxy](../../atoms/ingress/origin_icmp_proxy.md), [ingress/config](../../atoms/ingress/config.md), [ingress/origins/dns](../../atoms/ingress/origins/dns.md), [ingress/origins/metrics](../../atoms/ingress/origins/metrics.md), [ingress/icmp_linux](../../atoms/ingress/icmp_linux.md), [ingress/icmp_posix](../../atoms/ingress/icmp_posix.md), [ingress/icmp_windows](../../atoms/ingress/icmp_windows.md), [ingress/icmp_darwin](../../atoms/ingress/icmp_darwin.md), [ingress/icmp_generic](../../atoms/ingress/icmp_generic.md), [ingress/icmp_metrics](../../atoms/ingress/icmp_metrics.md), [ingress/middleware/middleware](../../atoms/ingress/middleware/middleware.md), [ingress/middleware/jwtvalidator](../../atoms/ingress/middleware/jwtvalidator.md) |
@@ -137,7 +137,7 @@ Primary layering details are captured in [OSI Layer Coverage](#osi-layer-coverag
 This is an OSI-inspired analysis aid for proxy behavior boundaries, not a claim that cloudflared implements a strict OSI protocol stack.
 
 | OSI-inspired layer analogy | Proxying behavior in baseline | Primary module coverage | Representative atoms |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Layer 7 Application | HTTP ingress rule evaluation, middleware, websocket/http2 semantics, management and control RPC request framing | [ingress](../../atoms/ingress), [connection](../../atoms/connection), [websocket](../../atoms/websocket), [tunnelrpc](../../atoms/tunnelrpc), [proxy](../../atoms/proxy) | [ingress/ingress](../../atoms/ingress/ingress.md), [ingress/rule](../../atoms/ingress/rule.md), [connection/http2](../../atoms/connection/http2.md), [websocket/websocket](../../atoms/websocket/websocket.md), [tunnelrpc/quic/request_server_stream](../../atoms/tunnelrpc/quic/request_server_stream.md) |
 | Layer 6 Presentation | Payload and message translation/serialization boundaries for transport metadata and session framing | [connection](../../atoms/connection), [tunnelrpc](../../atoms/tunnelrpc) | [connection/protocol](../../atoms/connection/protocol.md), [tunnelrpc/pogs/quic_metadata_protocol](../../atoms/tunnelrpc/pogs/quic_metadata_protocol.md), [connection/header](../../atoms/connection/header.md) |
 | Layer 5 Session | Tunnel session lifecycle, stream setup/teardown, bidirectional relay session control | [connection](../../atoms/connection), [quic](../../atoms/quic), [stream](../../atoms/stream), [datagramsession](../../atoms/datagramsession), [tunnelrpc](../../atoms/tunnelrpc) | [connection/connection](../../atoms/connection/connection.md), [quic/v3/session](../../atoms/quic/v3/session.md), [stream/stream](../../atoms/stream/stream.md), [datagramsession/session](../../atoms/datagramsession/session.md), [tunnelrpc/quic/session_server](../../atoms/tunnelrpc/quic/session_server.md) |
@@ -153,7 +153,7 @@ Layer 1 and Layer 2 are out of scope for this catalog because the baseline atom 
 Two distinct pipe modes exist in the stream package:
 
 | Mode | Function | `maxWaitForSecondStream` | `CloseWrite` propagation | Use case |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | Simple | `Pipe(tunnelConn, originConn)` | `0` (no wait) | No (wrapped with `NopCloseWriterAdapter`) | HTTP2 proxy relay |
 | Bidirectional | `PipeBidirectional(downstream, upstream, maxWait, log)` | Caller-specified | Yes (`CloseWrite()` called on dst when src EOF) | QUIC stream relay with half-close support |
 
@@ -176,7 +176,7 @@ When `debugCopy` is false, `cfio.Copy` is used (a wrapper around `io.Copy`). The
 The [tunnels](tunnels.md) and proxying catalogs share a structural seam: tunnel connections carry proxied traffic, so transport and session atoms appear in both domains. An overlap-reduction pass pruned atoms along the control-plane vs. data-path boundary:
 
 | Boundary | Kept in tunnels | Kept in proxying | Rationale |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Tunnel registration RPC | `tunnelrpc/registration_*`, `pogs/registration_server`, `pogs/configuration_manager`, `proto/*.capnp` | — | Registration and configuration management are tunnel lifecycle operations, not request forwarding |
 | Connection lifecycle events | `connection/tunnelsforha`, `connection/event`, `connection/json` | — | HA slot tracking, lifecycle events, and control-stream JSON are tunnel management concerns |
 | Data-path RPC streams | `tunnelrpc/quic/protocol`, `quic/session_*`, `quic/request_*`, `quic/cloudflared_*` | Same | Request/session stream framing is equally relevant to tunnel transport and proxy relay |
@@ -214,7 +214,7 @@ sequenceDiagram
 ### SOCKS5 Implementation Constraints
 
 | Constraint | Detail |
-|---|---|
+| --- | --- |
 | Supported commands | CONNECT only; BIND and UDP ASSOCIATE are not implemented |
 | Auth methods | NoAuth (0x00) and Username/Password (0x02); GSSAPI not supported |
 | Address types | IPv4, IPv6, and domain name (FQDN) |
@@ -226,7 +226,7 @@ sequenceDiagram
 When proxy request forwarding encounters errors, cloudflared maps internal error conditions to HTTP response codes returned to the edge:
 
 | Error condition | HTTP status | Source |
-|---|---|---|
+| --- | --- | --- |
 | Origin connection refused | `502 Bad Gateway` | [proxy/proxy](../../atoms/proxy/proxy.md) |
 | Origin connection timeout | `504 Gateway Timeout` | [proxy/proxy](../../atoms/proxy/proxy.md) |
 | Ingress rule not matched (catch-all 404) | `404 Not Found` | [ingress/ingress](../../atoms/ingress/ingress.md) |

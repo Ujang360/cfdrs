@@ -12,7 +12,7 @@ scoped — what RR leaves behind becomes FC's starting point.
 ## Strata
 
 | Stratum | Tag | Purpose | Status |
-|---------|-----|---------|--------|
+| --------- | ----- | --------- | -------- |
 | 1 | [RAW](s1/README.md) | Go source behavior extraction | Closed |
 | 2 | SUBSTRATE | Rust-aware design decisions | Next |
 | 3 | COOK | Rust implementation | Not started |
@@ -27,7 +27,7 @@ target language.
 **Location:** [s1](s1/README.md)
 
 | Phase | Description | Artifact | Status |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | 1.1 | Go AST audit — behavioral atomization | `atoms/` — 241 atoms across 41 modules | Done |
 | 1.2 | Domain cataloging | `catalogs/domain/` — 22 catalogs | Done |
 | 1.3 | Cross-cutting cataloging | `catalogs/cross-cutting/` — 8 catalogs + sub-files | Done |
@@ -36,7 +36,7 @@ target language.
 | 1.6 | Audit analysis — Jaccard, Gini, hub atoms, clusters | [audit-analysis.md](s1/audit-analysis.md) | Done |
 
 | Metric | Value |
-|---|---|
+| --- | --- |
 | Atoms | 241 (100% coverage) |
 | Catalogs | 30 (22 domain + 8 cross-cutting) |
 | Gini coefficient | 0.3464 (below 0.40 alarm) |
@@ -60,7 +60,7 @@ Go behavior becomes Rust architecture.
 pass) + GPT 5.4 (verification pass).
 
 | Phase | Description | Artifact |
-|---|---|---|
+| --- | --- | --- |
 | 2.1 | Dependencies vetting — plumbing + behavioral layers | `s2/dependencies.md` |
 | 2.2 | Scoping — platform matrix, MoSCoW, explicit non-ports | `s2/scope.md` |
 | 2.3 | Risk register — probability × impact from catalogs | `s2/risks.md` |
@@ -129,7 +129,7 @@ Opus 4.6 (verification). One crate per session. Parity TOML written
 before implementation.
 
 | Stage | Scope | Entry condition |
-|---|---|---|
+| --- | --- | --- |
 | 3.0 | Foundation — shared types, error taxonomy, trait interfaces | S2 exit gate |
 | 3.1 | Independent crates — cli, config, const-and-env, crypto, overwatch, metrics | 3.0 |
 | 3.2 | Control plane — capnp-rpc, tunnelrpc, registration client | 3.0 |
@@ -150,7 +150,7 @@ Prove behavioral equivalence between Go oracle and Rust implementation.
 **Location:** `s4/`
 
 | Phase | Activity | Output |
-|---|---|---|
+| --- | --- | --- |
 | 4.1 | Parity execution — all TOMLs vs Rust binary | Green/red report |
 | 4.2 | Behavioral diff — Go oracle vs Rust on identical inputs | Delta catalog |
 | 4.3 | Edge case discovery | New TOML contracts |

@@ -94,7 +94,7 @@ flowchart TD
 ## Domain Map
 
 | Domain | Description | Representative atoms |
-|---|---|---|
+| --- | --- | --- |
 | Core policy model | Canonical allow/deny policy primitives over CIDR, port lists, and default behavior. | [ipaccess/access](../../atoms/ipaccess/access.md), [ingress/config](../../atoms/ingress/config.md), [ingress/ingress](../../atoms/ingress/ingress.md), [ingress/rule](../../atoms/ingress/rule.md) |
 | JWT and request validators | JWT validation middleware and access validator contracts for hostname/url/issuer/audience checks. | [ingress/middleware/jwtvalidator](../../atoms/ingress/middleware/jwtvalidator.md), [validation/validation](../../atoms/validation/validation.md), [cmd/cloudflared/access/validation](../../atoms/cmd/cloudflared/access/validation.md) |
 | Access CLI policy enforcement | Access command-family behavior that obtains app URL metadata, checks tokens, and drives policy-protected request flows. | [cmd/cloudflared/access/cmd](../../atoms/cmd/cloudflared/access/cmd.md), [cmd/cloudflared/access/carrier](../../atoms/cmd/cloudflared/access/carrier.md), [cmd/cloudflared/main](../../atoms/cmd/cloudflared/main.md) |
@@ -105,7 +105,7 @@ flowchart TD
 ## Policy Contract Matrix
 
 | Contract area | Behavior contract |
-|---|---|
+| --- | --- |
 | IP allow/deny precedence | Policy decisions are evaluated from explicit rules with default policy fallback, and rule matching includes CIDR and port constraints. |
 | Ingress access validation | Access configuration is validated during ingress parsing, and invalid access policy configuration fails early on config ingestion paths. |
 | JWT/AUD enforcement | Middleware and validator surfaces enforce issuer/audience semantics; failed validation yields request deny behavior. |
@@ -117,7 +117,7 @@ flowchart TD
 ## Policy Surface Matrix
 
 | Surface | Primary policy input | Decision output |
-|---|---|---|
+| --- | --- | --- |
 | `ipaccess` | CIDR, ports, allow/deny, default policy | allow/deny boolean and matched rule |
 | Ingress rule parsing | unvalidated ingress access config and origin request policy | accepted/rejected ingress configuration |
 | JWT middleware | team/environment/audience tags and request token | handled request or auth failure |
@@ -161,7 +161,7 @@ _Cross-referenced against [token/token.go](https://github.com/cloudflare/cloudfl
 ### Token Constants
 
 | Constant | Value | Source |
-|---|---|---|
+| --- | --- | --- |
 | `keyName` | `"token"` | [token/token.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/token/token.go) |
 | `tokenCookie` | `"CF_Authorization"` | [token/token.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/token/token.go) |
 | `appSessionCookie` | `"CF_AppSession"` | [token/token.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/token/token.go) |
@@ -174,7 +174,7 @@ _Cross-referenced against [token/token.go](https://github.com/cloudflare/cloudfl
 ### FedRAMP Constants
 
 | Constant | Value | Source |
-|---|---|---|
+| --- | --- | --- |
 | `FedEndpoint` | `"fed"` | [credentials/credentials.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/credentials/credentials.go) |
 | `FedRampBaseApiURL` | `"https://api.fed.cloudflare.com/client/v4"` | [credentials/credentials.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/credentials/credentials.go) |
 | `FedRampHostname` | `"management.fed.argotunnel.com"` | [credentials/credentials.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/credentials/credentials.go) |

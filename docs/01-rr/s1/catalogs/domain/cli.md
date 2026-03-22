@@ -97,7 +97,7 @@ flowchart TD
 ## Domain Map
 
 | Domain | Description | Representative atoms |
-|---|---|---|
+| --- | --- | --- |
 | Root bootstrap and command graph | Constructs root CLI app, global flags, action wrapper, and top-level command wiring. | [cmd/cloudflared/main](../../atoms/cmd/cloudflared/main.md), [cmd/cloudflared/flags/flags](../../atoms/cmd/cloudflared/flags/flags.md) |
 | Shared CLI utility layer | Config-file flag overlay, error wrapping, deprecated command handling, logger and build metadata helpers, management-token helper. | [cmd/cloudflared/cliutil/handler](../../atoms/cmd/cloudflared/cliutil/handler.md), [cmd/cloudflared/cliutil/errors](../../atoms/cmd/cloudflared/cliutil/errors.md), [cmd/cloudflared/cliutil/deprecated](../../atoms/cmd/cloudflared/cliutil/deprecated.md), [cmd/cloudflared/cliutil/logger](../../atoms/cmd/cloudflared/cliutil/logger.md), [cmd/cloudflared/cliutil/build_info](../../atoms/cmd/cloudflared/cliutil/build_info.md), [cmd/cloudflared/cliutil/management](../../atoms/cmd/cloudflared/cliutil/management.md) |
 | Tunnel command family | Named/quick tunnel run/create/list/delete/info/token/route/diagnostic paths and shared subcommand context. | [cmd/cloudflared/tunnel/cmd](../../atoms/cmd/cloudflared/tunnel/cmd.md), [cmd/cloudflared/tunnel/subcommands](../../atoms/cmd/cloudflared/tunnel/subcommands.md), [cmd/cloudflared/tunnel/subcommand_context](../../atoms/cmd/cloudflared/tunnel/subcommand_context.md), [cmd/cloudflared/tunnel/configuration](../../atoms/cmd/cloudflared/tunnel/configuration.md), [cmd/cloudflared/tunnel/quick_tunnel](../../atoms/cmd/cloudflared/tunnel/quick_tunnel.md), [cmd/cloudflared/tunnel/ingress_subcommands](../../atoms/cmd/cloudflared/tunnel/ingress_subcommands.md), [cmd/cloudflared/tunnel/login](../../atoms/cmd/cloudflared/tunnel/login.md) |
@@ -111,7 +111,7 @@ flowchart TD
 ## Command Family Matrix
 
 | Command family | Core behavior contracts | Primary evidence |
-|---|---|---|
+| --- | --- | --- |
 | Root `cloudflared` | Builds command tree, parses global flags, dispatches action, and routes service-mode calls. | [cmd/cloudflared/main](../../atoms/cmd/cloudflared/main.md) |
 | `cloudflared tunnel` | Implements tunnel lifecycle commands, route/teamnet/vnet operations, login/token/diag flows, and runtime startup orchestration. | [cmd/cloudflared/tunnel/cmd](../../atoms/cmd/cloudflared/tunnel/cmd.md), [cmd/cloudflared/tunnel/subcommands](../../atoms/cmd/cloudflared/tunnel/subcommands.md) |
 | `cloudflared access` | Performs access login/curl/token/ssh flows and edge token validation with command argument parsing. | [cmd/cloudflared/access/cmd](../../atoms/cmd/cloudflared/access/cmd.md), [cmd/cloudflared/access/validation](../../atoms/cmd/cloudflared/access/validation.md) |
@@ -124,7 +124,7 @@ flowchart TD
 ## Lifecycle and Failure Contracts
 
 | Surface | Contract |
-|---|---|
+| --- | --- |
 | Config and flag ingestion | Command actions can be wrapped through `cliutil` handlers that merge config-file inputs and normalize usage-error behavior before command-specific execution. |
 | Command dispatch determinism | Root app dispatches to explicit command families; empty invocations and service-mode routing are handled before normal command execution branches. |
 | Credential/token resolution | Tunnel/access/management commands perform credential and token lookup/derivation with explicit parse/validation branches and typed error exits. |
@@ -218,7 +218,7 @@ _Cross-referenced against [cmd/cloudflared/tunnel/cmd.go](https://github.com/clo
 `hostnameFromURI` maps schemes to default ports for tunnel access paths:
 
 | Scheme | Default port |
-|---|---|
+| --- | --- |
 | `ssh` | 22 |
 | `rdp` | 3389 |
 | `smb` | 445 |

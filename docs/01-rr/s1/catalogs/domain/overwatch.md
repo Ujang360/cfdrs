@@ -69,7 +69,7 @@ sequenceDiagram
 ## Core Contract Inventory
 
 | Contract | Kind | Behavior |
-|---|---|---|
+| --- | --- | --- |
 | `Service` | interface | Managed unit exposes `Name`, `Type`, `Hash`, `Shutdown`, and `Run` contracts. |
 | `Manager` | interface | Registry surface supports `Add`, `Remove`, and `Services` operations. |
 | `AppManager` | struct | Default manager implementation with map-backed service registry and callback wiring. |
@@ -80,7 +80,7 @@ Primary evidence: [atoms/overwatch/manager](../../atoms/overwatch/manager.md), [
 ## Controller-Object Behavior Matrix
 
 | Controller object | Owned state | Lifecycle contract |
-|---|---|---|
+| --- | --- | --- |
 | `AppManager.services` | `map[string]Service` by service name | `Add` replaces existing service of same name, `Remove` shuts down then deletes, `Services` snapshots current managed values. |
 | `AppManager.callback` | optional completion hook | `serviceRun` forwards terminal run result to callback when present. |
 | `AppService` | config observer channel + shutdown channel + manager reference | receives config updates, computes service set changes, and applies `Add`/`Remove` against manager. |
@@ -106,7 +106,7 @@ stateDiagram-v2
 ## Integration Contracts
 
 | Integration surface | Overwatch interaction | Representative atoms |
-|---|---|---|
+| --- | --- | --- |
 | Service-mode bootstrap | Root service-mode path creates manager and app-service orchestration context. | [atoms/cmd/cloudflared/main](../../atoms/cmd/cloudflared/main.md), [atoms/cmd/cloudflared/app_service](../../atoms/cmd/cloudflared/app_service.md) |
 | Config mutation path | Config updates trigger app-service handling that mutates managed service set via manager operations. | [atoms/cmd/cloudflared/app_service](../../atoms/cmd/cloudflared/app_service.md), [atoms/config/manager](../../atoms/config/manager.md) |
 | Managed-service runtime | Each managed service runs with callback-backed completion notification and optional replacement semantics. | [atoms/overwatch/app_manager](../../atoms/overwatch/app_manager.md), [atoms/overwatch/manager](../../atoms/overwatch/manager.md) |
@@ -114,7 +114,7 @@ stateDiagram-v2
 ## Shared-State and Concurrency Overlap
 
 | Overlap catalog | Shared concern | Evidence |
-|---|---|---|
+| --- | --- | --- |
 | [shared-state](shared-state.md) | map-backed registry mutation + asynchronous runloop completion callback is shared-state coordination. | [atoms/overwatch/app_manager](../../atoms/overwatch/app_manager.md), [atoms/cmd/cloudflared/app_service](../../atoms/cmd/cloudflared/app_service.md) |
 | [state-machines](state-machines.md) | service add/run/remove transitions and callback terminal states are explicit lifecycle machine edges. | [atoms/overwatch/app_manager](../../atoms/overwatch/app_manager.md) |
 | [cli](cli.md) | service-mode entrypoint decides when overwatch-managed app lifecycle is activated. | [atoms/cmd/cloudflared/main](../../atoms/cmd/cloudflared/main.md) |
@@ -122,7 +122,7 @@ stateDiagram-v2
 ## Failure and Shutdown Semantics
 
 | Pattern | Contracted behavior |
-|---|---|
+| --- | --- |
 | Replace-on-add | adding a service with an existing name triggers prior service shutdown before replacement run. |
 | Remove semantics | remove path performs shutdown for existing service and always deletes registry entry. |
 | Callback error propagation | run completion error is surfaced through callback parameters, allowing caller-defined terminal policy. |
@@ -150,7 +150,7 @@ Primary evidence: [atoms/overwatch/app_manager](../../atoms/overwatch/app_manage
 The `Service` interface in [overwatch/manager.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/overwatch/manager.go) defines the minimal contract for managed services:
 
 | Method | Return | Semantics |
-|---|---|---|
+| --- | --- | --- |
 | `Name()` | `string` | Unique service identifier |
 | `Type()` | `string` | Service category (e.g., tunnel, dns-proxy) |
 | `Hash()` | `string` | Configuration fingerprint for change detection |
@@ -162,7 +162,7 @@ The `Service` interface in [overwatch/manager.go](https://github.com/cloudflare/
 The `Manager` interface is intentionally minimal (3 methods):
 
 | Method | Semantics |
-|---|---|
+| --- | --- |
 | `Add(Service)` | Register and start a service |
 | `Remove(string)` | Stop and unregister by name |
 | `Services()` | List currently managed services |
@@ -201,7 +201,7 @@ sequenceDiagram
 ### Interface-to-Trait Translation
 
 | Go interface | Rust trait | Key difference |
-|---|---|---|
+| --- | --- | --- |
 | `Service` (5 methods) | `trait Service: Send + Sync` | Must be object-safe for `dyn Service` storage; `Run` returns `Result<(), Error>` |
 | `Manager` (3 methods) | `trait Manager: Send + Sync` | `Services()` returns owned `Vec` vs Go slice of interface values |
 | `ServiceCallback` function type | `Box<dyn Fn(ServiceType, &str, Option<Error>) + Send>` | Or use `tokio::sync::mpsc` channel for completion notification |
@@ -211,7 +211,7 @@ sequenceDiagram
 The `serviceRun` goroutine spawned per managed service maps to a `tokio::spawn` task:
 
 | Go pattern | Rust pattern |
-|---|---|
+| --- | --- |
 | `go am.serviceRun(svc)` | `tokio::spawn(async move { svc.run().await })` |
 | Callback invocation on run completion | `JoinHandle` result or channel send |
 | Panic in service goroutine is unrecoverable | `JoinHandle` captures panic; supervisor decides policy |
@@ -222,7 +222,7 @@ The `serviceRun` goroutine spawned per managed service maps to a `tokio::spawn` 
 The `services map[string]Service` protected by implicit Go single-goroutine access maps to Rust's explicit synchronization:
 
 | Go pattern | Rust pattern |
-|---|---|
+| --- | --- |
 | Map mutation in single-goroutine context | `RwLock<HashMap<String, Box<dyn Service>>>` |
 | `Add` replaces same-name entry after shutdown | Lock → shutdown old → remove → insert new → unlock |
 | `Services()` returns snapshot | `read()` lock and clone service list |
