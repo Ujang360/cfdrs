@@ -37,7 +37,7 @@ $$G = \frac{\sum_{i=1}^{n} \sum_{j=1}^{n} |x_i - x_j|}{2 n \sum_{i=1}^{n} x_i}$$
 ### Thresholds
 
 | Metric | Threshold | Purpose |
-|---|---|---|
+| --- | --- | --- |
 | Depth floor | $\geq 45$ | Minimum depth for all non-test catalogs |
 | Depth ceiling | $\leq 150$ | Maximum depth (excl. tests aggregate) |
 | Overlap alarm | $J \geq 0.25$ | Edge drawn in overlap graph |
@@ -56,7 +56,7 @@ $$G = \frac{\sum_{i=1}^{n} \sum_{j=1}^{n} |x_i - x_j|}{2 n \sum_{i=1}^{n} x_i}$$
 ## 1) Coverage Depth
 
 | Catalog | Atoms | H2 | H3 | Mermaid | Lines | Depth |
-|---|---:|---:|---:|---:|---:|---:|
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
 | [catalogs/cross-cutting/porting-friction](catalogs/cross-cutting/porting-friction/README.md) | 79 | 44 | 110 | 5 | 1406 | 245.0 |
 | [catalogs/cross-cutting/features](catalogs/cross-cutting/features/README.md) | 127 | 16 | 34 | 4 | 614 | 135.5 |
 | [catalogs/cross-cutting/wire-protocol](catalogs/cross-cutting/wire-protocol/README.md) | 76 | 20 | 33 | 5 | 725 | 118.5 |
@@ -93,7 +93,7 @@ $$G = \frac{\sum_{i=1}^{n} \sum_{j=1}^{n} |x_i - x_j|}{2 n \sum_{i=1}^{n} x_i}$$
 ### Depth Tier Classification
 
 | Tier | Depth range | Catalogs |
-|---|---|---|
+| --- | --- | --- |
 | **Broad synthesis** | $\geq 60$ | features, wire-protocol, porting-friction, concurrency, tunnels, error-propagation, deployments, init-teardown, proxying, edge-interactions |
 | **Upper-mid** | 45–59 | shared-state, upstream-api-contracts, platform-substrates, cli, host-interactions, state-machines, observabilities, tunnels-transport, metrics, platforms, capnp-rpc, ingress, sessions, access-policies, overwatch, const-and-env, config, crypto, supervisor |
 | **Mid** | 35–44 | *(none — all catalogs meet the upper-mid floor)* |
@@ -194,7 +194,7 @@ graph LR
 Eight natural catalog clusters emerge from the overlap graph:
 
 | Cluster | Catalogs | Binding pattern |
-|---|---|---|
+| --- | --- | --- |
 | **Tunnel core** | tunnels, proxying, tunnels-transport | Post-overlap-pruning Jaccard ($J = 0.36$ at the center, down from $J = 0.65$). 26 proxy-implementation atoms pruned from tunnels and 14 tunnel-control atoms pruned from proxying. Transport layer splits out at $J = 0.29$–$0.31$. |
 | **Control plane** | capnp-rpc, edge-interactions, upstream-api-contracts | RPC schema and edge discovery bind these; capnp-rpc ↔ edge-interactions $J = 0.34$. |
 | **Concurrency/lifecycle** | shared-state, state-machines, sessions, concurrency, init-teardown | Concurrency ↔ init-teardown $J = 0.41$; concurrency ↔ state-machines $J = 0.35$; concurrency ↔ shared-state $J = 0.34$. Init-teardown binds to shared-state ($J = 0.32$) and state-machines ($J = 0.27$). Sessions ↔ state-machines $J = 0.33$. |
@@ -230,7 +230,7 @@ Unevenness is computed on per-catalog unique atom-link counts across 30 catalogs
 ### Distribution Statistics
 
 | Statistic | Value |
-|---|---:|
+| --- | ---: |
 | Min | 5 |
 | $Q1$ | 24.0 |
 | Median ($Q2$) | 37 |
@@ -260,7 +260,7 @@ Unevenness is computed on per-catalog unique atom-link counts across 30 catalogs
 All 241 atom docs are now covered. The [catalogs/cross-cutting/tests](catalogs/cross-cutting/tests.md) catalog covers the 3 previously uncovered test/mock atoms:
 
 | Atom | Covered by |
-|---|---|
+| --- | --- |
 | [atoms/internal/test/wstest](atoms/internal/test/wstest.md) | [catalogs/cross-cutting/tests](catalogs/cross-cutting/tests.md) |
 | [atoms/mocks/mock_limiter](atoms/mocks/mock_limiter.md) | [catalogs/cross-cutting/tests](catalogs/cross-cutting/tests.md) |
 | [atoms/mocks/mockgen](atoms/mocks/mockgen.md) | [catalogs/cross-cutting/tests](catalogs/cross-cutting/tests.md) |
@@ -270,7 +270,7 @@ All 241 atom docs are now covered. The [catalogs/cross-cutting/tests](catalogs/c
 Each atom may appear in one or more catalogs. The membership distribution reveals whether catalogs redundantly cover the same atoms or specialize effectively.
 
 | Membership (catalogs) | Atom count | Share |
-|---:|---:|---:|
+| ---: | ---: | ---: |
 | 1 | 8 | 3.3% |
 | 2 | 18 | 7.5% |
 | 3 | 31 | 12.9% |
@@ -299,7 +299,7 @@ Each atom may appear in one or more catalogs. The membership distribution reveal
 The most cross-referenced atoms act as integration hubs across the catalog set. These are the implementation files that naturally bind multiple domains.
 
 | Atom | Catalogs | Role |
-|---|---:|---|
+| --- | ---: | --- |
 | [atoms/cmd/cloudflared/tunnel/configuration](atoms/cmd/cloudflared/tunnel/configuration.md) | 14 | Central tunnel configuration dispatch |
 | [atoms/connection/control](atoms/connection/control.md) | 14 | RPC control stream multiplexer |
 | [atoms/cmd/cloudflared/tunnel/cmd](atoms/cmd/cloudflared/tunnel/cmd.md) | 13 | Primary tunnel CLI command |
@@ -361,7 +361,7 @@ The most cross-referenced atoms act as integration hubs across the catalog set. 
 All 30 catalogs share a consistent structural skeleton:
 
 | Structural element | Catalogs with element | Conformance |
-|---|---:|---|
+| --- | ---: | --- |
 | `## Scope` section | 29 / 30 | 96.7% |
 | `## Notes` section | 25 / 30 | 83.3% |
 | `## Coverage Audit` section | 28 / 30 | 93.3% |
@@ -382,7 +382,7 @@ All 30 catalogs share a consistent structural skeleton:
 Density measures atom coverage efficiency: unique atoms per 100 lines of catalog text.
 
 | Tier | Density range | Catalogs |
-|---|---|---|
+| --- | --- | --- |
 | **High density** | $\geq 40$ atoms/100 lines | _(none after rebalancing)_ |
 | **Medium density** | 20–39 | proxying (35.6), tunnels (31.6), edge-interactions (28.0), host-interactions (24.4), shared-state (22.3), features (21.0) |
 | **Low density** | 10–19 | cli (18.1), metrics (17.7), tunnels-transport (17.7), capnp-rpc (16.3), observabilities (13.7), platforms (13.5), crypto (13.4), porting-friction (12.2), access-policies (10.6), config (10.7), wire-protocol (10.5) |

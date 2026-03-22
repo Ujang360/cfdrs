@@ -37,7 +37,7 @@ flowchart TB
 ```
 
 | Site | File | Goroutines | Cancellation semantic | Evidence |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | `serveQUIC()` | supervisor/tunnel.go | `tunnelConn.Serve` + `listenReconnect` | first return cancels both | [atoms/supervisor/tunnel](../../../atoms/supervisor/tunnel.md) |
 | `serveHTTP2()` | supervisor/tunnel.go | `h2conn.Serve` + `listenReconnect` | first return cancels both | [atoms/supervisor/tunnel](../../../atoms/supervisor/tunnel.md) |
 | `quicConnection.Serve()` | connection/quic_connection.go | control stream + accept stream + datagram handler | first return cancels all; `defer q.Close()` | [atoms/connection/quic_connection](../../../atoms/connection/quic_connection.md) |
@@ -70,7 +70,7 @@ flowchart TB
 ```
 
 | Context | Scope | Cancel trigger | Downstream effect | Evidence |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | main ctx | process | ctrl+c / OS signal | everything shuts down | [atoms/cmd/cloudflared/tunnel/cmd](../../../atoms/cmd/cloudflared/tunnel/cmd.md) |
 | `Supervisor.Run` ctx | supervisor | parent cancel | all HA tunnels exit | [atoms/supervisor/supervisor](../../../atoms/supervisor/supervisor.md) |
 | per-connection ctx | connection | errgroup first-return | connection teardown | [atoms/supervisor/tunnel](../../../atoms/supervisor/tunnel.md) |
@@ -243,7 +243,7 @@ Evidence: [atoms/quic/v3/session](../../../atoms/quic/v3/session.md), [atoms/dat
 ## Sync Primitives for Coordination
 
 | Primitive | Location | Purpose | Evidence |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `sync.WaitGroup` | `waitToShutdown(wg, ...)` | Wait for all server goroutines before process exit | [atoms/cmd/cloudflared/tunnel/cmd](../../../atoms/cmd/cloudflared/tunnel/cmd.md) |
 | `sync.WaitGroup` | `HTTP2Connection.activeRequestsWG` | Track in-flight HTTP/2 requests for graceful close | [atoms/connection/http2](../../../atoms/connection/http2.md) |
 | `sync.Once` | `signal.Signal.once` | Ensure `close(ch)` called exactly once | [atoms/signal/safe_signal](../../../atoms/signal/safe_signal.md) |

@@ -59,7 +59,7 @@ flowchart LR
 The `cfapi` client applies these shared contracts:
 
 | Surface | Contract |
-|---|---|
+| --- | --- |
 | Auth header | `Authorization: Bearer <token>` |
 | Versioned accept | `Accept: application/json;version=1` |
 | Content type | `Content-Type: application/json` when a request body is present |
@@ -72,7 +72,7 @@ Primary evidence: [cfapi/base_client](../../atoms/cfapi/base_client.md).
 ### Shared HTTP Status-to-Error Mapping
 
 | Status class | Mapped behavior |
-|---|---|
+| --- | --- |
 | `200 OK` | success path |
 | `400 Bad Request` | mapped to `ErrBadRequest` |
 | `401 Unauthorized` and `403 Forbidden` | mapped to `ErrUnauthorized` |
@@ -86,7 +86,7 @@ Primary evidence: [cfapi/base_client](../../atoms/cfapi/base_client.md).
 ### Tunnels and Management Tokens
 
 | Operation | Method | Endpoint template | Request contract | Success payload contract | Failure contract |
-|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- |
 | Create tunnel | `POST` | `/accounts/{account_tag}/cfd_tunnel` | body `{name, tunnel_secret}`; `name` must be non-empty and not a UUID string | `TunnelWithToken` (`id`, `name`, timestamps, `connections`, `token`) | `409` maps to name conflict; otherwise shared status mapping |
 | Get tunnel | `GET` | `/accounts/{account_tag}/cfd_tunnel/{tunnel_id}` | path `tunnel_id` UUID | `Tunnel` | shared status mapping |
 | Get tunnel token | `GET` | `/accounts/{account_tag}/cfd_tunnel/{tunnel_id}/token` | path `tunnel_id` UUID | token string in envelope `result` | shared status mapping |
@@ -101,7 +101,7 @@ Primary evidence: [cfapi/tunnel](../../atoms/cfapi/tunnel.md), [cfapi/tunnel_fil
 ### Hostname Routing (Zone-Level)
 
 | Operation | Method | Endpoint template | Request contract | Success payload contract |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | Route tunnel via DNS record | `PUT` | `/zones/{zone_tag}/tunnels/{tunnel_id}/routes` | route body `type=dns`, `user_hostname`, `overwrite_existing` | `DNSRouteResult` change summary (`new`, `updated`, `unchanged`) |
 | Route tunnel via LB/pool | `PUT` | `/zones/{zone_tag}/tunnels/{tunnel_id}/routes` | route body `type=lb`, `lb_name`, `lb_pool` | `LBRouteResult` load balancer and pool change tuple |
 
@@ -110,7 +110,7 @@ Primary evidence: [cfapi/hostname](../../atoms/cfapi/hostname.md), [cfapi/base_c
 ### Teamnet IP Routes
 
 | Operation | Method | Endpoint template | Request contract | Success payload contract |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | List routes | `GET` | `/accounts/{account_tag}/teamnet/routes` | query from `IpRouteFilter`; client auto-paginates | paginated `[]DetailedRoute` |
 | Add route | `POST` | `/accounts/{account_tag}/teamnet/routes` | body `{network, tunnel_id, comment, virtual_network_id?}` with CIDR serialized as string | `Route` |
 | Delete route | `DELETE` | `/accounts/{account_tag}/teamnet/routes/{route_id}` | path `route_id` UUID | parsed deleted `Route` |
@@ -121,10 +121,10 @@ Primary evidence: [cfapi/ip_route](../../atoms/cfapi/ip_route.md), [cfapi/ip_rou
 ### Teamnet Virtual Networks
 
 | Operation | Method | Endpoint template | Request contract | Success payload contract |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | Create virtual network | `POST` | `/accounts/{account_tag}/teamnet/virtual_networks` | body `{name, comment, is_default_network}` | `VirtualNetwork` |
 | List virtual networks | `GET` | `/accounts/{account_tag}/teamnet/virtual_networks` | query from `VnetFilter` | `[]VirtualNetwork` |
-| Delete virtual network | `DELETE` | `/accounts/{account_tag}/teamnet/virtual_networks/{vnet_id}` | optional query `force=true|false` | parsed deleted `VirtualNetwork` |
+| Delete virtual network | `DELETE` | `/accounts/{account_tag}/teamnet/virtual_networks/{vnet_id}` | optional query `force=true \| false` | parsed deleted `VirtualNetwork` |
 | Update virtual network | `PATCH` | `/accounts/{account_tag}/teamnet/virtual_networks/{vnet_id}` | partial body `{name?, comment?, is_default_network?}` | parsed updated `VirtualNetwork` |
 
 Primary evidence: [cfapi/virtual_network](../../atoms/cfapi/virtual_network.md), [cfapi/virtual_network_filter](../../atoms/cfapi/virtual_network_filter.md), [cmd/cloudflared/tunnel/vnets_subcommands](../../atoms/cmd/cloudflared/tunnel/vnets_subcommands.md), [cmd/cloudflared/tunnel/subcommand_context_vnets](../../atoms/cmd/cloudflared/tunnel/subcommand_context_vnets.md).
@@ -134,7 +134,7 @@ Primary evidence: [cfapi/virtual_network](../../atoms/cfapi/virtual_network.md),
 ### Tunnel Filter Query Keys
 
 | Key | Semantics |
-|---|---|
+| --- | --- |
 | `name` | exact name filter |
 | `name_prefix` | prefix filter |
 | `exclude_prefix` | exclusion prefix filter |
@@ -149,7 +149,7 @@ Primary evidence: [cfapi/tunnel_filter](../../atoms/cfapi/tunnel_filter.md).
 ### IP Route Filter Query Keys
 
 | Key | Semantics |
-|---|---|
+| --- | --- |
 | `tun_types=cfd_tunnel` | enforced route type scope |
 | `comment` | exact comment filter |
 | `is_deleted` | deleted/non-deleted switch |
@@ -166,7 +166,7 @@ Primary evidence: [cfapi/ip_route_filter](../../atoms/cfapi/ip_route_filter.md),
 ### Virtual Network Filter Query Keys
 
 | Key | Semantics |
-|---|---|
+| --- | --- |
 | `id` | virtual network UUID |
 | `name` | exact name |
 | `is_default` | default-network selector |
@@ -180,12 +180,12 @@ Primary evidence: [cfapi/virtual_network_filter](../../atoms/cfapi/virtual_netwo
 ### HTTP Endpoint Surface
 
 | Endpoint | Method(s) | Contract |
-|---|---|---|
+| --- | --- | --- |
 | `/ping` | `GET`, `HEAD` | health response (`200`) |
 | `/host_details` | `GET` | JSON payload: `connector_id`, optional `ip`, optional `hostname`; CORS-enabled |
 | `/logs` | `GET` (WebSocket upgrade) | management log streaming channel |
 | `/metrics` | `GET` (when diag enabled) | Prometheus scrape endpoint |
-| `/debug/pprof/{heap|goroutine}` | `GET` (when diag enabled) | profile handlers |
+| `/debug/pprof/{heap \| goroutine}` | `GET` (when diag enabled) | profile handlers |
 
 Shared middleware contract:
 
@@ -215,20 +215,20 @@ sequenceDiagram
 #### Client Event Contract
 
 | Event type | Payload |
-|---|---|
+| --- | --- |
 | `start_streaming` | optional `filters` object |
 | `stop_streaming` | no additional fields required |
 
 #### Server Event Contract
 
 | Event type | Payload |
-|---|---|
+| --- | --- |
 | `logs` | `logs: []Log` |
 
 #### Log Object Contract
 
 | Field | Type | Notes |
-|---|---|---|
+| --- | --- | --- |
 | `time` | string | event timestamp |
 | `level` | enum string | one of `debug`, `info`, `warn`, `error` |
 | `message` | string | human-readable message |
@@ -238,7 +238,7 @@ sequenceDiagram
 #### Streaming Filter Contract
 
 | Filter field | Type | Behavior |
-|---|---|---|
+| --- | --- | --- |
 | `events` | `[]LogEventType` | keep only matching event families |
 | `level` | `LogLevel` | drop entries below requested level |
 | `sampling` | float64 | clamped to `[0,1]`; probabilistic sampling when between 0 and 1 |
@@ -246,7 +246,7 @@ sequenceDiagram
 #### Connection Lifecycle and Limits
 
 | Behavior | Contract |
-|---|---|
+| --- | --- |
 | First command requirement | first valid command must be `start_streaming` |
 | Concurrent session limit | one active actor/session at a time; same actor can preempt prior session |
 | Idle timeout | idle WebSocket closed after 5 minutes if not actively streaming |
@@ -260,7 +260,7 @@ Primary evidence: [management/service](../../atoms/management/service.md), [mana
 ## Quick Tunnel Provisioning Contract
 
 | Operation | Method | Endpoint template | Request contract | Response contract |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | Create quick tunnel | `POST` | `{quick-service}/tunnel` | no body (`nil`), sets `Content-Type: application/json` and `User-Agent` | JSON object with `success`, `result`, `errors`; `result` contains `id`, `name`, `hostname`, `account_tag`, `secret` |
 
 Behavioral post-processing contract:
@@ -275,7 +275,7 @@ Primary evidence: [cmd/cloudflared/tunnel/quick_tunnel](../../atoms/cmd/cloudfla
 ## CLI-to-API Adapter Contracts
 
 | CLI surface | Adapter contract |
-|---|---|
+| --- | --- |
 | `cloudflared management token --resource ...` | validates resource in `{logs, admin, host_details}`, requests management JWT via cfapi, prints JSON `{token: ...}` |
 | teamnet route commands | parse and validate CIDR/UUID flags, convert into `IpRouteFilter` or route request bodies |
 | vnet commands | parse ID/name/default/deleted/max-fetch filters and convert into `VnetFilter` query parameters |
@@ -311,7 +311,7 @@ Primary evidence: [cmd/cloudflared/management/cmd](../../atoms/cmd/cloudflared/m
 ### HTTP Transport Constants
 
 | Constant | Value | Source |
-|---|---|---|
+| --- | --- | --- |
 | `defaultTimeout` | `15 seconds` | [cfapi/base_client.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/cfapi/base_client.go) |
 | TLS handshake timeout | `15 seconds` (same `defaultTimeout`) | Same file |
 | Response header timeout | `15 seconds` (same `defaultTimeout`) | Same file |
@@ -335,7 +335,7 @@ When the response envelope contains multiple errors, they are concatenated with 
 ### Management Host Details Format
 
 | Condition | `hostname` field value |
-|---|---|
+| --- | --- |
 | `--label` flag set | `"custom:{label}"` |
 | No label, hostname resolvable | `os.Hostname()` result (not FQDN) |
 | No label, hostname error | `"unknown"` |

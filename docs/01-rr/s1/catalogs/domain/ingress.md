@@ -91,7 +91,7 @@ stateDiagram-v2
 ## Domain Map
 
 | Domain | Description | Representative atoms |
-|---|---|---|
+| --- | --- | --- |
 | Ingress rule model | Rule matching, hostname and path predicates, default/catch-all behavior, and config parse lifecycle. | [ingress/ingress](../../atoms/ingress/ingress.md), [ingress/rule](../../atoms/ingress/rule.md) |
 | Origin request policy merge | Merge and normalize ingress origin-request settings (timeouts, tls, proxy, access, ip rules, http2 toggles). | [ingress/config](../../atoms/ingress/config.md) |
 | Middleware contracts | Middleware interface boundary and JWT validation middleware behavior. | [ingress/middleware/middleware](../../atoms/ingress/middleware/middleware.md), [ingress/middleware/jwtvalidator](../../atoms/ingress/middleware/jwtvalidator.md) |
@@ -102,7 +102,7 @@ stateDiagram-v2
 ## Contract Matrix
 
 | Contract area | Behavior contract |
-|---|---|
+| --- | --- |
 | Rule selection contract | Rule matching is driven by hostname and path evaluation with explicit catch-all validation constraints and deterministic rule order semantics. |
 | Config-validation contract | Ingress config parse paths validate access settings and hostname/rule constraints before runtime starts origins. |
 | Middleware gate contract | Middleware can permit or deny requests before origin service dispatch, with JWT validator enforcing team/environment/audience policy. |
@@ -114,7 +114,7 @@ stateDiagram-v2
 ## Middleware and Policy Surface
 
 | Surface | Input | Output or side effect |
-|---|---|---|
+| --- | --- | --- |
 | JWT validator middleware | team, environment, audience tags, request token | allow handling continuation or auth error |
 | Ingress access config validation | ingress access config block | accepted ingress config or validation error |
 | IP rules in origin request config | serialized ip rule list from config | runtime origin request policy with rule list applied |
@@ -151,7 +151,7 @@ _Cross-referenced against [ingress/ingress.go](https://github.com/cloudflare/clo
 ### Origin Request Default Constants
 
 | Constant | Value | Source |
-|---|---|---|
+| --- | --- | --- |
 | `defaultHTTPConnectTimeout` | 30 s | [ingress/config.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/ingress/config.go) |
 | `defaultWarpRoutingConnectTimeout` | 5 s | [ingress/config.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/ingress/config.go) |
 | `defaultTLSTimeout` | 10 s | [ingress/config.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/ingress/config.go) |
@@ -164,7 +164,7 @@ _Cross-referenced against [ingress/ingress.go](https://github.com/cloudflare/clo
 ### Service Type Sentinel Constants
 
 | Constant | Value | Role |
-|---|---|---|
+| --- | --- | --- |
 | `ServiceBastion` | `"bastion"` | Triggers bastion/jump-host mode |
 | `ServiceSocksProxy` | `"socks-proxy"` | Triggers SOCKS5-over-WS origin service |
 | `ServiceWarpRouting` | `"warp-routing"` | Triggers WARP routing config branch |
@@ -195,7 +195,7 @@ The `setConfig` function applies a documented 4-layer lookup for each origin-req
 ### Service parse taxonomy
 
 | Service string prefix | Constructed origin service |
-|---|---|
+| --- | --- |
 | `unix:` | `unixSocketPath` (scheme `http`) |
 | `unix+tls:` | `unixSocketPath` (scheme `https`) |
 | `http_status:NNN` | `defaultStatusCode` |
@@ -254,7 +254,7 @@ flowchart TD
 Each origin service type has distinct startup and shutdown behavior:
 
 | Service type | Startup behavior | Shutdown behavior |
-|---|---|---|
+| --- | --- | --- |
 | `httpService` | Constructs `http.Transport` with origin request TLS/timeout/keepalive settings | Transport `CloseIdleConnections` |
 | `tcpOverWSService` | Lazy dial per request; no listener preallocation | Connection close per stream |
 | `unixSocketPath` | Validates socket path exists at parse time | No persistent connection |

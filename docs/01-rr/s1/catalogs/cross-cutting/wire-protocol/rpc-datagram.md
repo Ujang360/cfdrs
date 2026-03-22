@@ -13,7 +13,7 @@ Primary evidence: [tunnelrpc/utils](../../../atoms/tunnelrpc/utils.md).
 ### Registration RPC Wire Format
 
 | RPC method | Direction | Wire parameters | Wire response |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `RegisterConnection` | cloudflared → edge | `TunnelAuth{AccountTag, TunnelSecret}`, `tunnelID uuid`, `connIndex uint8`, `ConnectionOptions{ClientInfo{ClientID, Features[], Version, Arch}, OriginLocalIP, ReplaceExisting, CompressionQuality, NumPreviousAttempts}` | `ConnectionDetails{UUID, Location, TunnelIsRemotelyManaged}` or `ConnectionError{cause, shouldRetry, retryAfter}` |
 | `SendLocalConfiguration` | cloudflared → edge | `config []byte` (JSON) | *(void)* |
 | `GracefulShutdown` | cloudflared → edge | `gracePeriod time.Duration` | *(void)* |
@@ -25,7 +25,7 @@ Primary evidence: [tunnelrpc/registration_client](../../../atoms/tunnelrpc/regis
 ### Session Management RPC Wire Format (v2)
 
 | RPC method | Direction | Wire parameters |
-|---|---|---|
+| --- | --- | --- |
 | `RegisterUdpSession` | cloudflared → edge | `sessionID uuid`, `dstIP net.IP`, `dstPort uint16`, `closeIdleAfterHint time.Duration`, `traceContext string` |
 | `UnregisterUdpSession` | cloudflared → edge | `sessionID uuid`, `message string` |
 | `UpdateConfiguration` | edge → cloudflared | `version int32`, `config []byte` |
@@ -37,7 +37,7 @@ Primary evidence: [tunnelrpc/quic/cloudflared_client](../../../atoms/tunnelrpc/q
 ### RPC Error Wire Semantics
 
 | Error pattern | Wire behavior |
-|---|---|
+| --- | --- |
 | Retryable connection errors | `ConnectionError` with `shouldRetry=true` and optional `retryAfter` duration |
 | Duplicate connection | Pre-mapped error detected by RPC adapter; triggers specific metric |
 | Temporary transport reads | `SafeTransport` absorbs `net.Error.Temporary()` reads instead of tearing down the RPC conn |
@@ -52,7 +52,7 @@ Datagram v2 uses a **suffix-muxed** scheme. The last byte of each datagram is a 
 ### v2 Datagram Types
 
 | Type byte (suffix) | Enum | Content |
-|---|---|---|
+| --- | --- | --- |
 | `0x00` | `DatagramTypeUDP` | Session payload: `[payload][16-byte sessionID][0x00]` |
 | `0x01` | `DatagramTypeIP` | Raw IP packet: `[IP packet][0x01]` |
 | `0x02` | `DatagramTypeIPWithTrace` | IP + tracing: `[IP packet][tracing identity][0x02]` |
@@ -77,7 +77,7 @@ Datagram v3 uses a **prefix-typed binary** scheme. The first byte is the datagra
 ### v3 Datagram Types
 
 | Type byte (prefix) | Enum | Meaning |
-|---|---|---|
+| --- | --- | --- |
 | `0x00` | `UDPSessionRegistrationType` | Session registration request |
 | `0x01` | `UDPSessionPayloadType` | Session payload delivery |
 | `0x02` | `ICMPType` | ICMP packet relay (v4 and v6) |
@@ -107,7 +107,7 @@ Datagram v3 uses a **prefix-typed binary** scheme. The first byte is the datagra
 **Flags byte:**
 
 | Bit | Mask | Meaning |
-|---|---|---|
+| --- | --- | --- |
 | 0 | `0x01` | IPv6 (1) vs IPv4 (0) destination |
 | 1 | `0x02` | Traced session |
 | 2 | `0x04` | Bundled payload present |
@@ -149,7 +149,7 @@ Header size: 17 bytes (`datagramTypeLen` + 16-byte RequestID).
 **Response type codes:**
 
 | Code | Enum | Meaning |
-|---|---|---|
+| --- | --- | --- |
 | `0x00` | `ResponseOk` | Session ready to proxy |
 | `0x01` | `ResponseDestinationUnreachable` | Origin not reachable |
 | `0x02` | `ResponseUnableToBindSocket` | Local UDP bind failed |
@@ -175,7 +175,7 @@ Primary evidence: [quic/v3/datagram](../../../atoms/quic/v3/datagram.md), [quic/
 ## v2 vs v3 Datagram Protocol Comparison
 
 | Aspect | Datagram v2 | Datagram v3 |
-|---|---|---|
+| --- | --- | --- |
 | Type encoding | Suffix (last byte) | Prefix (first byte) |
 | Session ID encoding | 16-byte UUID suffix before type byte | 16-byte RequestID after type byte |
 | Session registration | Cap'n Proto RPC (`SessionClient`) | Binary datagram frame (type `0x00`) with inline dest/flags |
@@ -194,7 +194,7 @@ Primary evidence: [quic/datagramv2](../../../atoms/quic/datagramv2.md), [quic/v3
 ### HTTP Endpoints
 
 | Path | Method | Wire behavior |
-|---|---|---|
+| --- | --- | --- |
 | `/ping` | GET | Returns 200 OK, no body |
 | `/logs` | GET (WebSocket upgrade) | Streaming JSON log events with filter params |
 | `/host_details` | GET | JSON system information |

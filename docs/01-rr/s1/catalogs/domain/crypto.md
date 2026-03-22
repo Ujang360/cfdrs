@@ -15,7 +15,7 @@ This catalog records cryptography-related usage in the baseline audit corpus.
 Post-quantum cryptography is actively used in tunnel negotiation paths.
 
 | Aspect | Source-backed detail | Evidence |
-|---|---|---|
+| --- | --- | --- |
 | Activation path | `needPQ` in protocol selection forces QUIC path selection. | [connection/protocol](../../atoms/connection/protocol.md) and [cloudflare/cloudflared/connection/protocol.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/connection/protocol.go), [atoms/connection/protocol](../../atoms/connection/protocol.md) |
 | PQ negotiation function | `curvePreference(pqMode, fipsEnabled, currentCurve)` computes TLS curve preferences for post-quantum modes. | [supervisor/pqtunnels](../../atoms/supervisor/pqtunnels.md) and [cloudflare/cloudflared/supervisor/pqtunnels.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/supervisor/pqtunnels.go), [atoms/supervisor/pqtunnels](../../atoms/supervisor/pqtunnels.md) |
 | Non-FIPS strict/prefer curve | `X25519MLKEM768` (`tls.CurveID(0x11ec)`). | [cloudflare/cloudflared/supervisor/pqtunnels.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/supervisor/pqtunnels.go), [atoms/supervisor/pqtunnels](../../atoms/supervisor/pqtunnels.md) |
@@ -28,7 +28,7 @@ Post-quantum cryptography is actively used in tunnel negotiation paths.
 ## Direct Crypto Imports in Behavior Atoms
 
 | Import | Atom count | Atom references | Usage | Notes |
-|---|---:|---|---|---|
+| --- | ---: | --- | --- | --- |
 | `crypto/tls` | 14 | [carrier/carrier](../../atoms/carrier/carrier.md), [tlsconfig/tlsconfig](../../atoms/tlsconfig/tlsconfig.md), [tlsconfig/hello_ca](../../atoms/tlsconfig/hello_ca.md), [tlsconfig/certreloader](../../atoms/tlsconfig/certreloader.md), [edgediscovery/dial](../../atoms/edgediscovery/dial.md), [edgediscovery/allregions/discovery](../../atoms/edgediscovery/allregions/discovery.md), [supervisor/tunnel](../../atoms/supervisor/tunnel.md), [supervisor/pqtunnels](../../atoms/supervisor/pqtunnels.md), [cmd/cloudflared/tunnel/configuration](../../atoms/cmd/cloudflared/tunnel/configuration.md), [cmd/cloudflared/access/carrier](../../atoms/cmd/cloudflared/access/carrier.md), [ingress/origin_service](../../atoms/ingress/origin_service.md), [ingress/origin_proxy](../../atoms/ingress/origin_proxy.md), [hello/hello](../../atoms/hello/hello.md), [connection/quic](../../atoms/connection/quic.md) | TLS transport and handshake behavior | Transport security surface; details remain in linked atoms |
 | `crypto/x509` | 5 | [tlsconfig/tlsconfig](../../atoms/tlsconfig/tlsconfig.md), [tlsconfig/hello_ca](../../atoms/tlsconfig/hello_ca.md), [tlsconfig/cloudflare_ca](../../atoms/tlsconfig/cloudflare_ca.md), [tlsconfig/certreloader](../../atoms/tlsconfig/certreloader.md), [sshgen/sshgen](../../atoms/sshgen/sshgen.md) | Certificate parsing/verification and trust material handling | CA and cert chain management surface |
 | `crypto/rand` | 4 | [cmd/cloudflared/tunnel/subcommands](../../atoms/cmd/cloudflared/tunnel/subcommands.md), [ingress/origins/dns](../../atoms/ingress/origins/dns.md), [token/encrypt](../../atoms/token/encrypt.md), [sshgen/sshgen](../../atoms/sshgen/sshgen.md) | Secret generation (`generateTunnelSecret`) and random resolver index selection in `getAddress` | DNS path explicitly marks random selection as non-security-sensitive and used for linter compliance |
@@ -43,7 +43,7 @@ Post-quantum cryptography is actively used in tunnel negotiation paths.
 This section records version/variant/bit details verified against upstream source where atom summaries are too coarse.
 
 | Crypto surface | Explicit version or variant detail in atom docs | Explicit bit-length detail in atom docs | Atoms using this surface |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | TLS protocol versioning | Source-verified in [cloudflare/cloudflared/tlsconfig/tlsconfig.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/tlsconfig/tlsconfig.go), [atoms/tlsconfig/tlsconfig](../../atoms/tlsconfig/tlsconfig.md): `TLSParameters.MinVersion` and `TLSParameters.MaxVersion` are configurable; source comment documents defaults when zero as min TLS 1.0 and max latest supported (currently TLS 1.3). | Version fields are `uint16`; no fixed bit-length constants beyond Go TLS version encodings are declared in this file. | [tlsconfig/tlsconfig](../../atoms/tlsconfig/tlsconfig.md), [connection/quic](../../atoms/connection/quic.md), [ingress/origin_service](../../atoms/ingress/origin_service.md), [ingress/origin_proxy](../../atoms/ingress/origin_proxy.md), [hello/hello](../../atoms/hello/hello.md), [cmd/cloudflared/tunnel/configuration](../../atoms/cmd/cloudflared/tunnel/configuration.md), [carrier/carrier](../../atoms/carrier/carrier.md), [edgediscovery/dial](../../atoms/edgediscovery/dial.md), [edgediscovery/allregions/discovery](../../atoms/edgediscovery/allregions/discovery.md), [supervisor/tunnel](../../atoms/supervisor/tunnel.md), [supervisor/pqtunnels](../../atoms/supervisor/pqtunnels.md), [cmd/cloudflared/access/carrier](../../atoms/cmd/cloudflared/access/carrier.md), [tlsconfig/hello_ca](../../atoms/tlsconfig/hello_ca.md), [tlsconfig/certreloader](../../atoms/tlsconfig/certreloader.md) |
 | TLS compliance mode | FIPS variant is explicitly signaled by `crypto/tls/fipsonly` import. | Not explicitly documented. | [fips/fips](../../atoms/fips/fips.md) |
 | TLS curve negotiation variant | Source-verified in [cloudflare/cloudflared/supervisor/pqtunnels.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/supervisor/pqtunnels.go), [atoms/supervisor/pqtunnels](../../atoms/supervisor/pqtunnels.md): explicit PQ/hybrid curve IDs include `0x11ec` (`X25519MLKEM768`) and `0xfe32` (`P256Kyber768Draft00`), with FIPS-gated curve preference logic; default non-PQ curve in [cloudflare/cloudflared/tlsconfig/tlsconfig.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/tlsconfig/tlsconfig.go), [atoms/tlsconfig/tlsconfig](../../atoms/tlsconfig/tlsconfig.md) is `tls.CurveP256` when unspecified. | Exact curve IDs are explicit for PQ entries (`0x11ec`, `0xfe32`, legacy `0x6399` constant retained); classical default curve family is P-256. | [supervisor/pqtunnels](../../atoms/supervisor/pqtunnels.md), [tlsconfig/tlsconfig](../../atoms/tlsconfig/tlsconfig.md) |
@@ -54,7 +54,7 @@ This section records version/variant/bit details verified against upstream sourc
 ## External Crypto and Token Libraries in Behavior Atoms
 
 | Import | Atom count | Atom references |
-|---|---:|---|
+| --- | ---: | --- |
 | `github.com/go-jose/go-jose/v4` | 3 | [token/token](../../atoms/token/token.md), [sshgen/sshgen](../../atoms/sshgen/sshgen.md), [management/token](../../atoms/management/token.md) |
 | `github.com/go-jose/go-jose/v4/jwt` | 2 | [sshgen/sshgen](../../atoms/sshgen/sshgen.md), [management/token](../../atoms/management/token.md) |
 | `golang.org/x/crypto/nacl/box` | 1 | [token/encrypt](../../atoms/token/encrypt.md) |
@@ -120,7 +120,7 @@ flowchart TD
 ### Variance: PQ Curve IDs and Legacy Retention
 
 | Curve ID | Name | Context |
-|---|---|---|
+| --- | --- | --- |
 | `0x11ec` | `X25519MLKEM768` | Non-FIPS PQ strict/prefer |
 | `0xfe32` | `P256Kyber768Draft00` | FIPS PQ strict/prefer |
 | `0x6399` | (legacy constant) | Retained in source but no longer used in active selection paths |
@@ -165,7 +165,7 @@ flowchart TD
 ### System vs Embedded CA Certificates
 
 | Trust source | Usage path | Evidence |
-|---|---|---|
+| --- | --- | --- |
 | System certificate pool | Origin TLS connections via `x509.SystemCertPool()` | [tlsconfig/tlsconfig](../../atoms/tlsconfig/tlsconfig.md) |
 | Embedded Cloudflare CA | Edge server identity verification via `cloudflare_ca.pem` | [tlsconfig/cloudflare_ca](../../atoms/tlsconfig/cloudflare_ca.md) |
 | Embedded hello-world CA | Built-in test origin server TLS | [tlsconfig/hello_ca](../../atoms/tlsconfig/hello_ca.md) |

@@ -9,7 +9,7 @@
 The edge sends requests to cloudflared over a shared HTTP/2 connection. Each request is classified by the `Cf-Cloudflared-Proxy-Connection-Upgrade` header:
 
 | Header value | Type constant | Stream behavior |
-|---|---|---|
+| --- | --- | --- |
 | `control-stream` | `TypeControlStream` | Registration RPC, config push, graceful shutdown |
 | `configuration-update` | `TypeConfiguration` | JSON config version + payload |
 | `websocket` | `TypeWebsocket` | WebSocket origin proxy with flushing |
@@ -25,7 +25,7 @@ User headers from HTTP/1.x origins are base64-encoded and serialized into a sing
 Control response headers are identified by prefix: `:`, `cf-int-`, `cf-cloudflared-`, or `cf-proxy-`.
 
 | Header | Direction | Wire format |
-|---|---|---|
+| --- | --- | --- |
 | `Cf-Cloudflared-Request-Headers` | edge → cloudflared | base64 `key:value;` pairs |
 | `Cf-Cloudflared-Response-Headers` | cloudflared → edge | base64 `key:value;` pairs |
 | `Cf-Cloudflared-Response-Meta` | cloudflared → edge | JSON `{"src":"origin"/"cloudflared","flow_rate_limited":bool}` |
@@ -75,7 +75,7 @@ Primary evidence: [connection/http2](../../../atoms/connection/http2.md), [conne
 Responses are flushed per-write when any of these conditions hold:
 
 | Condition | Detection method |
-|---|---|
+| --- | --- |
 | Stream type is WebSocket, TCP, or ControlStream | `Type.shouldFlush()` returns true |
 | Missing `Content-Length` header | Empty header check |
 | `Transfer-Encoding: chunked` present | Header prefix match |
@@ -96,7 +96,7 @@ Primary evidence: [connection/quic](../../../atoms/connection/quic.md).
 Every QUIC stream begins with a 6-byte protocol signature followed by a 2-byte version identifier:
 
 | Signature | Hex bytes | Version | Meaning |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Data stream | `0A 36 CD 12 A1 3E` | `"01"` (ASCII) | Request/response proxy stream |
 | RPC stream | `52 BB 82 5C DB 65` | *(Cap'n Proto framing)* | Control RPC stream (registration, config, session) |
 
@@ -152,7 +152,7 @@ Over data streams, after the 6+2 byte preamble, the wire exchanges Cap'n Proto-e
 **ConnectRequest** (edge → cloudflared):
 
 | Field | Type | Example values |
-|---|---|---|
+| --- | --- | --- |
 | `Dest` | string | `"localhost:8080"`, `"192.168.1.1:443"` |
 | `Type` | ConnectionType enum | `HTTP=1`, `Websocket=2`, `TCP=3` |
 | `Metadata` | repeated key-value | `HttpMethod:GET`, `HttpHost:example.com`, `HttpHeader:X-Foo:bar`, `FlowID:abc123` |
@@ -160,7 +160,7 @@ Over data streams, after the 6+2 byte preamble, the wire exchanges Cap'n Proto-e
 **ConnectResponse** (cloudflared → edge):
 
 | Field | Type | Meaning |
-|---|---|---|
+| --- | --- | --- |
 | `Error` | string (optional) | Non-nil signals proxy failure |
 | `Metadata` | repeated key-value | `HttpStatus:200`, `HttpHeader:Content-Type:text/html`, flow rate limit flag |
 
@@ -173,7 +173,7 @@ Primary evidence: [connection/quic_connection](../../../atoms/connection/quic_co
 ## Connection Lifecycle Events (Wire Telemetry)
 
 | Event | Direction | Trigger |
-|---|---|---|
+| --- | --- | --- |
 | `RegisteringTunnel` | internal | Before registration RPC |
 | `Connected` | internal + metrics | Registration success |
 | `Reconnecting` | internal | Transport error, retrying |
