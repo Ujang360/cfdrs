@@ -61,7 +61,7 @@ pass) + GPT 5.4 (verification pass).
 
 | Phase | Description | Artifact |
 | --- | --- | --- |
-| 2.1 | Dependencies vetting — plumbing + behavioral layers | `s2/dependencies.md` |
+| 2.1 | Dependencies vetting — plumbing + behavioral layers | [s2/dependency-shopping-cart.md](s2/dependency-shopping-cart.md) |
 | 2.2 | Scoping — platform matrix, MoSCoW, explicit non-ports | `s2/scope.md` |
 | 2.3 | Risk register — probability × impact from catalogs | `s2/risks.md` |
 | 2.4 | ADRs — one per decision, references catalog evidence | `s2/adr/NNN-*.md` |
