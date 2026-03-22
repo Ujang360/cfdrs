@@ -18,7 +18,7 @@ Source: [management/service\_test.go](https://github.com/cloudflare/cloudflared/
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestDisableDiagnosticRoutes` | Metrics and pprof routes disabled when diagnostic disabled |
 | `TestReadEventsLoop` | WebSocket event streaming loop delivers log events to connected client |
 | `TestReadEventsLoop_ContextCancelled` | Context cancellation stops the event loop cleanly |
@@ -43,7 +43,7 @@ Source: [management/events\_test.go](https://github.com/cloudflare/cloudflared/b
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestIntoClientEvent_StartStreaming` | Deserializes `EventStartStreaming` with filter combinations (none, level, events, sampling, combined) |
 | `TestIntoClientEvent_StopStreaming` | Deserializes `EventStopStreaming` |
 | `TestIntoClientEvent_Invalid` | Unknown/mismatched event type returns false |
@@ -78,7 +78,7 @@ Source: [management/logger\_test.go](https://github.com/cloudflare/cloudflared/b
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestLoggerWrite_NoSessions` | Writing with no listeners does not panic or block |
 | `TestLoggerWrite_OneSession` | Single session receives log event with correct Time, Message, Level, Event fields |
 | `TestLoggerWrite_MultipleSessions` | All sessions receive same event; removed session receives nothing |
@@ -98,7 +98,7 @@ Source: [management/middleware\_test.go](https://github.com/cloudflare/cloudflar
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestValidateAccessTokenQueryMiddleware` | Valid `access_token` query param → 200 with claims; missing → 400; malformed → 400 |
 
 ### Atom Links
@@ -114,7 +114,7 @@ Source: [management/session\_test.go](https://github.com/cloudflare/cloudflared/
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestSession_ActiveControl` | Session starts inactive; activatable via atomic store; `Stop()` deactivates |
 | `TestSession_Insert` | Filters by level, event type, and sampling rate; correctly passes or drops events |
 | `TestSession_InsertOverflow` | Full listener channel (capacity=1) drops excess inserts silently (non-blocking) |
@@ -124,7 +124,7 @@ Source: [management/session\_test.go](https://github.com/cloudflare/cloudflared/
 **Streaming filters**: The session supports three filter dimensions:
 
 | Filter | Behavior |
-|---|---|
+| --- | --- |
 | Level (e.g., Warn) | Events below configured level are dropped |
 | Events (e.g., HTTP only) | Non-matching event types dropped |
 | Sampling (0.0–1.0) | Random sampling based on configurable rate |
@@ -142,7 +142,7 @@ Source: [management/token\_test.go](https://github.com/cloudflare/cloudflared/bl
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestParseToken` | Table-driven: valid claims accepted; missing tunnel, tunnel ID, account tag, actor, actor ID, and invalid schema all rejected |
 
 ### Key Behavioral Details
@@ -162,7 +162,7 @@ Source: [diagnostic/handlers\_test.go](https://github.com/cloudflare/cloudflared
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestSystemHandler` | Returns 200 with system info; returns 200 (graceful) even on collector error |
 | `TestTunnelStateHandler` | Serializes tunnel ID, connector ID, connections, ICMP sources |
 | `TestConfigurationHandler` | Returns CLI flags as JSON; `uid` key always injected |
@@ -170,7 +170,7 @@ Source: [diagnostic/handlers\_test.go](https://github.com/cloudflare/cloudflared
 ### Mock Types
 
 | Type | Purpose |
-|---|---|
+| --- | --- |
 | `SystemCollectorMock` | Configurable system info and error |
 
 ### Atom Links
@@ -186,7 +186,7 @@ Source: [diagnostic/diagnostic\_utils\_test.go](https://github.com/cloudflare/cl
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestFindMetricsServer_WhenSingleServerIsRunning_ReturnState` | Single metrics server → return state |
 | `TestFindMetricsServer_WhenMultipleServerAreRunning_ReturnError` | Multiple servers → `ErrMultipleMetricsServerFound` |
 | `TestFindMetricsServer_WhenNoInstanceIsRuning_ReturnError` | No server → `ErrMetricsServerNotFound` |
@@ -204,7 +204,7 @@ Source: [diagnostic/system\_collector\_test.go](https://github.com/cloudflare/cl
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestParseMemoryInformationFromKV` | Parses Linux, macOS, and Windows memory KV output |
 | `TestParseUnameOutput` | Parses `uname -a` for Darwin and Linux |
 | `TestParseFileDescriptorInformationFromKV` | Parses macOS sysctl KV |
@@ -229,7 +229,7 @@ Source: [edgediscovery/edgediscovery\_test.go](https://github.com/cloudflare/clo
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestGiveBack` | Address returned to pool when connection fails |
 | `TestRPCAndProxyShareSingleEdgeIP` | Single edge IP usable for both tunnel and RPC simultaneously |
 | `TestGetAddrForRPC` | RPC address usage does not consume from available pool |
@@ -290,7 +290,7 @@ Source: [cfapi/hostname\_test.go](https://github.com/cloudflare/cloudflared/blob
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestDNSRouteUnmarshalResult` | DNS route JSON deserialization (success + malformed/error rejection) |
 | `TestLBRouteUnmarshalResult` | LB route JSON deserialization with pool + load\_balancer changes |
 | `TestLBRouteResultSuccessSummary` | 3×3 Change enum matrix → human-readable summary strings |
@@ -308,7 +308,7 @@ Source: [cfapi/ip\_route\_test.go](https://github.com/cloudflare/cloudflared/blo
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestUnmarshalRoute` | Route JSON deserialization with/without VNet ID |
 | `TestDetailedRouteJsonRoundtrip` | JSON unmarshal → marshal round-trip produces identical output |
 | `TestMarshalNewRoute` | NewRoute serializes with `tunnel_id`; VNet ID omitted when nil |
@@ -327,7 +327,7 @@ Source: [cfapi/tunnel\_test.go](https://github.com/cloudflare/cloudflared/blob/2
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `Test_unmarshalTunnel` | Table-driven: tunnel JSON with `deleted_at`, `conns_active_at=null` |
 | `TestUnmarshalTunnelOk` | Minimal valid tunnel JSON |
 | `TestUnmarshalTunnelErr` | Malformed/error-response JSONs produce error |
@@ -349,7 +349,7 @@ Source: [cfapi/virtual\_network\_test.go](https://github.com/cloudflare/cloudfla
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestVirtualNetworkJsonRoundtrip` | JSON unmarshal → marshal byte-identical |
 | `TestMarshalNewVnet` | Serializes name correctly |
 | `TestMarshalUpdateVnet` | Partial field serialization |
@@ -368,7 +368,7 @@ Source: [credentials/credentials\_test.go](https://github.com/cloudflare/cloudfl
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestCredentialsRead` | Cert file → User with correct certPath, APIToken, ZoneID, AccountID |
 | `TestCredentialsClient` | Valid cert → non-nil API client |
 
@@ -385,7 +385,7 @@ Source: [credentials/origin\_cert\_test.go](https://github.com/cloudflare/cloudf
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestLoadOriginCert` | Empty cert → error; unknown PEM block → error with block name |
 | `TestJSONArgoTunnelTokenEmpty` | Cert with no token → "missing token" error |
 | `TestJSONArgoTunnelToken` | Valid JSON tunnel token decodes correctly (zoneID, apiToken) |
@@ -407,7 +407,7 @@ Source: [token/token\_test.go](https://github.com/cloudflare/cloudflared/blob/20
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestHandleRedirects_AttachOrgToken` | Redirect handler attaches org token cookie to login request |
 | `TestHandleRedirects_AttachAppSessionCookie` | Redirect handler forwards `CF_AppSession` cookie from via-chain |
 | `TestHandleRedirects_StopAtAuthorizedEndpoint` | Returns `http.ErrUseLastResponse` at authorized worker path |
@@ -436,7 +436,7 @@ Build constraint: `//go:build linux || darwin`
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestSignalHandler` | SIGUSR1 delivery triggers registered callback |
 | `TestSignalHandlerClose` | Deregistered handler prevents callback execution |
 
@@ -453,7 +453,7 @@ Source: [features/selector\_test.go](https://github.com/cloudflare/cloudflared/b
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestUnmarshalFeaturesRecord` | Feature record JSON with `dv3_2` percentage field (0, 39, 100, missing, unknown keys) |
 | `TestFeaturePrecedenceEvaluationPostQuantum` | Default → PostQuantumPrefer; CLI flag → PostQuantumStrict |
 | `TestFeaturePrecedenceEvaluationDatagramVersion` | Default → DatagramV2; CLI `FeatureDatagramV3_2` → DatagramV3 |
@@ -474,7 +474,7 @@ Source: [features/selector\_test.go](https://github.com/cloudflare/cloudflared/b
 ### Mock Types
 
 | Type | Purpose |
-|---|---|
+| --- | --- |
 | `mockResolver` | Returns configurable percentages sequentially |
 | `staticResolver` | Returns fixed `featuresRecord` |
 
@@ -491,7 +491,7 @@ Source: [config/configuration\_test.go](https://github.com/cloudflare/cloudflare
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestConfigFileSettings` | YAML config deserializes to correct tunnel ID, ingress rules, warp-routing, IP rules, typed scalar accessors |
 | `TestMarshalUnmarshalOriginRequest` | `OriginRequestConfig` round-trips through JSON and YAML |
 
@@ -532,7 +532,7 @@ Source: [metrics/metrics\_test.go](https://github.com/cloudflare/cloudflared/blo
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestMetricsListenerCreation` | 5 listeners on sequential ports (20241–20245); 6th gets different port; custom address respected |
 
 ### Atom Links
@@ -548,7 +548,7 @@ Source: [metrics/readiness\_test.go](https://github.com/cloudflare/cloudflared/b
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestReadinessEventHandling` | Full lifecycle: not-ready → connected (200) → multiple connected → reconnecting (still OK) → registering (not OK) → connected → unregistering (not OK) → disconnected (not OK) |
 
 ### Key Behavioral Details
@@ -568,7 +568,7 @@ Source: [tracing/tracing\_test.go](https://github.com/cloudflare/cloudflared/blo
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestNewCfTracer` | Valid `Cf-Access-Trace-Id` header → real TracerProvider with InMemoryOtlpClient |
 | `TestNewCfTracerMultiple` | Multiple trace headers → valid tracer (takes first) |
 | `TestNewCfTracerNilHeader` | Nil header → NoopOtlpClient |
@@ -589,7 +589,7 @@ Source: [tracing/identity\_test.go](https://github.com/cloudflare/cloudflared/bl
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestNewIdentity` | Table-driven: full-length, short (zero-padded), empty, malformed traces; round-trip via MarshalBinary/UnmarshalBinary |
 
 ### Atom Links
@@ -605,7 +605,7 @@ Source: [tracing/client\_test.go](https://github.com/cloudflare/cloudflared/blob
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestUploadTraces` | InMemoryOtlpClient accumulates spans across calls |
 | `TestSpans` | Spans() returns base64-encoded protobuf |
 | `TestSpansEmpty` | Empty upload → `errNoTraces` |
@@ -636,7 +636,7 @@ Source: [validation/validation\_test.go](https://github.com/cloudflare/cloudflar
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestValidateHostname` | Hostname normalization: empty, plain, URL-prefixed, IDN punycode, percent-encoded |
 | `TestValidateUrl` | URL normalization: scheme inference, path/port, IDN, IPv4, IPv6, credential stripping, ftp rejection |
 | `TestNewAccessValidatorOk` | Access validator creation for valid domain; rejects empty/invalid JWT |
@@ -660,7 +660,7 @@ Source: [ipaccess/access\_test.go](https://github.com/cloudflare/cloudflared/blo
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestRuleCreation` | Null ipnet, out-of-range ports rejected; valid ports sorted |
 | `TestRuleCreationByCIDR` | CIDR string parsing: nil, bad, good |
 | `TestRulesNoRules` | Empty policy: allow=true allows, allow=false denies |
@@ -680,7 +680,7 @@ Source: [signal/safe\_signal\_test.go](https://github.com/cloudflare/cloudflared
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestMultiNotifyDoesntCrash` | Double Notify does not panic (safe for double-close) |
 | `TestWait` | After Notify, Wait channel is immediately readable |
 
@@ -699,13 +699,13 @@ Build constraint: `//go:build !windows`
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestFileChanged` | File watcher detects write to watched file and notifies callback |
 
 ### Mock Types
 
 | Type | Purpose |
-|---|---|
+| --- | --- |
 | `mockNotifier` | Captures event path from WatcherItemDidChange |
 
 ### Atom Links
@@ -721,7 +721,7 @@ Source: [retry/backoffhandler\_test.go](https://github.com/cloudflare/cloudflare
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestBackoffRetries` | Allows exactly maxRetries attempts, then refuses |
 | `TestBackoffCancel` | Respects context cancellation |
 | `TestBackoffGracePeriod` | Grace period expiry resets retry counter |
@@ -746,7 +746,7 @@ Source: [overwatch/manager\_test.go](https://github.com/cloudflare/cloudflared/b
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestManagerAddAndRemove` | Adds 2 services, removes 1 by name |
 | `TestManagerDuplicate` | Adding same service twice results in 1 service |
 | `TestManagerErrorChannel` | Service run error propagated through manager callback |
@@ -754,7 +754,7 @@ Source: [overwatch/manager\_test.go](https://github.com/cloudflare/cloudflared/b
 ### Mock Types
 
 | Type | Purpose |
-|---|---|
+| --- | --- |
 | `mockService` | Configurable Name/Type/Hash/Run/Shutdown with optional error |
 
 ### Atom Links
@@ -770,7 +770,7 @@ Source: [hello/hello\_test.go](https://github.com/cloudflare/cloudflared/blob/20
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestCreateTLSListenerHostAndPortSuccess` | `CreateTLSListener("localhost:1234")` succeeds |
 | `TestCreateTLSListenerOnlyHostSuccess` | `CreateTLSListener("localhost:")` succeeds with OS-assigned port |
 | `TestCreateTLSListenerOnlyPortSuccess` | `CreateTLSListener("localhost:8888")` succeeds |
@@ -788,14 +788,14 @@ Source: [logger/create\_test.go](https://github.com/cloudflare/cloudflared/blob/
 ### Contracts
 
 | Test | Behavioral Contract |
-|---|---|
+| --- | --- |
 | `TestResilientMultiWriter_Errors` | All writers receive writes regardless of individual writer errors |
 | `TestResilientMultiWriter_Management` | Management writer receives WriteLevel calls for all levels |
 
 ### Mock Types
 
 | Type | Purpose |
-|---|---|
+| --- | --- |
 | `mockedWriter` | Configurable error, counts write calls |
 | `mockedManagementWriter` | Counts WriteLevel calls |
 
@@ -831,7 +831,7 @@ Sources:
 ## Contract Density Summary
 
 | File | Tests | Fuzz | Key Contracts |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | management/service\_test.go | 6 | 0 | Session limits, diagnostic routes |
 | management/events\_test.go | 11 | 0 | WebSocket event protocol |
 | management/logger\_test.go | 5 | 0 | Multi-session log distribution |

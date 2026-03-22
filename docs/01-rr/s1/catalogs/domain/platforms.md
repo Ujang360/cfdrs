@@ -118,7 +118,7 @@ sequenceDiagram
 ## Domain Map
 
 | Domain | Description | Representative atoms |
-|---|---|---|
+| --- | --- | --- |
 | Service platform adapters | Service install/uninstall and runtime control split by Linux init systems, macOS launchd context, and Windows SCM callbacks. | [cmd/cloudflared/common_service](../../atoms/cmd/cloudflared/common_service.md), [cmd/cloudflared/generic_service](../../atoms/cmd/cloudflared/generic_service.md), [cmd/cloudflared/linux_service](../../atoms/cmd/cloudflared/linux_service.md), [cmd/cloudflared/macos_service](../../atoms/cmd/cloudflared/macos_service.md), [cmd/cloudflared/windows_service](../../atoms/cmd/cloudflared/windows_service.md), [cmd/cloudflared/app_service](../../atoms/cmd/cloudflared/app_service.md), [cmd/cloudflared/app_forward_service](../../atoms/cmd/cloudflared/app_forward_service.md) |
 | Container and host diagnostics | Docker/Kubernetes log collection, host log collection, and OS-specific system collection/parsing layers. | [diagnostic/log_collector_docker](../../atoms/diagnostic/log_collector_docker.md), [diagnostic/log_collector_kubernetes](../../atoms/diagnostic/log_collector_kubernetes.md), [diagnostic/log_collector_host](../../atoms/diagnostic/log_collector_host.md), [diagnostic/log_collector_utils](../../atoms/diagnostic/log_collector_utils.md), [diagnostic/system_collector](../../atoms/diagnostic/system_collector.md), [diagnostic/system_collector_linux](../../atoms/diagnostic/system_collector_linux.md), [diagnostic/system_collector_macos](../../atoms/diagnostic/system_collector_macos.md), [diagnostic/system_collector_windows](../../atoms/diagnostic/system_collector_windows.md), [diagnostic/system_collector_utils](../../atoms/diagnostic/system_collector_utils.md), [diagnostic/diagnostic_utils](../../atoms/diagnostic/diagnostic_utils.md) |
 | Platform network diagnostics | Trace-route collection split for Unix and Windows output formats plus shared decode helpers. | [diagnostic/network/collector_unix](../../atoms/diagnostic/network/collector_unix.md), [diagnostic/network/collector_windows](../../atoms/diagnostic/network/collector_windows.md), [diagnostic/network/collector_utils](../../atoms/diagnostic/network/collector_utils.md) |
@@ -129,7 +129,7 @@ sequenceDiagram
 ## Platform Conditional Matrix
 
 | Surface | Linux | macOS | Windows | Fallback / shared behavior |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | Service installation | systemd or sysv branches selected by runtime checks and install flags | launchd path split by root vs user contexts | Windows service manager registration plus recovery-option wiring | shared templates and common argument builders in service helper atoms |
 | Service runtime control | daemon scripts and service control commands | launchd load/unload semantics | `Execute` loop handles SCM control requests and graceful stop | generic service abstractions keep command-level interfaces consistent |
 | Host system diagnostics | procfs and Linux command parsing | sysctl and macOS tool output parsing | WMI/Windows command parsing | shared parse/util layers normalize output structures |
@@ -141,7 +141,7 @@ sequenceDiagram
 ## Key Lifecycle Contracts
 
 | Contract area | Platform-specific behavior |
-|---|---|
+| --- | --- |
 | Linux service branch | Linux service install chooses systemd or sysv path and persists runtime args/config in branch-specific templates. |
 | macOS launch scope | macOS service install chooses system-wide daemon vs per-user agent path based on effective privilege and home-directory resolution. |
 | Windows service execution | Windows service loop consumes service-control change requests and coordinates graceful shutdown via control channels and status transitions. |
@@ -194,7 +194,7 @@ Primary evidence: [cmd/cloudflared/linux_service](../../atoms/cmd/cloudflared/li
 The `isSystemd()` detection in [cmd/cloudflared/linux_service.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/cmd/cloudflared/linux_service.go) checks for the existence of `/run/systemd/system` directory.
 
 | Install mode | Templates generated | Auto-update mechanism | Start sequence |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | systemd | cloudflared service, update service, update timer | `OnCalendar=daily` timer | `systemctl enable` → start timer → `daemon-reload` → `start` |
 | sysv | `/etc/init.d/cloudflared` script | `--autoupdate-freq 24h0m0s` flag | Symlinks to `/etc/rc{2,3,4,5}.d/S50et` and `/etc/rc{0,1,6}.d/K02et` |
 
@@ -207,7 +207,7 @@ Quirk — **Token vs config mode**: `service install` accepts either a `--token`
 The Linux system collector in [diagnostic/system_collector_linux.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/diagnostic/system_collector_linux.go) collects four categories:
 
 | Category | Source command or path | Parsed fields |
-|---|---|---|
+| --- | --- | --- |
 | Memory | `cat /proc/meminfo` | `MemTotal`, `MemAvailable` (parsed as `KEY VALUE kB` format) |
 | File descriptors | `sysctl -n fs.file-nr` | max and current FD counts |
 | Disk volumes | Unix-shared collection | Volume mount and usage info |

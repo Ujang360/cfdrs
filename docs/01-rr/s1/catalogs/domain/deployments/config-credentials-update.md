@@ -29,14 +29,14 @@ flowchart TD
 ```
 
 | Platform | Search directories (in order) | Config filenames |
-|---|---|---|
+| --- | --- | --- |
 | Linux / macOS | `~/.cloudflared`, `~/.cloudflare-warp`, `~/cloudflare-warp`, `/etc/cloudflared`, `/usr/local/etc/cloudflared` | `config.yml`, `config.yaml` |
 | Windows | `~/.cloudflared`, `~/.cloudflare-warp`, `~/cloudflare-warp` | `config.yml`, `config.yaml` |
 
 ### Default Directories
 
 | Function | Linux / macOS | Windows |
-|---|---|---|
+| --- | --- | --- |
 | `DefaultConfigDirectory()` | `/usr/local/etc/cloudflared` | `$CFDPATH` env var, or `%ProgramFiles(x86)%\cloudflared`, or `%ProgramFiles%\cloudflared` |
 | `DefaultLogDirectory()` | `/var/log/cloudflared` | Same as `DefaultConfigDirectory()` |
 | `DefaultConfigPath()` | `/usr/local/etc/cloudflared/config.yml` | `<DefaultConfigDirectory>\config.yml` |
@@ -58,7 +58,7 @@ The origin certificate is obtained via `cloudflared login` and stored as a PEM-e
 Search order for `FindDefaultOriginCertPath()`: iterate over `DefaultConfigSearchDirectories()` and check for `cert.pem` in each directory.
 
 | Platform | Search paths (in order) |
-|---|---|
+| --- | --- |
 | Linux / macOS | `~/.cloudflared/cert.pem`, `~/.cloudflare-warp/cert.pem`, `~/cloudflare-warp/cert.pem`, `/etc/cloudflared/cert.pem`, `/usr/local/etc/cloudflared/cert.pem` |
 | Windows | `~/.cloudflared/cert.pem`, `~/.cloudflare-warp/cert.pem`, `~/cloudflare-warp/cert.pem` |
 
@@ -102,7 +102,7 @@ flowchart TD
 Three certificates are compiled into the binary via [tlsconfig/cloudflare_ca.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/tlsconfig/cloudflare_ca.go):
 
 | Certificate | Type | Purpose |
-|---|---|---|
+| --- | --- | --- |
 | CloudFlare Origin SSL ECC Certificate Authority | ECC | Origin SSL validation |
 | CloudFlare Origin SSL Certificate Authority | RSA | Origin SSL validation |
 | Origin Pull (`origin-pull.cloudflare.net`) | RSA | Authenticated origin pull |
@@ -110,7 +110,7 @@ Three certificates are compiled into the binary via [tlsconfig/cloudflare_ca.go]
 ### Platform-Specific Certificate Behavior
 
 | Platform | System cert pool | Notes |
-|---|---|---|
+| --- | --- | --- |
 | Linux | `x509.SystemCertPool()` succeeds | Standard `/etc/ssl/certs` or distro-specific paths |
 | macOS | `x509.SystemCertPool()` succeeds | Reads from Keychain |
 | Windows | `x509.SystemCertPool()` fails | Go issue [#16736](https://github.com/golang/go/issues/16736); user warned to use `--origin-ca-pool` flag |
@@ -166,7 +166,7 @@ flowchart TD
 ### Update Eligibility
 
 | Condition | Auto-update supported? | Reason |
-|---|---|---|
+| --- | --- | --- |
 | Windows | No | Not supported on Windows |
 | Package-managed install | No | Sentinel file `.installedFromPackageManager` exists, or `BuiltForPackageManager` linker var set |
 | Running from terminal | No | Interactive shell — service mode only |
@@ -178,7 +178,7 @@ flowchart TD
 ### Update URLs
 
 | URL | Purpose |
-|---|---|
+| --- | --- |
 | `https://update.argotunnel.com` | Production update endpoint |
 | `https://staging-update.argotunnel.com` | Staging update endpoint (`--staging` flag) |
 

@@ -15,7 +15,7 @@ Atom links are relative to [atoms/](../../atoms/).
 ## Substrate Dimensions
 
 | Dimension | Values | Selection Mechanism |
-|-----------|--------|---------------------|
+| ----------- | -------- | --------------------- |
 | **Operating System** | Linux, macOS (darwin), Windows, FreeBSD, generic fallback | Go build tags / file suffix |
 | **Init System** | Systemd, Sysvinit, Launchd, Windows SCM | Runtime detection (Linux); compile-time (others) |
 | **Container Runtime** | Docker, Kubernetes, bare host | Runtime detection |
@@ -34,7 +34,7 @@ Features marked with their behavior on each platform.
 ### ICMP Proxy
 
 | Capability | Linux | macOS | Windows | POSIX Generic | Other |
-|------------|:-----:|:-----:|:-------:|:-------------:|:-----:|
+| ------------ | :-----: | :-----: | :-------: | :-------------: | :-----: |
 | Socket type | `SOCK_DGRAM` | Raw socket | FFI (`iphlpapi.dll`) | `x/net/icmp` | Stub |
 | Unprivileged ICMP | Full | N/A (needs root) | N/A (admin) | Partial | Stub |
 | IPv4 echo | Full | Full | Full | Full | Stub |
@@ -55,7 +55,7 @@ Source atoms:
 ### Service Management
 
 | Capability | Linux (Systemd) | Linux (Sysvinit) | macOS (Launchd) | Windows (SCM) |
-|------------|:---------------:|:-----------------:|:---------------:|:-------------:|
+| ------------ | :---------------: | :-----------------: | :---------------: | :-------------: |
 | Install service | Full | Full | Full | Full |
 | Uninstall service | Full | Full | Full | Full |
 | Service readiness signal | `Type=notify` | N/A | N/A | `svc.Status` |
@@ -76,7 +76,7 @@ Source atoms:
 ### System Diagnostics
 
 | Data Point | Linux | macOS | Windows |
-|------------|:-----:|:-----:|:-------:|
+| ------------ | :-----: | :-----: | :-------: |
 | Memory info | `/proc/meminfo` | `sysctl hw.memsize` | WMI `Win32_ComputerSystem` |
 | CPU info | `/proc/cpuinfo` or `uname` | `sysctl hw.physicalcpu` | WMI |
 | Disk info | N/A | N/A | WMI `Win32_LogicalDisk` |
@@ -94,7 +94,7 @@ Source atoms:
 ### Network Path Tracing
 
 | Aspect | Unix (Linux/macOS/BSD) | Windows |
-|--------|:----------------------:|:-------:|
+| -------- | :----------------------: | :-------: |
 | Command | `traceroute` | `tracert` |
 | Output parsing | Hop + RTT regex | Windows-format regex |
 | Build tag | `//go:build unix` | `//go:build windows` |
@@ -107,7 +107,7 @@ Source atoms:
 ### Browser Launching (Auth Flow)
 
 | Platform | Command | Build Tag | Notes |
-|----------|---------|-----------|-------|
+| ---------- | --------- | ----------- | ------- |
 | Windows | `cmd /c start "<URL>"` | `windows` | `CREATE_NO_WINDOW` via `SysProcAttr` |
 | macOS | `open "<URL>"` | `darwin` | Native default-app handler |
 | Linux / FreeBSD | `xdg-open "<URL>"` | `linux \|\| freebsd` | Desktop environment standard |
@@ -125,7 +125,7 @@ Source atoms:
 ### QUIC Socket Parameters
 
 | Parameter Set | Build Tag | Purpose |
-|---------------|-----------|---------|
+| --------------- | ----------- | --------- |
 | Unix | `//go:build unix` | Unix-specific socket options and buffer sizes |
 | Windows | `//go:build windows` | Windows-specific socket options and buffer sizes |
 
@@ -137,7 +137,7 @@ Source atoms:
 ### Auto-Updater
 
 | Capability | Unix (Linux/macOS) | Windows |
-|------------|:------------------:|:-------:|
+| ------------ | :------------------: | :-------: |
 | Auto-update supported | Full | Partial (batch workaround) |
 | Binary replacement | Atomic rename + `exec()` | Batch script: write → spawn → exit → rename |
 | Process restart | In-place exec-based takeover | New process via batch |
@@ -151,7 +151,7 @@ Source atoms:
 ### Configuration Discovery
 
 | Platform | Default Search Paths |
-|----------|---------------------|
+| ---------- | --------------------- |
 | Linux / Unix | `~/.cloudflare-warp/config.yaml`, `/etc/cloudflare-warp/`, system paths |
 | macOS | `~/Library/Application Support/Cloudflare/`, system admin paths |
 | Windows | `%APPDATA%\Cloudflare\` |
@@ -166,7 +166,7 @@ Log collection behavior depends on the detected container runtime,
 not the operating system.
 
 | Capability | Docker | Kubernetes | Bare Host |
-|------------|:------:|:----------:|:---------:|
+| ------------ | :------: | :----------: | :---------: |
 | Log source | `docker logs <id>` | `kubectl logs <pod>` | `journalctl` / log file |
 | Detection | Runtime | Runtime | Runtime |
 | Init-system awareness | N/A | N/A | Systemd ↔ Sysvinit dispatch |
@@ -188,7 +188,7 @@ FIPS is a **compile-time** feature flag, not a runtime toggle. A single
 binary is either FIPS-enabled or not.
 
 | Aspect | `fips` build | `!fips` build |
-|--------|:------------:|:-------------:|
+| -------- | :------------: | :-------------: |
 | TLS backend | `crypto/tls/fipsonly` | Standard Go `crypto/tls` |
 | `IsFipsEnabled()` | `true` | `false` |
 | Approved curves | P-256, P-384 only | All curves including X25519 |
@@ -214,7 +214,7 @@ contracts that care about byte order or pointer width.
 ### Build and Distribution Matrix
 
 | Artifact | amd64 | arm64 | 32-bit (x86) | Notes |
-|----------|:-----:|:-----:|:------------:|-------|
+| ---------- | :-----: | :-----: | :------------: | ------- |
 | Docker image | Dedicated `Dockerfile.amd64` | Dedicated `Dockerfile.arm64` | N/A | Multi-arch manifest; base `gcr.io/distroless/base-debian13:nonroot` |
 | Linux deb/rpm | Built per-arch via `fpm` | Built per-arch via `fpm` | Not shipped | Filename follows `<name>_<ver>_<arch>` convention |
 | Windows MSI (64-bit) | `%ProgramFiles%\cloudflared\` | N/A | N/A | 64-bit install path |
@@ -227,7 +227,7 @@ Source: [build-packaging.md](../domain/deployments/build-packaging.md)
 ### Build-Time Compilation Flags
 
 | Flag | Value | Purpose |
-|------|-------|---------|
+| ------ | ------- | --------- |
 | `CGO_ENABLED` | `0` (standard) / `1` (FIPS) | Static build eliminates native C arch mismatches |
 | `GOOS` | `linux`, `darwin`, `windows` | Target OS selection |
 | `GOARCH` | `amd64`, `arm64` | Target CPU architecture |
@@ -240,7 +240,7 @@ The diagnostic subsystem captures the CPU architecture at startup for
 reporting purposes.
 
 | Collector Field | Source | Purpose |
-|----------------|--------|---------|
+| ---------------- | -------- | --------- |
 | `architecture` | OS-reported (e.g., `uname -m`) | Hardware architecture string |
 | `goArchitecture` | `runtime.GOARCH` | Go runtime architecture (may differ under emulation) |
 
@@ -253,7 +253,7 @@ wire protocols enforce explicit big-endian encoding that the Rust port
 must preserve.
 
 | Protocol | Endianness | Encoding Mechanism | Atoms |
-|----------|:----------:|-------------------|-------|
+| ---------- | :----------: | ------------------- | ------- |
 | QUIC datagram v2/v3 framing | Big-endian | `encoding/binary.BigEndian` | [quic/v3/datagram.md](../../atoms/quic/v3/datagram.md) |
 | RPC / capnp wire format | Big-endian | capnp schema-driven | [tunnelrpc/](../../atoms/tunnelrpc/) atoms |
 | SOCKS5 port encoding | Big-endian | Manual 2-byte pack | [socks/](../../atoms/socks/) atoms |
@@ -286,7 +286,7 @@ Every platform-gated source unit, grouped by mechanism.
 ### Compile-Time: Go Build Tags / File Suffix
 
 | Module | Atom | `linux` | `darwin` | `windows` | `unix` | `!windows` | `fips` | `!fips` | Fallback |
-|--------|------|:-------:|:--------:|:---------:|:------:|:-----------:|:------:|:-------:|:--------:|
+| -------- | ------ | :-------: | :--------: | :---------: | :------: | :-----------: | :------: | :-------: | :--------: |
 | ingress | [icmp_linux](../../atoms/ingress/icmp_linux.md) | X | | | | | | | |
 | ingress | [icmp_darwin](../../atoms/ingress/icmp_darwin.md) | | X | | | | | | |
 | ingress | [icmp_windows](../../atoms/ingress/icmp_windows.md) | | | X | | | | | |
@@ -311,7 +311,7 @@ Every platform-gated source unit, grouped by mechanism.
 ### Runtime Detection
 
 | Module | Atom | Detection Method | Detected Values |
-|--------|------|-----------------|-----------------|
+| -------- | ------ | ----------------- | ----------------- |
 | cmd | [linux_service](../../atoms/cmd/cloudflared/linux_service.md) | Filesystem probe (`/run/systemd/system`) | Systemd, Sysvinit |
 | diagnostic | [log_collector](../../atoms/diagnostic/log_collector.md) | Environment / socket probing | Docker, Kubernetes, bare host |
 | diagnostic | [log_collector_host](../../atoms/diagnostic/log_collector_host.md) | Init-system check | Systemd ↔ Sysvinit log path |
@@ -370,7 +370,7 @@ or falls through to host-level log sources.
 ## Rust Porting Implications
 
 | Go Mechanism | Rust Equivalent | Notes |
-|-------------|-----------------|-------|
+| ------------- | ----------------- | ------- |
 | `//go:build linux` | `#[cfg(target_os = "linux")]` | Direct mapping |
 | `//go:build darwin` | `#[cfg(target_os = "macos")]` | Note: Go uses `darwin`, Rust uses `macos` |
 | `//go:build windows` | `#[cfg(target_os = "windows")]` | Direct mapping |

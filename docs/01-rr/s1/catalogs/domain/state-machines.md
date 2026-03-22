@@ -165,7 +165,7 @@ sequenceDiagram
 ## Domain Map
 
 | Domain | Description | Representative atoms |
-|---|---|---|
+| --- | --- | --- |
 | Supervisor lifecycle machine | Core tunnel runtime state progression across startup, connect, reconnect, fallback, and shutdown. | [supervisor/supervisor](../../atoms/supervisor/supervisor.md), [supervisor/tunnel](../../atoms/supervisor/tunnel.md), [retry/backoffhandler](../../atoms/retry/backoffhandler.md), [signal/safe_signal](../../atoms/signal/safe_signal.md) |
 | Protocol-selection machine | Dynamic protocol current/fallback state and remote/default switching logic. | [connection/protocol](../../atoms/connection/protocol.md) |
 | Control-stream machine | Register, update, unregister, and stopped-state control stream lifecycle. | [connection/control](../../atoms/connection/control.md) |
@@ -179,7 +179,7 @@ sequenceDiagram
 ## State Transition Contracts
 
 | Surface | Contracted state behavior |
-|---|---|
+| --- | --- |
 | Supervisor runtime | Tunnel workers advance through initialize, attempt-connect, recoverable-error, fallback, and shutdown states with reconnect channels and graceful-stop coordination. |
 | Protocol selector | Selector state evolves from configured/default pools through fallback transitions and remote percentage-driven switching thresholds. |
 | Control stream | Control path transitions through register, serve, wait-for-unregister, and stopped states, with context/shutdown termination. |
@@ -193,7 +193,7 @@ Primary evidence: [supervisor/supervisor](../../atoms/supervisor/supervisor.md),
 ## Companion State/Event/Failure Matrix
 
 | Machine | State | Entry trigger | Normal exit | Failure or forced exit |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | Supervisor runtime | Bootstrapping | supervisor run and initialize begin | first tunnel worker started | initialization error aborts run |
 | Supervisor runtime | Connecting | connect loop issues register/serve attempt | connection established and connected signal raised | recoverable transport error transitions to backoff/fallback |
 | Supervisor runtime | ProtocolFallback | protocol judged broken by selector/fallback path | next protocol selected and connect retried | no viable fallback keeps retry loop on current constraints |
@@ -242,7 +242,7 @@ Primary evidence for matrix rows: [supervisor/supervisor](../../atoms/supervisor
 The backoff handler ([retry/backoffhandler.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/retry/backoffhandler.go)) uses exponential backoff with jitter:
 
 | Parameter | Value or formula |
-|---|---|
+| --- | --- |
 | `DefaultBaseTime` | `1 second` |
 | Max wait per retry | $\text{baseTime} \times 2^{\text{retries}+1}$ |
 | Actual wait | Uniform random in $[0, \text{maxWait})$ |
@@ -258,7 +258,7 @@ Quirk — **Non-mutating peek**: `GetMaxBackoffDuration` follows the same logic 
 Three implementations of `ProtocolSelector` interface exist, each with distinct state behavior:
 
 | Implementation | When used | State transitions |
-|---|---|---|
+| --- | --- | --- |
 | `staticProtocolSelector` | Explicit `--protocol quic` or `--protocol http2` | No state changes; `Fallback()` always returns `(0, false)` |
 | `defaultProtocolSelector` | `--protocol auto` with `--token` | Starts QUIC; `Fallback()` returns `(HTTP2, true)` via the `Protocol.fallback()` method; HTTP2 has no further fallback |
 | `remoteProtocolSelector` | `--protocol auto` without `--token` | `Current()` refreshes from remote percentage fetcher when `time.Now() >= refreshAfter`; uses FNV32a hash of account tag as threshold in `[0, 100)` |

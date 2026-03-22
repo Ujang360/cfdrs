@@ -11,7 +11,7 @@ The operator interacts with cloudflared through the CLI command tree, YAML/JSON 
 The top-level command tree provides tunnel CRUD, access login, service management, and diagnostic commands.
 
 | Command family | Description | Key atoms |
-|---|---|---|
+| --- | --- | --- |
 | `tunnel` (run, create, delete, list, info, cleanup, token) | Named-tunnel lifecycle and execution. | [cmd/cloudflared/tunnel/cmd](../../../atoms/cmd/cloudflared/tunnel/cmd.md), [cmd/cloudflared/tunnel/subcommands](../../../atoms/cmd/cloudflared/tunnel/subcommands.md), [cmd/cloudflared/tunnel/subcommand_context](../../../atoms/cmd/cloudflared/tunnel/subcommand_context.md) |
 | `tunnel route dns`, `tunnel route ip` | DNS and IP route provisioning for tunnels. | [cmd/cloudflared/tunnel/teamnet_subcommands](../../../atoms/cmd/cloudflared/tunnel/teamnet_subcommands.md), [cmd/cloudflared/tunnel/subcommand_context_teamnet](../../../atoms/cmd/cloudflared/tunnel/subcommand_context_teamnet.md) |
 | `tunnel route vnet` | Virtual-network CRUD for private routing. | [cmd/cloudflared/tunnel/vnets_subcommands](../../../atoms/cmd/cloudflared/tunnel/vnets_subcommands.md), [cmd/cloudflared/tunnel/subcommand_context_vnets](../../../atoms/cmd/cloudflared/tunnel/subcommand_context_vnets.md) |
@@ -27,7 +27,7 @@ Deeper CLI and flag documentation: [cli](../cli.md).
 The operator supplies runtime configuration through YAML files discovered by a platform-dependent search path, environment variables, or CLI flags. Configuration undergoes a layered merge: CLI flags override config-file values which override defaults.
 
 | Aspect | Contract | Atoms |
-|---|---|---|
+| --- | --- | --- |
 | Config file discovery | Platform search path → `FindDefaultConfigPath()` | [config/configuration](../../../atoms/config/configuration.md) |
 | Config model types | `Configuration`, `NamedTunnel`, `OriginRequestConfig` | [config/model](../../../atoms/config/model.md) |
 | Ingress rules | `ingress:` YAML block → rule matching engine | [ingress/ingress](../../../atoms/ingress/ingress.md), [ingress/rule](../../../atoms/ingress/rule.md) |
@@ -41,7 +41,7 @@ Deeper configuration documentation: [config](../config.md).
 When no named tunnel is configured, the operator can run an ephemeral quick tunnel via `--url` or `--hello-world`. Quick tunnels obtain a random `*.trycloudflare.com` hostname from the quick-tunnel service endpoint.
 
 | Contract | Detail | Atom |
-|---|---|---|
+| --- | --- | --- |
 | Provisioning endpoint | `https://api.trycloudflare.com` POST | [cmd/cloudflared/tunnel/quick_tunnel](../../../atoms/cmd/cloudflared/tunnel/quick_tunnel.md) |
 | Constraints | No ICMP packet routing, no custom ingress rules | [cmd/cloudflared/tunnel/cmd](../../../atoms/cmd/cloudflared/tunnel/cmd.md) |
 | URL broadcasting | `observer.SendURL(quickTunnelURL)` → metrics counter | [connection/observer](../../../atoms/connection/observer.md) |
@@ -61,7 +61,7 @@ The operating system interacts with cloudflared through service lifecycle manage
 Platform-specific service installation writes unit files, plist files, or Windows service registrations.
 
 | Platform | Service manager | Install atom | Template atom |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Linux | systemd / sysv | [cmd/cloudflared/linux_service](../../../atoms/cmd/cloudflared/linux_service.md) | [cmd/cloudflared/service_template](../../../atoms/cmd/cloudflared/service_template.md) |
 | macOS | launchd (daemon + user agent) | [cmd/cloudflared/macos_service](../../../atoms/cmd/cloudflared/macos_service.md) | [cmd/cloudflared/service_template](../../../atoms/cmd/cloudflared/service_template.md) |
 | Windows | Service Control Manager | [cmd/cloudflared/windows_service](../../../atoms/cmd/cloudflared/windows_service.md) | [cmd/cloudflared/service_template](../../../atoms/cmd/cloudflared/service_template.md) |
@@ -77,7 +77,7 @@ Deeper platform documentation: [platforms](../platforms.md), [deployments](../de
 cloudflared registers signal handlers for graceful shutdown and reconnection.
 
 | Signal | Behavior | Atoms |
-|---|---|---|
+| --- | --- | --- |
 | `SIGINT`, `SIGTERM` | Initiates graceful shutdown → grace period → force exit | [signal/safe_signal](../../../atoms/signal/safe_signal.md) |
 | systemd `READY=1` | Sent after first successful connection via `daemon.SdNotify` | [cmd/cloudflared/tunnel/cmd](../../../atoms/cmd/cloudflared/tunnel/cmd.md) |
 
@@ -86,7 +86,7 @@ cloudflared registers signal handlers for graceful shutdown and reconnection.
 The auto-updater runs as a background goroutine checking for new versions at configurable intervals.
 
 | Aspect | Detail | Atoms |
-|---|---|---|
+| --- | --- | --- |
 | Update check | Periodic version comparison against update server | [cmd/cloudflared/updater/check](../../../atoms/cmd/cloudflared/updater/check.md) |
 | Update execution | Download, verify, exec replacement binary | [cmd/cloudflared/updater/update](../../../atoms/cmd/cloudflared/updater/update.md) |
 | Service integration | Update-as-service for managed installs | [cmd/cloudflared/updater/service](../../../atoms/cmd/cloudflared/updater/service.md) |

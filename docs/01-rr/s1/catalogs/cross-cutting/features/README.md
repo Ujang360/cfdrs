@@ -164,7 +164,7 @@ flowchart LR
 ## Stakeholder Interaction Matrix
 
 | Stakeholder | Reads from | Writes to | Behavioral catalogs |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Operator / Human | stdout, config files, credentials | CLI commands, config files, stdin | [cli](../cli.md), [config](../config.md), [deployments](../deployments/README.md) |
 | Cloudflare Edge | Registration responses, proxied requests | Registration, config export, proxy responses | [edge-interactions](../edge-interactions.md), [tunnels](../tunnels.md), [tunnels-transport](../tunnels-transport.md) |
 | Dashboard & API | cfapi responses, management service data | cfapi requests, remote config updates | [upstream-api-contracts](../upstream-api-contracts.md), [observabilities](../observabilities.md) |

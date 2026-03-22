@@ -9,7 +9,7 @@
 The [Makefile](https://github.com/cloudflare/cloudflared/blob/2026.3.0/Makefile) produces the core binary via `make cloudflared`. Compile-time version information is embedded via `-ldflags`:
 
 | Linker variable | Source | Purpose |
-|---|---|---|
+| --- | --- | --- |
 | `main.Version` | `git describe --tags --always` | Semantic version string |
 | `main.BuildTime` | `date -u -r RELEASE_NOTES` | UTC build timestamp |
 | `updater.BuiltForPackageManager` | `PACKAGE_MANAGER` env var | Identifies deb/rpm/brew origin for auto-update suppression |
@@ -21,7 +21,7 @@ Build artifact evidence: [cmd/cloudflared/cliutil/build_info](../../../atoms/cmd
 ### Binary Naming
 
 | Build mode | Binary name | Notes |
-|---|---|---|
+| --- | --- | --- |
 | Standard | `cloudflared` | Default for all non-FIPS builds |
 | FIPS | `cloudflared-fips` | Unless `ORIGINAL_NAME=true`, which keeps `cloudflared` |
 | Nightly | `cloudflared-nightly` | Package name only; binary installed as `cloudflared` |
@@ -29,7 +29,7 @@ Build artifact evidence: [cmd/cloudflared/cliutil/build_info](../../../atoms/cmd
 ### Install Destinations
 
 | Artifact | Makefile path | Notes |
-|---|---|---|
+| --- | --- | --- |
 | Binary | `/usr/bin/cloudflared` (`$(PREFIX)/bin/`) | Installed with `0755` permissions |
 | Man page | `/usr/share/man/man1/cloudflared.1` (`$(PREFIX)/share/man/man1/`) | Installed with `0644` permissions |
 
@@ -46,7 +46,7 @@ FIPS evidence: [fips/fips](../../../atoms/fips/fips.md), [fips/nofips](../../../
 Both formats are produced by [fpm](https://fpm.readthedocs.io/) via the `build_package` Makefile function:
 
 | Field | Value |
-|---|---|
+| --- | --- |
 | Description | `Cloudflare Tunnel daemon` |
 | Vendor | `Cloudflare` |
 | License | `Apache License Version 2.0` |
@@ -87,7 +87,7 @@ Removes the symlink and sentinel file. Does **not** remove config directory or c
 The [cloudflared.wxs](https://github.com/cloudflare/cloudflared/blob/2026.3.0/cloudflared.wxs) WiX manifest defines:
 
 | Property | Value |
-|---|---|
+| --- | --- |
 | Install scope | `perMachine` |
 | Install directory | `%ProgramFiles%\cloudflared\` (64-bit) or `%ProgramFiles(x86)%\cloudflared\` (32-bit) |
 | PATH addition | `[INSTALLDIR]` appended to system `PATH` |
@@ -97,7 +97,7 @@ The [cloudflared.wxs](https://github.com/cloudflare/cloudflared/blob/2026.3.0/cl
 ### Docker Container Image
 
 | Property | Value |
-|---|---|
+| --- | --- |
 | Builder base | `golang:1.24.13` |
 | Runtime base | `gcr.io/distroless/base-debian13:nonroot` |
 | Binary location | `/usr/local/bin/cloudflared` |
@@ -115,7 +115,7 @@ Container builds set `CONTAINER_BUILD=1`, which embeds `metrics.Runtime=virtual`
 ### Linux (Package-Managed)
 
 | Path | Type | Owner | Purpose |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `/usr/bin/cloudflared` | binary | root | Primary binary installed by deb/rpm |
 | `/usr/local/bin/cloudflared` | symlink | root | `postinst.sh` symlink to `/usr/bin/cloudflared` |
 | `/usr/share/man/man1/cloudflared.1` | file | root | Man page |
@@ -138,7 +138,7 @@ Container builds set `CONTAINER_BUILD=1`, which embeds `metrics.Runtime=virtual`
 ### macOS
 
 | Path | Type | Owner | Purpose |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Binary path | binary | user/root | Wherever installed (Homebrew: `/opt/homebrew/bin/cloudflared`) |
 | `/Library/LaunchDaemons/com.cloudflare.cloudflared.plist` | plist | root | System daemon (root install) |
 | `~/Library/LaunchAgents/com.cloudflare.cloudflared.plist` | plist | user | User agent (non-root install) |
@@ -153,7 +153,7 @@ Container builds set `CONTAINER_BUILD=1`, which embeds `metrics.Runtime=virtual`
 ### Windows
 
 | Path | Type | Owner | Purpose |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `%ProgramFiles%\cloudflared\cloudflared.exe` | binary | SYSTEM | MSI install target (64-bit) |
 | `%ProgramFiles(x86)%\cloudflared\cloudflared.exe` | binary | SYSTEM | MSI install target (32-bit) |
 | `%USERPROFILE%\.cloudflared\cert.pem` | file | user | Origin certificate |
@@ -167,7 +167,7 @@ Windows config directory discovery: `CFDPATH` env var → `%ProgramFiles(x86)%\c
 ### Docker Container
 
 | Path | Type | Owner | Purpose |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `/usr/local/bin/cloudflared` | binary | `65532:65532` | Copied from builder stage with `--chown=nonroot` |
 
 No config files, credential files, or service units are embedded in the image. All configuration must be provided at runtime via volume mounts, environment variables, or CLI arguments (commonly `--token`).

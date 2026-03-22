@@ -79,7 +79,7 @@ sequenceDiagram
 ## Domain Map
 
 | Domain | Description | Representative atoms |
-|---|---|---|
+| --- | --- | --- |
 | Datagram session runtime | Core session object lifecycle, activity tracking, and close behavior. | [datagramsession/session](../../atoms/datagramsession/session.md), [datagramsession/event](../../atoms/datagramsession/event.md), [packet/session](../../atoms/packet/session.md) |
 | Session manager orchestration | Session registry, register/unregister flow, and fanout routing to active sessions. | [datagramsession/manager](../../atoms/datagramsession/manager.md), [quic/v3/manager](../../atoms/quic/v3/manager.md) |
 | Datagram transport adapters | V2 and V3 handler contracts bridging edge datagrams to session managers. | [connection/quic_datagram_v2](../../atoms/connection/quic_datagram_v2.md), [connection/quic_datagram_v3](../../atoms/connection/quic_datagram_v3.md), [quic/v3/muxer](../../atoms/quic/v3/muxer.md) |
@@ -91,7 +91,7 @@ sequenceDiagram
 ## Lifecycle and State Contracts
 
 | Stage | Contract |
-|---|---|
+| --- | --- |
 | Registration | Datagram handlers accept session registration requests and invoke manager registration with destination and idle hints. |
 | Activation | Managers materialize session instances and wire transport/origin streams for bidirectional forwarding. |
 | Activity tracking | Session runtime marks activity on payload transfer and resets idle timers to avoid premature closure. |
@@ -104,7 +104,7 @@ Primary evidence: [datagramsession/session](../../atoms/datagramsession/session.
 ## RPC and Schema Contracts
 
 | Surface | Contracted behavior |
-|---|---|
+| --- | --- |
 | QUIC session client | Exposes `RegisterUdpSession` and `UnregisterUdpSession` with timeout-bounded request semantics and trace context propagation. |
 | QUIC session server | Serves SessionManager RPC streams and dispatches register/unregister calls to backing manager implementations. |
 | POGS session manager | Marshals session registration fields (session ID, destination, idle hint, trace context) across Cap'n Proto boundaries. |
@@ -115,7 +115,7 @@ Primary evidence: [tunnelrpc/quic/session_client](../../atoms/tunnelrpc/quic/ses
 ## Management Session Contracts
 
 | Surface | Session-management behavior |
-|---|---|
+| --- | --- |
 | Websocket session state | Management log-stream sessions maintain active state, bounded queues, and dynamic event filters. |
 | Stream lifecycle control | Management service enforces stream-start gating and parses client filter events before emitting logs. |
 | Event serialization | Management events layer normalizes client/server event codecs and websocket close/error classification. |
@@ -151,7 +151,7 @@ Primary evidence: [management/session](../../atoms/management/session.md), [mana
 ### Datagram Session Idle Timeout
 
 | Constant | Value | Source |
-|---|---|---|
+| --- | --- | --- |
 | `defaultCloseIdleAfter` | `210 seconds` (3 min 30 sec) | [datagramsession/session.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/datagramsession/session.go) |
 | Idle check frequency | $\frac{\text{closeAfterIdle}}{8}$ | Same file |
 | Read buffer size | `1500 bytes` (`maxPacketSize` const) | Same file |
@@ -178,7 +178,7 @@ The `ErrVithVariableSeverity` interface (note: typo in upstream source — "Vith
 ### Management Session Constants
 
 | Constant | Value | Source |
-|---|---|---|
+| --- | --- | --- |
 | Management WS idle timeout | `5 minutes` | [management/service.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/management/service.go) |
 | Management WS heartbeat | `15 seconds` (ping ticker) | Same file |
 | `StatusInvalidCommand` | `4001` | Same file |
@@ -194,7 +194,7 @@ The `ErrVithVariableSeverity` interface (note: typo in upstream source — "Vith
 ### V2 vs V3 Behavioral Differences
 
 | Aspect | V2 (datagramsession) | V3 (quic/v3) |
-|---|---|---|
+| --- | --- | --- |
 | Registration path | RPC-based via tunnelrpc session client | Local manager registration without RPC round-trip |
 | Session migration | Not supported | Supported via muxer migration branches |
 | Payload framing | Datagram manager message routing | Direct QUIC datagram stream dispatch |
@@ -222,7 +222,7 @@ This catalog shares 10 atoms with [state-machines](state-machines.md) ($J = 0.33
 ### Shared Atom Inventory
 
 | Shared atom | Sessions perspective | State-machines perspective |
-|---|---|---|
+| --- | --- | --- |
 | [connection/quic_datagram_v2](../../atoms/connection/quic_datagram_v2.md) | V2 datagram transport adapter for session dispatch | V2 handler state transitions in registration and payload forwarding |
 | [connection/quic_datagram_v3](../../atoms/connection/quic_datagram_v3.md) | V3 datagram transport adapter for session dispatch | V3 handler state transitions including migration branches |
 | [datagramsession/event](../../atoms/datagramsession/event.md) | Session event types driving registration and close | Event-triggered state transitions in session lifecycle |

@@ -19,7 +19,7 @@ The catalog is organized into four sub-catalogs by architectural domain:
 ## Test Suite Statistics
 
 | Metric | Value |
-|---|---|
+| --- | --- |
 | Total `_test.go` files | 123 |
 | Estimated test functions | ~280 |
 | Fuzz targets | 8 |
@@ -34,7 +34,7 @@ The upstream test suite employs a consistent set of testing patterns. Understand
 ### Assertion Patterns
 
 | Go Pattern | Rust Equivalent | Prevalence |
-|---|---|---|
+| --- | --- | --- |
 | `testify/assert` (soft fail) | `assert!` / `assert_eq!` | ~90% of files |
 | `testify/require` (hard fail) | `assert!` with early return | ~70% of files |
 | stdlib `t.Fatal`/`t.Errorf` | `panic!` / `assert!` | ~15% of files |
@@ -42,7 +42,7 @@ The upstream test suite employs a consistent set of testing patterns. Understand
 ### Structural Patterns
 
 | Pattern | Description | Prevalence | Key Files |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Table-driven tests | `[]struct` slice iterated with `t.Run` | ~65% of files | ingress, features, connection, cfapi |
 | Fuzz testing | `func Fuzz*(f *testing.F)` with corpus | 8 targets in 4 files | `quic/v3/datagram`, `packet/decoder`, `tracing`, `validation` |
 | Benchmarks | `func Benchmark*(b *testing.B)` | 3 targets | `connection/http2`, `ingress` |
@@ -59,7 +59,7 @@ The upstream test suite employs a consistent set of testing patterns. Understand
 ### Mock Type Taxonomy
 
 | Mock Category | Examples | Purpose |
-|---|---|---|
+| --- | --- | --- |
 | Protocol mocks | `mockQuicConn`, `mockRPCStream`, `mockOriginProxy` | Simulate transport endpoints |
 | Session mocks | `mockSession`, `mockSessionManager`, `mockSessionRPCServer` | Control session lifecycle |
 | Network mocks | `mockMuxer`, `mockEyeball`, `mockICMPRouter` | Simulate edge connectivity |
@@ -71,7 +71,7 @@ The upstream test suite employs a consistent set of testing patterns. Understand
 ### Test Infrastructure Files
 
 | File | Purpose |
-|---|---|
+| --- | --- |
 | [internal/test/wstest.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/internal/test/wstest.go) | `WSPipe` — in-memory WebSocket client/server pair for management tests |
 | [mocks/mockgen.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/mocks/mockgen.go) | gomock-generated `MockLimiter` for `flow.Limiter` interface |
 | [mocks/mock\_limiter.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/mocks/mock_limiter.go) | gomock `MockLimiter` implementation |
@@ -152,7 +152,7 @@ flowchart TD
 This catalog acts as a behavioral contract mirror for every domain catalog. The following table maps test file clusters to the domain catalogs whose contracts they validate.
 
 | Test Domain | Files | Primary Catalog Overlap | Secondary Overlap |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | connection/* | 7 | [tunnels-transport](../domain/tunnels-transport.md) | [wire-protocol](wire-protocol/README.md), [concurrency](concurrency/README.md) |
 | quic/* | 2 | [tunnels-transport](../domain/tunnels-transport.md) | [sessions](../domain/sessions.md) |
 | quic/v3/* | 8 | [sessions](../domain/sessions.md) | [wire-protocol](wire-protocol/README.md), [tunnels-transport](../domain/tunnels-transport.md) |
@@ -196,7 +196,7 @@ Tests encode behavioral contracts at varying levels of criticality. The followin
 ### Tier 1 — Correctness-Critical (Must-Port First)
 
 | Test Cluster | Reason | Test Count |
-|---|---|---|
+| --- | --- | --- |
 | `connection/*` | Core tunnel transport, registration, graceful shutdown | ~25 |
 | `quic/v3/*` | Primary datagram path, session lifecycle, fuzz coverage | ~40 |
 | `proxy/*` | All 8 connection type permutations, SSE, error propagation | ~10 |
@@ -207,7 +207,7 @@ Tests encode behavioral contracts at varying levels of criticality. The followin
 ### Tier 2 — Behavioral Fidelity (Port Before Release)
 
 | Test Cluster | Reason | Test Count |
-|---|---|---|
+| --- | --- | --- |
 | `orchestration/*` | Config hot-reload, concurrent safety | ~10 |
 | `datagramsession/*` | Legacy session manager, bidirectional relay | ~8 |
 | `features/*` | Feature flag resolution, snapshot isolation | ~8 |
@@ -218,7 +218,7 @@ Tests encode behavioral contracts at varying levels of criticality. The followin
 ### Tier 3 — Completeness (Port for Parity)
 
 | Test Cluster | Reason | Test Count |
-|---|---|---|
+| --- | --- | --- |
 | `cfapi/*` | JSON serialization contracts | ~12 |
 | `packet/*` | ICMP encode/decode, fuzz targets | ~10 |
 | `socks/*` | SOCKS5 protocol compliance | ~5 |
@@ -230,7 +230,7 @@ Tests encode behavioral contracts at varying levels of criticality. The followin
 ## Sub-Catalog Index
 
 | Sub-Catalog | Packages Covered | Test Files | Estimated Tests |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | [tests-transport](tests-transport.md) | connection, quic, tunnelrpc, tlsconfig, websocket | 13 | ~65 |
 | [tests-proxy-ingress](tests-proxy-ingress.md) | proxy, ingress, orchestration, supervisor, socks, carrier | 27 | ~80 |
 | [tests-sessions-packets](tests-sessions-packets.md) | quic/v3, datagramsession, packet, flow, stream | 15 | ~65 |
