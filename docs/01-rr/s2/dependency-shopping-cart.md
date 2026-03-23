@@ -511,9 +511,13 @@ deferred to S4 if contention benchmarks warrant it.
 - `capnp` + `capnpc` + `capnp-rpc` are the Cap'n Proto stack —
   maintained by David Renshaw (original Cap'n Proto team); Go schemas
   can be reused directly with `capnpc` codegen; POGS-style adapter
-  layer must be hand-written (custom work)
+  layer must be hand-written (custom work).
+  **lib.rs update:** latest is 0.25.2 (cart lists 0.20.x) — evaluate
+  breaking changes before pinning version
 - `prost` for protobuf — datagram v2 uses protobuf for tracing spans
-  (`0x03` frame type)
+  (`0x03` frame type). **lib.rs note:** passively maintained —
+  maintainer expects official `protobuf` crate to supersede; factor
+  into long-term dependency planning
 - cloudflared config is YAML-native; config hot-reload and CLI flag
   overlay both depend on YAML decode; 5-layer config precedence
   (flags > env > file > defaults > zero)
@@ -1802,6 +1806,144 @@ Decisions requiring formal ADRs in phase 2.4 based on this analysis:
 **Pre-decided (not requiring ADR):** tokio runtime (§1.1),
 `serde_yaml` 0.9.x (§2.1), `chrono` 0.4.x (§6.2), MSRV ≥ 1.75
 (§1.2), h3 deferred to FC (§3.1), mimalloc feature-flagged (§1.6).
+
+---
+
+## lib.rs Ecosystem Classification
+
+Crate categorization sourced from [lib.rs](https://lib.rs), the
+community-maintained Rust crate directory. lib.rs applies manual
+editorial categorization (unlike crates.io's author-chosen keywords),
+providing a curated ecosystem taxonomy. Rank is the crate's position
+within its primary lib.rs category. Downloads are monthly.
+
+### Purpose
+
+This dimension complements the existing T/M/S scoring and shopping cart
+layers. lib.rs categories reveal:
+
+- **Ecosystem dominance** — crates ranked #1–3 in their category are
+  de facto standards
+- **Category concentration** — when multiple shopping cart crates share
+  a lib.rs category, they compete for the same niche
+- **Maturity signal** — high download counts with top-3 rank indicate
+  strong ecosystem convergence
+
+### lib.rs Category Map
+
+| Crate | lib.rs Category | Rank | Downloads/mo | Layer | Key Findings |
+| --- | --- | --- | --- | --- | --- |
+| `tokio` | Asynchronous | #20 | 40.1M | 1 | v1.50.0, MSRV 1.71 |
+| `tokio-util` | Asynchronous | #953 | 32.9M | 1 | |
+| `tokio-stream` | Asynchronous | #150 | 22.6M | 1 | |
+| `futures` | Asynchronous | #1 | 34.4M | 1 | De facto standard for futures trait extensions |
+| `futures-lite` | Asynchronous | #9 | 12.6M | 1 | Lighter alternative, smol ecosystem |
+| `glommio` | Concurrency | #392 | 3.2K | 1 | Niche — thread-per-core, io-uring only |
+| `crossbeam-channel` | Concurrency | #107 | 22.5M | 1 | MPMC channels, Go-style select |
+| `parking_lot` | Concurrency | #1 | 44.8M | 1 | **Category leader.** 1.5–5× faster than std Mutex |
+| `dashmap` | Concurrency | #10 | 17.8M | 1 | v7.0.0-rc2 upcoming, MSRV 1.70 |
+| `signal-hook` | Rust patterns | #17 | 11.7M | 1 | v0.4.3, safe Unix signal handling |
+| `governor` | Network programming | #17 | 4.2M | 1 | GCRA rate limiter, 64-bit atomic state |
+| `moka` | Caching | #1 | 6.9M | 1 | **Category leader.** Caffeine-inspired, TinyLFU |
+| `serde` | Encoding | #42 | 50M | 2 | v1.0.228 |
+| `serde_json` | Encoding | #1 | 50.3M | 2 | **Category leader.** 500–1000 MB/s deser |
+| `serde_yaml` | Encoding | #2981 | 18.7M | 2 | **Deprecated upstream.** Still 18.7M downloads/mo |
+| `capnp` | Memory management | #10 | 797K | 2 | v0.25.2 (cart lists 0.20.x — **update needed**) |
+| `prost` | Encoding | #3 | 29M | 2 | **Passively maintained.** Expects official `protobuf` crate to supersede |
+| `bytes` | Rust patterns | #23 | 43.7M | 2 | v1.11.1, tokio-rs org |
+| `uuid` | Value formatting | #1 | 34.1M | 2 | **Category leader.** v1.22.0 |
+| `url` | Parser implementations | #6 | 38.6M | 2 | v2.5.8, WHATWG URL Standard |
+| `http` | Rust patterns | #6 | 44.9M | 2 | v1.4.0, hyperium org |
+| `smallvec` | Data structures | #4 | 47.7M | 2 | v2.0.0-alpha.12 in development |
+| `quinn` | Network programming | #7 | 17M | 3 | v0.11.9, has `rustls-aws-lc-rs-fips` feature |
+| `quiche` | Network programming | #52 | 179K | 3 | v0.26.1, **Cloudflare-owned**, uses BoringSSL, MSRV 1.85 |
+| `tokio-quiche` | Network programming | #1582 | 129K | 3 | v0.16.1, **Cloudflare-owned**, wraps quiche+tokio |
+| `hyper` | Web programming | #1 (HTTP server) | 40.6M | 3 | **Category leader.** |
+| `h2` | Asynchronous | #2 | 36.1M | 3 | v0.4.13 |
+| `rustls` | Cryptography | #2 | 43.9M | 3 | v0.24.0-dev.0, recommends `aws-lc-rs` as default provider |
+| `reqwest` | Web programming | #2 (HTTP client) | 32.5M | 3 | v0.13.x available (cart lists 0.12.x — **update needed**) |
+| `axum` | Web programming | #2 (HTTP server) | 22.4M | 3 | v0.8.8, cart lists 0.8.x (correct) |
+| `tower` | Network programming | #1 | 32.5M | 3 | **Category leader.** Service trait standard |
+| `pingora` | Network programming | #87 | 781K | 3 | v0.8.0, **Cloudflare-owned**, MSRV 1.84 |
+| `socket2` | Network programming | #6 | 57.8M | 3/9 | v0.6.3, rust-lang org, MSRV 1.70 |
+| `tracing` | Debugging | #1 | 37M | 4 | **Category leader.** v0.1.44, MSRV 1.65 |
+| `clap` | Command-line interface | #7 | 43.9M | 6 | v4.6.0, Rust 2024 edition |
+| `ipnet` | Network programming | #4 | 24.7M | 7 | v2.12.0, IPv4/IPv6 prefix types |
+| `ractor` | Asynchronous | #28 | 55K | 7 | v0.15.12, Erlang-inspired, used at Meta |
+| `aws-lc-rs` | Cryptography | #20 | 13.6M | 8 | v1.16.2, **FIPS via `fips` feature**, PQ crypto support |
+| `rustls-post-quantum` | Cryptography | #2382 | 6.7K | 8 | ML-KEM moved to rustls itself since v0.23.22 |
+| `boring` | Cryptography | #35 | 238K | 8 | v5.0.2, **Cloudflare-owned**, `fips`+`mlkem`+`rpk` features |
+| `nix` | Unix APIs | #3 | 37M | 9 | v0.31.2, MSRV 1.69 |
+| `thiserror` | Rust patterns | #6 | 68.2M | 5 | v2.0.18, MSRV 1.68 |
+| `anyhow` | Rust patterns | #3 | 41.6M | 5 | v1.0.102 |
+| `miette` | Rust patterns | #21 | 4.2M | 5 | v7.6.0, fancy diagnostics, MSRV 1.70 |
+| `prometheus-client` | Text processing | #26 | 2.2M | 4 | v0.24.0, Open Metrics spec |
+| `proptest` | Testing | #8 | 9.3M | 10 | v1.10.0, MSRV 1.84, Hypothesis-inspired |
+| `mockall` | Testing | #15 | 8M | 10 | v0.14.0, MSRV 1.77 |
+
+### Key Findings from lib.rs Research
+
+#### Version Updates Needed
+
+| Crate | Cart Version | lib.rs Latest | Action |
+| --- | --- | --- | --- |
+| `capnp` | 0.20.x | 0.25.2 | Update — significant version gap |
+| `reqwest` | 0.12.x | 0.13.x | Evaluate — new major bump available |
+| `boring` | 4.x | 5.0.2 | Update — major breaking changes in v5 |
+
+#### Ecosystem Intelligence
+
+- **`aws-lc-rs` is now the recommended default crypto provider for
+  `rustls`** — not just `ring`. Has native FIPS support via `fips`
+  feature flag and post-quantum crypto support. This strengthens
+  the quinn+rustls+aws-lc-rs FIPS path as a viable alternative to
+  boring+quiche
+- **`rustls-post-quantum`** — ML-KEM support has been moved into
+  `rustls` itself since v0.23.22; use the `prefer-post-quantum`
+  feature flag. The standalone crate is now mostly for ML-DSA via
+  `aws-lc-rs-unstable`
+- **`boring-rustls-provider`** does NOT exist on lib.rs — this was
+  a hypothesis, not a real crate. Remove from consideration
+- **`boring` v5.0.2** has breaking changes from v4; adds `fips`,
+  `mlkem`, `rpk` features; `hyper 1.x` only compatibility.
+  Cloudflare-owned
+- **`quiche` v0.26.1** has `boringssl-boring-crate` feature allowing
+  use of the `boring` crate for TLS — this simplifies the
+  boring+quiche integration story
+- **`tokio-quiche` v0.16.1** is Cloudflare's official async wrapper
+  around quiche+boring; depends on the `foundations` crate
+- **`prost` is passively maintained** — maintainer expects the
+  official `protobuf` crate to supersede it. Factor this into the
+  protobuf decision for datagram v2 tracing spans
+- **`serde_yaml` deprecated** but still at 18.7M downloads/mo —
+  confirms the pre-decision to use 0.9.x in S3 with planned
+  migration is sound
+- **`pingora`** — Cloudflare-owned, v0.8.0, supports HTTP 1/2 proxy,
+  TLS over OpenSSL/BoringSSL/rustls, MSRV 1.84. Ranks #87 in
+  Network programming. Worth evaluating for selective reuse
+
+#### Category Leaders Adopted
+
+Crates ranked #1–3 in their lib.rs category that appear in this
+shopping cart — these represent ecosystem convergence points:
+
+| Crate | Category | Rank | Implication |
+| --- | --- | --- | --- |
+| `futures` | Asynchronous | #1 | De facto async trait extensions |
+| `parking_lot` | Concurrency | #1 | De facto sync primitives |
+| `moka` | Caching | #1 | De facto async cache |
+| `serde_json` | Encoding | #1 | De facto JSON |
+| `uuid` | Value formatting | #1 | De facto identifier |
+| `hyper` | HTTP server | #1 | De facto HTTP |
+| `tower` | Network programming | #1 | De facto service middleware |
+| `tracing` | Debugging | #1 | De facto instrumentation |
+| `rustls` | Cryptography | #2 | De facto Rust-native TLS |
+| `reqwest` | HTTP client | #2 | De facto HTTP client |
+| `axum` | HTTP server | #2 | De facto web framework |
+| `h2` | Asynchronous | #2 | De facto HTTP/2 |
+| `anyhow` | Rust patterns | #3 | De facto app error handling |
+| `nix` | Unix APIs | #3 | De facto Unix syscalls |
+| `prost` | Encoding | #3 | De facto protobuf (but passively maintained) |
 
 ---
 
