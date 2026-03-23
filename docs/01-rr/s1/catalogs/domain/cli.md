@@ -215,6 +215,33 @@ _Cross-referenced against [cmd/cloudflared/tunnel/cmd.go](https://github.com/clo
 
 - **Quirk — stdin-control reconnect.** When `--stdin-control` is enabled, the `stdinControl` goroutine reads commands from stdin. Only `reconnect [delay]` is supported; any unknown command triggers a help message.
 
+### Access Forwarder Listener Type
+
+_Cross-referenced against
+[cmd/cloudflared/access/carrier.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/cmd/cloudflared/access/carrier.go)
+and
+[carrier/carrier.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/carrier/carrier.go)
+at tag `2026.3.0`._
+
+- **Plain TCP, not SOCKS5.** `cloudflared access tcp` (and its
+  aliases `rdp`, `ssh`, `smb`) opens a **plain TCP listener** via
+  `net.Listen("tcp", address)` in `carrier.StartForwarder()`.
+  Accepted connections are wrapped in a WebSocket to the Cloudflare
+  edge. No SOCKS5 negotiation occurs on the client side.
+
+- **Intentional omission comment.** Both `StartForwarder()` and
+  `ssh()` in `cmd/cloudflared/access/carrier.go` contain:
+  `// we could add a cmd line variable for this bool if we want the
+  SOCK5 server to be on the client side` — confirming SOCKS5 was
+  considered but not implemented for the access path.
+
+- **Implication for proxy variant taxonomy.** SOCKS5 exists only on
+  the tunnel/ingress side (inbound proxy via `socks` origin service).
+  The access path is a plain TCP-to-WebSocket forwarder. This means
+  there is **one** SOCKS5 server surface (tunnel-side), not two.
+  See [proxy-data-taxonomy](../../proxy-data-taxonomy.md) and
+  [config/model](../../atoms/config/model.md) for struct field evidence.
+
 ### Hostname Default Ports
 
 `hostnameFromURI` maps schemes to default ports for tunnel access paths:
