@@ -7,7 +7,7 @@ listed per domain to support architectural decisions in later phases.
 
 **Baseline:** cloudflare/cloudflared @ tag `2026.3.0`
 **Source:** All 30 S1 catalogs (22 domain + 8 cross-cutting)
-**Status:** Shopping cart — no decisions finalized
+**Status:** Shopping cart — decisions finalized in [dependency-decisions.md](dependency-decisions.md)
 
 ## Methodology
 

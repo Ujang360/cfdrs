@@ -18,7 +18,7 @@ documentation stratum set. The repo is designed to outlive all three.
 
 | # | Code | Name | Status |
 | --- | ------ | ------ | -------- |
-| 1 | [RR](01-rr/README.md) | Rust Rewrite | Active — S2/SUBSTRATE next |
+| 1 | [RR](01-rr/README.md) | Rust Rewrite | Active — S2/SUBSTRATE in progress |
 | 2 | [FC](02-fc/README.md) | Feature Complete | TBD |
 | 3 | [UM](03-um/README.md) | Upstream Maintenance | TBD |
 
@@ -32,8 +32,8 @@ RR ─────────────────────────�
 │   47 hub atoms · 8 Jaccard clusters · tests oracle
 │   └── exit gate: PASSED
 │
-├── S2/SUBSTRATE    ⏳ NEXT
-│   Dependencies (2 layers) · Scope · Risks · ADRs · Invariants
+├── S2/SUBSTRATE    🔨 ACTIVE
+│   ✅ Dependencies · Scope · Risks · ADRs · Invariants
 │   Architecture · Parity harness · Stages · Environment · Coherency
 │   └── exit gate: full traceability chain
 │

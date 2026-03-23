@@ -14,7 +14,7 @@ scoped — what RR leaves behind becomes FC's starting point.
 | Stratum | Tag | Purpose | Status |
 | --------- | ----- | --------- | -------- |
 | 1 | [RAW](s1/README.md) | Go source behavior extraction | Closed |
-| 2 | SUBSTRATE | Rust-aware design decisions | Next |
+| 2 | SUBSTRATE | Rust-aware design decisions | Active |
 | 3 | COOK | Rust implementation | Not started |
 | 4 | SERVING | Verification, conformance, deploy-ready | Not started |
 
@@ -59,18 +59,18 @@ Go behavior becomes Rust architecture.
 **Methodology:** Two-model handoff on all prompts — Sonnet 4.6 (first
 pass) + GPT 5.4 (verification pass).
 
-| Phase | Description | Artifact |
-| --- | --- | --- |
-| 2.1 | Dependencies vetting — plumbing + behavioral layers | [s2/dependency-shopping-cart.md](s2/dependency-shopping-cart.md) |
-| 2.2 | Scoping — platform matrix, MoSCoW, explicit non-ports | `s2/scope.md` |
-| 2.3 | Risk register — probability × impact from catalogs | `s2/risks.md` |
-| 2.4 | ADRs — one per decision, references catalog evidence | `s2/adr/NNN-*.md` |
-| 2.5 | Invariants — behavioral invariants → proptest properties | `s2/invariants.md` |
-| 2.6 | Architecture — crate boundaries from Jaccard clusters | `s2/architecture.md` |
-| 2.7 | Parity harness — TOML contracts, oracle, red-by-default | `s2/parity-design.md` |
-| 2.8 | Stages plan — phased from critical path + dep graph | `s2/stages/phase-*.md` |
-| 2.9 | Environment + guardrails — workspace, style, CI/CD | `s2/environment.md` |
-| 2.10 | Coherency audit — full traceability chain | `s2/coherency-report.md` |
+| Phase | Description | Artifact | Status |
+| --- | --- | --- | --- |
+| 2.1 | Dependencies vetting — plumbing + behavioral layers | [shopping cart](s2/dependency-shopping-cart.md), [decisions](s2/dependency-decisions.md) | Done |
+| 2.2 | Scoping — platform matrix, MoSCoW, explicit non-ports | `s2/scope.md` | — |
+| 2.3 | Risk register — probability × impact from catalogs | `s2/risks.md` | — |
+| 2.4 | ADRs — one per decision, references catalog evidence | `s2/adr/NNN-*.md` | — |
+| 2.5 | Invariants — behavioral invariants → proptest properties | `s2/invariants.md` | — |
+| 2.6 | Architecture — crate boundaries from Jaccard clusters | `s2/architecture.md` | — |
+| 2.7 | Parity harness — TOML contracts, oracle, red-by-default | `s2/parity-design.md` | — |
+| 2.8 | Stages plan — phased from critical path + dep graph | `s2/stages/phase-*.md` | — |
+| 2.9 | Environment + guardrails — workspace, style, CI/CD | `s2/environment.md` | — |
+| 2.10 | Coherency audit — full traceability chain | `s2/coherency-report.md` | — |
 
 ### Dependency vetting layers (Phase 2.1)
 
