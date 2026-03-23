@@ -27,6 +27,14 @@ Upstream evidence from [cloudflared@2026.3.0](https://github.com/cloudflare/clou
 - **Session registration RPCs** — v2 `RegisterUdpSession` /
   `UnregisterUdpSession` serve the data plane by establishing proxy data
   channels (classified as proxy data per project decision)
+- **Registration RPC frames** — `RegisterConnection`,
+  `UnregisterConnection`, `waitForUnregister` — session-based proxy
+  data that configures the connection identity
+- **Configuration sync frames** — `SendLocalConfiguration`,
+  `UpdateConfiguration` — session-based proxy data that mutates
+  connection state
+- **Graceful shutdown frames** — `GracefulShutdown` — session-based
+  proxy data that terminates the proxy session
 
 The proxy data plane encompasses: ingress rule matching, origin service
 dispatch, stream piping, datagram muxing, flow control, and proxy-layer
@@ -37,12 +45,9 @@ error handling.
 The tunnel's transport state machine — connection lifecycle management that
 carries no end-user traffic. Upstream evidence:
 
-- **Registration RPC** — `controlStream.ServeControlStream()` →
-  `RegisterConnection`, `waitForUnregister`
-- **Configuration sync** — `SendLocalConfiguration`,
-  `handleConfigurationUpdate()`, `UpdateConfiguration()` over HTTP/2 and
-  QUIC RPC
-- **Graceful shutdown** — `GracefulShutdown` RPC on the control stream
+- **RPC transport mechanics** — the control stream as a QUIC/HTTP2
+  stream object; stream establishment, framing, and teardown managed
+  by the transport library layer
 - **Protocol selection** — `protocolFallback`, `selectNextProtocol`,
   edge protocol negotiation
 - **Edge address rotation** — DNS/SRV-based address selection, reconnect
@@ -89,22 +94,20 @@ file and verified against upstream source.
 | [stream/stream](atoms/stream/stream.md) | 9 | Bidirectional stream pipe |
 | [tunnelrpc/quic/session_client](atoms/tunnelrpc/quic/session_client.md) | 10 | Session registration RPC client |
 | [tunnelrpc/pogs/session_manager](atoms/tunnelrpc/pogs/session_manager.md) | 8 | Session manager RPC |
+| [tunnelrpc/quic/cloudflared_client](atoms/tunnelrpc/quic/cloudflared_client.md) | 10 | Registration + config + shutdown RPC — session-based proxy data |
+| [tunnelrpc/registration_client](atoms/tunnelrpc/registration_client.md) | 10 | Registration RPC client — session-based proxy data |
+| [tunnelrpc/pogs/registration_server](atoms/tunnelrpc/pogs/registration_server.md) | 8 | Registration server RPC — session-based proxy data |
+| [tunnelrpc/pogs/configuration_manager](atoms/tunnelrpc/pogs/configuration_manager.md) | 9 | Configuration manager RPC — session-based proxy data |
+| [tunnelrpc/proto/tunnelrpc.capnp](atoms/tunnelrpc/proto/tunnelrpc.capnp.md) | 8 | Cap'n Proto RPC schema — defines all proxy data message formats |
+| [tunnelrpc/metrics/metrics](atoms/tunnelrpc/metrics/metrics.md) | 8 | RPC instrumentation — measures proxy data operations |
 
 ### Transport Control Atoms
 
 | Atom | Catalogs | Role |
 | --- | ---: | --- |
-| [connection/control](atoms/connection/control.md) | 14 | RPC control stream multiplexer |
 | [connection/protocol](atoms/connection/protocol.md) | 13 | Protocol selection and fallback |
 | [supervisor/tunnel](atoms/supervisor/tunnel.md) | 12 | Tunnel supervisor loop |
 | [supervisor/supervisor](atoms/supervisor/supervisor.md) | 10 | Supervisor HA startup loop |
-| [tunnelrpc/quic/cloudflared_client](atoms/tunnelrpc/quic/cloudflared_client.md) | 10 | Cap'n Proto cloudflared client |
-| [tunnelrpc/registration_client](atoms/tunnelrpc/registration_client.md) | 10 | Registration RPC client |
-| [tunnelrpc/pogs/registration_server](atoms/tunnelrpc/pogs/registration_server.md) | 8 | Registration server RPC |
-| [tunnelrpc/pogs/configuration_manager](atoms/tunnelrpc/pogs/configuration_manager.md) | 9 | Configuration manager RPC |
-| [tunnelrpc/metrics/metrics](atoms/tunnelrpc/metrics/metrics.md) | 8 | Tunnel RPC metrics |
-| [tunnelrpc/proto/tunnelrpc.capnp](atoms/tunnelrpc/proto/tunnelrpc.capnp.md) | 8 | Cap'n Proto tunnel RPC schema |
-| [connection/errors](atoms/connection/errors.md) | 9 | Connection error taxonomy |
 | [connection/tunnelsforha](atoms/connection/tunnelsforha.md) | 8 | HA tunnel slot management |
 | [retry/backoffhandler](atoms/retry/backoffhandler.md) | 9 | Exponential backoff handler |
 | [tlsconfig/tlsconfig](atoms/tlsconfig/tlsconfig.md) | 8 | TLS configuration and cipher selection |
@@ -119,6 +122,8 @@ file and verified against upstream source.
 | [connection/quic_connection](atoms/connection/quic_connection.md) | 10 | mixed | QUIC connection — control RPC + proxy streams share one conn |
 | [orchestration/orchestrator](atoms/orchestration/orchestrator.md) | 10 | mixed | Config hot-reload (control) + proxy store (data) |
 | [connection/observer](atoms/connection/observer.md) | 10 | mixed | Observes events from both planes |
+| [connection/control](atoms/connection/control.md) | 14 | mixed | RPC control stream — carries proxy-data RPC frames; stream mechanics are transport-control |
+| [connection/errors](atoms/connection/errors.md) | 9 | mixed | Connection errors — spans transport (EdgeQuicDial, StreamListener) and proxy data (registration, datagram) |
 
 ### Out-of-Band Atoms
 
@@ -140,11 +145,11 @@ file and verified against upstream source.
 
 | Plane | Hub atoms | Combined catalog memberships |
 | --- | ---: | ---: |
-| Proxy data | 16 | 151 |
-| Transport control | 15 | 148 |
-| Mixed | 5 | 54 |
-| Out-of-band | 11 | 106 |
-| **Total** | **47** | **459** |
+| Proxy data | 22 | 199 |
+| Transport control | 7 | 69 |
+| Mixed | 7 | 77 |
+| Out-of-band | 11 | 105 |
+| **Total** | **47** | **450** |
 
 ## Per-Catalog Impact Assessment
 
@@ -161,7 +166,7 @@ clarification. **Low**: needs only a brief taxonomy reference note.
 | [proxying](catalogs/domain/proxying.md) | domain | proxy-data | Strengthen "IS proxy data" framing |
 | [tunnels-transport](catalogs/domain/tunnels-transport.md) | domain | mixed | Add proxy-data vs control column to transport matrix |
 | [sessions](catalogs/domain/sessions.md) | domain | proxy-data | Reframe as UDP proxy data lifecycle |
-| [capnp-rpc](catalogs/domain/capnp-rpc.md) | domain | mixed | Split RPCs by plane |
+| [capnp-rpc](catalogs/domain/capnp-rpc.md) | domain | mixed | Reclassify registration/config/shutdown RPC frames as session-based proxy data; transport mechanics remain transport-control; split domain map to show both planes |
 | [wire-protocol](catalogs/cross-cutting/wire-protocol/README.md) | cross-cutting | mixed | Add plane column to communication class matrix |
 | [state-machines](catalogs/domain/state-machines.md) | domain | mixed | Tag each state machine by plane |
 | [supervisor](catalogs/domain/supervisor.md) | domain | transport-control | Reframe as transport-control orchestration |
@@ -206,6 +211,111 @@ clarification. **Low**: needs only a brief taxonomy reference note.
 | Medium | 10 | Section-level plane labels |
 | Low | 9 | Brief taxonomy reference note only |
 | **Total** | **30** | |
+
+## Session Classification of Proxy Data
+
+The proxy data plane divides into two behavioral subtypes observable
+in the Go codebase — distinguished by whether the Go code manages
+explicit session state or dispatches statelessly per request.
+
+### Subtype Definitions
+
+**Session-Based Proxy Data**
+Proxy data that explicitly allocates, tracks, or tears down session
+identifiers or session state over time. Requires a session registry,
+lifecycle management, or identity tracking.
+
+**Sessionless Proxy Data**
+Proxy data that operates per request or per stream without an explicit
+long-lived session registry in the behavioral contract. Stateless after
+any initial handshake.
+
+### Session Classification Table
+
+All proxy data atoms classified by session subtype.
+
+| Atom | Session Subtype | Evidence |
+| --- | --- | --- |
+| `quic/v3/session` | session-based | RequestID tracking, migration, idle timeout |
+| `quic/v3/muxer` | session-based | Session dispatch registry, deconfliction |
+| `quic/v3/manager` | session-based | Manager registration, session sweep |
+| `connection/quic_datagram_v2` | session-based | Per-session goroutine loops, RPC registration |
+| `connection/quic_datagram_v3` | session-based | Manager/muxer model, RequestID |
+| `datagramsession/session` | session-based | UDP session lifecycle, idle timeout, 3 close paths |
+| `datagramsession/manager` | session-based | Session registry, bidirectional relay |
+| `tunnelrpc/quic/session_client` | session-based | RegisterUdpSession/UnregisterUdpSession lifecycle |
+| `tunnelrpc/pogs/session_manager` | session-based | Session registration RPC marshaling |
+| `ingress/icmp_linux` | session-based | Echo-ID tracking, 2 router goroutines, shared table |
+| `ingress/icmp_darwin` | session-based | Echo-ID tracking, macOS-specific router state |
+| `tunnelrpc/quic/cloudflared_client` | session-based | RegisterConnection identity, UpdateLocalConfiguration, GracefulShutdown |
+| `tunnelrpc/registration_client` | session-based | Connection registration lifecycle, explicit teardown |
+| `tunnelrpc/pogs/registration_server` | session-based | Registration server, explicit connection identity |
+| `tunnelrpc/pogs/configuration_manager` | session-based | State mutation on existing session |
+| `carrier/carrier` | sessionless | Per-connection WebSocket pipe, no session registry |
+| `stream/stream` | sessionless | Bidirectional byte pipe, stateless after setup |
+| `ingress/origin_service` | sessionless | Per-request origin dispatch, no session identity |
+| `connection/http2` (proxy streams only) | sessionless | Per-request HTTP/2 streams, no session registry |
+| `quic/v3/metrics` | session-based | Measures QUIC v3 session operations |
+| `datagramsession/metrics` | session-based | Measures datagram session operations |
+| `tunnelrpc/proto/tunnelrpc.capnp` | session-based | Defines all session-based RPC message formats |
+| `tunnelrpc/metrics/metrics` | session-based | Instruments session-based RPC calls |
+
+Note: Metrics and codec atoms (`quic/v3/metrics`, `datagramsession/metrics`,
+`tunnelrpc/metrics/metrics`, `tunnelrpc/proto/tunnelrpc.capnp`) are
+session-classified but are stateless instrumentation and type definitions
+— they do not manage session state themselves.
+
+Note: `connection/http2` and `connection/quic_connection` are mixed atoms.
+Their control-stream aspect is transport-control. Their proxy-stream
+aspect is sessionless proxy data.
+
+### Go Dispatch Model
+
+| Dispatch Pattern | Handles | Go Behavioral Character |
+| --- | --- | --- |
+| **Session-managed goroutines** | All session-based proxy data | Long-lived goroutines with session registries, explicit lifecycle teardown |
+| **Per-request handlers** | All sessionless proxy data | Short-lived per-request/stream goroutines, no session registry |
+| **Transport state machine** | QUIC mechanics, TLS, HTTP/2 framing | Connection-level goroutines managing transport lifecycle — not proxy data dispatch |
+
+### Session-Managed Atom Set
+
+These atoms use long-lived goroutines with session registries in Go:
+
+- QUIC datagram v2 + v3: `connection/quic_datagram_v2`,
+  `connection/quic_datagram_v3`, `quic/v3/session`, `quic/v3/muxer`,
+  `quic/v3/manager`
+- UDP session management: `datagramsession/session`,
+  `datagramsession/manager`
+- Session RPC: `tunnelrpc/quic/session_client`,
+  `tunnelrpc/pogs/session_manager`
+- ICMP routing: `ingress/icmp_linux`, `ingress/icmp_darwin`
+- capnp-rpc control stream: `tunnelrpc/quic/cloudflared_client`,
+  `tunnelrpc/registration_client`, `tunnelrpc/pogs/registration_server`,
+  `tunnelrpc/pogs/configuration_manager`
+
+### Per-Request Dispatch Atom Set
+
+These atoms use per-request/per-stream goroutine handlers in Go:
+
+- Stream relay: `stream/stream`, `carrier/carrier`
+- Origin dispatch: `ingress/origin_service`
+- HTTP/2 proxy streams (data-plane only): `connection/http2`
+- WebSocket carrier streams: `carrier/websocket` (not a hub atom
+  but implied by carrier/carrier classification)
+- TCP proxy streams: `ingress/origin_connection` (implied by
+  origin_service classification)
+- SOCKS5: `socks/connection_handler` (not a hub atom, sessionless
+  by S1 Session Orientation classification)
+
+### Notes on Mixed Atoms
+
+`connection/http2` and `connection/quic_connection` span both dispatch
+models because they carry both the transport state machine and proxy
+streams on the same connection object. The Go dispatch boundary is:
+
+- Connection establishment + control stream → transport state machine goroutines
+- Per-request proxy streams → per-request handler goroutines
+- Datagram sessions → session-managed goroutines with registries
 
 ## Editorial Rubric
 
@@ -269,3 +379,22 @@ Rules for how the proxy-data framing gets applied across catalogs.
 - The classification of mixed atoms acknowledges that some implementation
   files genuinely serve both planes — this is a structural reality of the
   cloudflared codebase, not a taxonomy weakness
+- capnp-rpc registration, configuration, and shutdown frames
+  (`RegisterConnection`, `UpdateLocalConfiguration`, `GracefulShutdown`)
+  are classified as **proxy data (session-based)** — they travel through
+  the tunnel as bytes and carry session identity, state mutations, and
+  explicit teardown semantics. The RPC *transport mechanics* (the QUIC
+  stream object carrying them) remain transport-control. The distinction
+  is: transport-control = how bytes move; proxy data = what the bytes are.
+- The Cap'n Proto schema (`tunnelrpc/proto/tunnelrpc.capnp`) is classified
+  as **proxy data** — it defines message formats for all RPC operations
+  that flow through the tunnel wire (RegisterConnection, RegisterUdpSession,
+  UpdateConfiguration, GracefulShutdown, etc.). It is a proxy data codec.
+- `tunnelrpc/metrics/metrics` is classified as **proxy data** for
+  consistency with `quic/v3/metrics` and `datagramsession/metrics` —
+  all three measure proxy data operations. The RPC operations being
+  instrumented are proxy data (they flow through the tunnel).
+- `connection/errors` is classified as **mixed** — its error types span
+  both transport events (`EdgeQuicDialError`, `StreamListenerError`) and
+  proxy data events (`DupConnRegisterTunnelError`,
+  `ServerRegisterTunnelError`, `DatagramManagerError`).

@@ -247,11 +247,11 @@ Unevenness is computed on per-catalog unique atom-link counts across 30 catalogs
 - The mean (45.1) exceeds the median (37), confirming a right-skewed distribution driven by the high-breadth catalogs (features, tunnels, tests, proxying, porting-friction, wire-protocol, edge-interactions).
 - Most catalogs (16 of 29) sit in the 24–59 atom range, forming a core band of balanced specialization.
 - [catalogs/cross-cutting/features](catalogs/cross-cutting/features/README.md) is now the sole broadest catalog at 127 atoms. [catalogs/domain/tunnels](catalogs/domain/tunnels.md) dropped from 127 to 101 atoms after the rebalancing pass pruned proxy-implementation atoms to [catalogs/domain/proxying](catalogs/domain/proxying.md).
-- [catalogs/cross-cutting/error-propagation](catalogs/cross-cutting/error-propagation/README.md) enters at 52 atoms — above the mean (40.5) — adding no new distribution-distorting outlier. All 52 atoms were already covered by other catalogs.
-- [catalogs/cross-cutting/concurrency](catalogs/cross-cutting/concurrency/README.md) enters at 45 atoms — above the median (32.5) — reinforcing the upper core band without distortion. All 45 atoms were already covered by other catalogs.
+- [catalogs/cross-cutting/error-propagation](catalogs/cross-cutting/error-propagation/README.md) enters at 52 atoms — above the mean (45.1) — adding no new distribution-distorting outlier. All 52 atoms were already covered by other catalogs.
+- [catalogs/cross-cutting/concurrency](catalogs/cross-cutting/concurrency/README.md) enters at 45 atoms — above the median (37) — reinforcing the upper core band without distortion. All 45 atoms were already covered by other catalogs.
 - [catalogs/cross-cutting/init-teardown](catalogs/cross-cutting/init-teardown/README.md) enters at 45 atoms — identical to concurrency and above the mean — with zero impact on the distribution shape. All 45 atoms were already covered by other catalogs.
-- [catalogs/cross-cutting/porting-friction](catalogs/cross-cutting/porting-friction/README.md) enters at 79 atoms — well above the mean (40.5) but below the two broad-coverage outliers. All 79 atoms were already covered by other catalogs.
-- [catalogs/domain/deployments](catalogs/domain/deployments/README.md) enters at 33 atoms — near the median (32.5) — reinforcing the distribution center. All 33 atoms were already covered by other catalogs. Its addition slightly lowers the Gini coefficient (0.35 → 0.34), confirming a mild centralizing effect.
+- [catalogs/cross-cutting/porting-friction](catalogs/cross-cutting/porting-friction/README.md) enters at 79 atoms — well above the mean (45.1) but below the two broad-coverage outliers. All 79 atoms were already covered by other catalogs.
+- [catalogs/domain/deployments](catalogs/domain/deployments/README.md) enters at 33 atoms — below the median (37) — reinforcing the distribution center. All 33 atoms were already covered by other catalogs. Its addition slightly lowers the Gini coefficient (0.35 → 0.34), confirming a mild centralizing effect.
 - [catalogs/cross-cutting/features](catalogs/cross-cutting/features/README.md) enters at 127 atoms — now the sole broadest catalog after the rebalancing pass reduced [catalogs/domain/tunnels](catalogs/domain/tunnels.md) from 127 to 101 atoms. All 127 atoms were already covered by domain catalogs. Its addition raises the Gini coefficient slightly (0.34 → 0.35), reflecting the reinforcement of the high-breadth tail.
 - [catalogs/cross-cutting/wire-protocol](catalogs/cross-cutting/wire-protocol/README.md) enters at 76 atoms — above the mean (45.1) and above the median (37). All 76 atoms were already covered by other catalogs. Its addition has negligible impact on the Gini coefficient, confirming the mid-band placement does not distort the distribution.- [catalogs/cross-cutting/platform-substrates](catalogs/cross-cutting/platform-substrates.md) enters at 37 atoms — at the median (37) — reinforcing the distribution center with zero impact on the shape. All 37 atoms were already covered by other catalogs. Its addition slightly lowers the Gini coefficient (0.3515 → 0.3464), confirming a mild centralizing effect.- Outliers at the low end (overwatch: 5, supervisor: 8) are deliberate — these catalogs earn their depth through structure (H2 sections and Mermaid diagrams) rather than broad atom linkage.
 
@@ -414,10 +414,12 @@ All 30 catalogs have been annotated with a three-plane classification: **proxy d
 
 | Primary plane | Count | Catalogs |
 | --- | --- | --- |
-| proxy-data | 4 | proxying, ingress, sessions, (tests-sessions-packets) |
-| transport-control | 2 | supervisor, (tests-transport) |
-| out-of-band | 9 | upstream-api-contracts, cli, overwatch, access-policies, platforms, platform-substrates, deployments, host-interactions, (tests-infrastructure) |
-| mixed (spans multiple) | 15 | tunnels, tunnels-transport, capnp-rpc, edge-interactions, wire-protocol, state-machines, config, const-and-env, crypto, metrics, observabilities, shared-state, concurrency, error-propagation, init-teardown, porting-friction, features, tests, (tests-proxy-ingress) |
+| proxy-data | 3 | proxying, ingress, sessions |
+| transport-control | 2 | supervisor, crypto |
+| out-of-band | 8 | upstream-api-contracts, cli, overwatch, access-policies, platforms, platform-substrates, deployments, host-interactions |
+| mixed (spans multiple) | 17 | tunnels, tunnels-transport, capnp-rpc, edge-interactions, wire-protocol, state-machines, config, const-and-env, metrics, observabilities, shared-state, concurrency, error-propagation, init-teardown, porting-friction, features, tests |
+
+Note: The tests catalog's 4 sub-files map to: tests-sessions-packets (proxy-data), tests-transport (transport-control), tests-infrastructure (out-of-band), tests-proxy-ingress (mixed).
 
 ### Jaccard Cluster Reinterpretation
 
@@ -436,7 +438,7 @@ The 8 natural Jaccard clusters from the coverage graph map to the proxy-data tax
 
 ### Key Insight
 
-The proxy-data classification reveals that the majority of cloudflared's architectural complexity lives at the **boundary between transport control and proxy data** — particularly in the tunnel core, wire-protocol, and RPC clusters. This boundary is where the Rust port must be most precise about type-level separation.
+The proxy-data classification reveals that the majority of cloudflared's behavioral complexity lives at the **boundary between transport control and proxy data** — particularly in the tunnel core, wire-protocol, and RPC clusters. In the Go codebase, the same connection objects (`QUICConnection`, `HTTP2Connection`) carry both transport state machine goroutines and proxy data dispatch goroutines, making this boundary implicit rather than explicit.
 
 ## Upstream Verification Summary
 
