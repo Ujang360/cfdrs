@@ -179,7 +179,7 @@ The [tunnels](tunnels.md) and proxying catalogs share a structural seam: tunnel 
 
 | Boundary | Kept in tunnels | Kept in proxying | Rationale |
 | --- | --- | --- | --- |
-| Tunnel registration RPC [transport-control] | `tunnelrpc/registration_*`, `pogs/registration_server`, `pogs/configuration_manager`, `proto/*.capnp` | — | Registration and configuration management are transport control operations, not proxy data forwarding |
+| Tunnel registration RPC [proxy-data] | `tunnelrpc/registration_*`, `pogs/registration_server`, `pogs/configuration_manager`, `proto/*.capnp` | — | Registration and configuration RPC frames are session-based proxy data that travel through the tunnel transport, configuring connection identity and mutating connection state |
 | Connection lifecycle events [transport-control] | `connection/tunnelsforha`, `connection/event`, `connection/json` | — | HA slot tracking, lifecycle events, and control-stream JSON are transport control concerns |
 | Data-path RPC streams [proxy-data] | `tunnelrpc/quic/protocol`, `quic/session_*`, `quic/request_*`, `quic/cloudflared_*` | Same | Request/session stream framing is proxy data \u2014 these atoms establish and serve proxy data channels |
 | Proxy implementation [proxy-data] | — | `proxy/*`, `carrier/*`, `websocket/*`, `stream/*`, `packet/*`, `socks/*`, `hello/*` | Origin relay, packet forwarding, and protocol bridging are proxy data concerns |
