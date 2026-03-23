@@ -7,6 +7,8 @@
 
 ## Scope
 
+This catalog covers **both the proxy data and transport control planes** from the state-machine perspective — see [proxy-data-taxonomy](../../proxy-data-taxonomy.md). Each state machine is classified by which plane it primarily serves.
+
 This catalog documents finite-state and staged lifecycle behavior in tunnel runtime control loops, protocol selection, datagram/session dispatch, and orchestration coordinators.
 
 For this catalog, state-machine behavior includes:
@@ -164,17 +166,17 @@ sequenceDiagram
 
 ## Domain Map
 
-| Domain | Description | Representative atoms |
-| --- | --- | --- |
-| Supervisor lifecycle machine | Core tunnel runtime state progression across startup, connect, reconnect, fallback, and shutdown. | [supervisor/supervisor](../../atoms/supervisor/supervisor.md), [supervisor/tunnel](../../atoms/supervisor/tunnel.md), [retry/backoffhandler](../../atoms/retry/backoffhandler.md), [signal/safe_signal](../../atoms/signal/safe_signal.md) |
-| Protocol-selection machine | Dynamic protocol current/fallback state and remote/default switching logic. | [connection/protocol](../../atoms/connection/protocol.md) |
-| Control-stream machine | Register, update, unregister, and stopped-state control stream lifecycle. | [connection/control](../../atoms/connection/control.md) |
-| Datagram and session machine | Registration, migration, payload forwarding, idle detection, and unregister semantics. | [connection/quic_datagram_v2](../../atoms/connection/quic_datagram_v2.md), [connection/quic_datagram_v3](../../atoms/connection/quic_datagram_v3.md), [datagramsession/manager](../../atoms/datagramsession/manager.md), [datagramsession/session](../../atoms/datagramsession/session.md), [quic/v3/manager](../../atoms/quic/v3/manager.md), [quic/v3/muxer](../../atoms/quic/v3/muxer.md), [quic/v3/session](../../atoms/quic/v3/session.md) |
-| Connection-state tracking | HA-indexed connection activity and protocol-observed connection history. | [tunnelstate/conntracker](../../atoms/tunnelstate/conntracker.md), [connection/tunnelsforha](../../atoms/connection/tunnelsforha.md) |
-| Management session machine | Log-stream active/stopped/filtering lifecycle and stream start gating. | [management/session](../../atoms/management/session.md), [management/service](../../atoms/management/service.md) |
-| Config/orchestration machine | Remote configuration versioning, override rules, and live proxy rollover sequencing. | [orchestration/orchestrator](../../atoms/orchestration/orchestrator.md) |
-| Service registry machine | App add/remove/run lifecycle with callback-driven completion transitions. | [overwatch/app_manager](../../atoms/overwatch/app_manager.md) |
-| Stream completion machine | Two-leg stream completion and timeout synchronization. | [stream/stream](../../atoms/stream/stream.md) |
+| Domain | Plane | Description | Representative atoms |
+| --- | --- | --- | --- |
+| Supervisor lifecycle machine | transport-control | Core tunnel runtime state progression across startup, connect, reconnect, fallback, and shutdown. | [supervisor/supervisor](../../atoms/supervisor/supervisor.md), [supervisor/tunnel](../../atoms/supervisor/tunnel.md), [retry/backoffhandler](../../atoms/retry/backoffhandler.md), [signal/safe_signal](../../atoms/signal/safe_signal.md) |
+| Protocol-selection machine | transport-control | Dynamic protocol current/fallback state and remote/default switching logic. | [connection/protocol](../../atoms/connection/protocol.md) |
+| Control-stream machine | transport-control | Register, update, unregister, and stopped-state control stream lifecycle. | [connection/control](../../atoms/connection/control.md) |
+| Datagram and session machine | proxy-data | Registration, migration, payload forwarding, idle detection, and unregister semantics. | [connection/quic_datagram_v2](../../atoms/connection/quic_datagram_v2.md), [connection/quic_datagram_v3](../../atoms/connection/quic_datagram_v3.md), [datagramsession/manager](../../atoms/datagramsession/manager.md), [datagramsession/session](../../atoms/datagramsession/session.md), [quic/v3/manager](../../atoms/quic/v3/manager.md), [quic/v3/muxer](../../atoms/quic/v3/muxer.md), [quic/v3/session](../../atoms/quic/v3/session.md) |
+| Connection-state tracking | transport-control | HA-indexed connection activity and protocol-observed connection history. | [tunnelstate/conntracker](../../atoms/tunnelstate/conntracker.md), [connection/tunnelsforha](../../atoms/connection/tunnelsforha.md) |
+| Management session machine | out-of-band | Log-stream active/stopped/filtering lifecycle and stream start gating. | [management/session](../../atoms/management/session.md), [management/service](../../atoms/management/service.md) |
+| Config/orchestration machine | transport-control | Remote configuration versioning, override rules, and live proxy rollover sequencing. | [orchestration/orchestrator](../../atoms/orchestration/orchestrator.md) |
+| Service registry machine | out-of-band | App add/remove/run lifecycle with callback-driven completion transitions. | [overwatch/app_manager](../../atoms/overwatch/app_manager.md) |
+| Stream completion machine | proxy-data | Two-leg stream completion and timeout synchronization. | [stream/stream](../../atoms/stream/stream.md) |
 
 ## State Transition Contracts
 

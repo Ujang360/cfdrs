@@ -7,6 +7,8 @@
 
 ## Scope
 
+This catalog covers **both the proxy data and transport control planes** at the transport layer — see [proxy-data-taxonomy](../../proxy-data-taxonomy.md). Each transport family carries both proxy data (HTTP streams, datagram sessions, ICMP) and transport control (registration RPC, configuration sync, graceful shutdown) on the same wire connection.
+
 This catalog is the dedicated tunnel transport-differences view of baseline behavior.
 
 For this catalog, transport behavior includes:
@@ -76,21 +78,22 @@ sequenceDiagram
 
 ## Transport Families
 
-| Family | Primary behavior | Representative atoms |
-| --- | --- | --- |
-| HTTP2 edge transport | Stream-based serving using HTTP2 request/response semantics, websocket/control upgrade handling, and config update path integration. | [connection/http2](../../atoms/connection/http2.md), [connection/control](../../atoms/connection/control.md), [connection/header](../../atoms/connection/header.md), [connection/json](../../atoms/connection/json.md) |
-| QUIC stream transport | QUIC connection dial and stream accept loop with request dispatch and control stream handling. | [connection/quic](../../atoms/connection/quic.md), [connection/quic_connection](../../atoms/connection/quic_connection.md), [connection/control](../../atoms/connection/control.md), [quic/safe_stream](../../atoms/quic/safe_stream.md) |
-| QUIC datagram v2 | Datagram sessions with per-session origin dial and explicit registration/unregistration through tunnelrpc session control. | [connection/quic_datagram_v2](../../atoms/connection/quic_datagram_v2.md), [datagramsession/session](../../atoms/datagramsession/session.md), [tunnelrpc/quic/session_client](../../atoms/tunnelrpc/quic/session_client.md) |
-| QUIC datagram v3 | Session-manager/muxer model with request-ID-oriented registration, migration, and ICMP/datagram processing loops. | [connection/quic_datagram_v3](../../atoms/connection/quic_datagram_v3.md), [quic/v3/manager](../../atoms/quic/v3/manager.md), [quic/v3/muxer](../../atoms/quic/v3/muxer.md), [quic/v3/session](../../atoms/quic/v3/session.md) |
-| RPC control stream plane | Registration/config/session method calls shared by transport handlers but with transport-specific lifecycle context. | [tunnelrpc/registration_client](../../atoms/tunnelrpc/registration_client.md), [tunnelrpc/quic/protocol](../../atoms/tunnelrpc/quic/protocol.md), [tunnelrpc/quic/request_server_stream](../../atoms/tunnelrpc/quic/request_server_stream.md), [tunnelrpc/quic/cloudflared_client](../../atoms/tunnelrpc/quic/cloudflared_client.md) |
+| Family | Plane | Primary behavior | Representative atoms |
+| --- | --- | --- | --- |
+| HTTP2 edge transport | mixed | Stream-based serving using HTTP2 request/response semantics, websocket/control upgrade handling, and config update path integration. | [connection/http2](../../atoms/connection/http2.md), [connection/control](../../atoms/connection/control.md), [connection/header](../../atoms/connection/header.md), [connection/json](../../atoms/connection/json.md) |
+| QUIC stream transport | mixed | QUIC connection dial and stream accept loop with request dispatch and control stream handling. | [connection/quic](../../atoms/connection/quic.md), [connection/quic_connection](../../atoms/connection/quic_connection.md), [connection/control](../../atoms/connection/control.md), [quic/safe_stream](../../atoms/quic/safe_stream.md) |
+| QUIC datagram v2 | proxy-data | Datagram sessions with per-session origin dial and explicit registration/unregistration through tunnelrpc session control. | [connection/quic_datagram_v2](../../atoms/connection/quic_datagram_v2.md), [datagramsession/session](../../atoms/datagramsession/session.md), [tunnelrpc/quic/session_client](../../atoms/tunnelrpc/quic/session_client.md) |
+| QUIC datagram v3 | proxy-data | Session-manager/muxer model with request-ID-oriented registration, migration, and ICMP/datagram processing loops. | [connection/quic_datagram_v3](../../atoms/connection/quic_datagram_v3.md), [quic/v3/manager](../../atoms/quic/v3/manager.md), [quic/v3/muxer](../../atoms/quic/v3/muxer.md), [quic/v3/session](../../atoms/quic/v3/session.md) |
+| RPC control stream | transport-control | Registration, configuration, and graceful-shutdown RPC calls shared by transport handlers. | [tunnelrpc/registration_client](../../atoms/tunnelrpc/registration_client.md), [tunnelrpc/quic/protocol](../../atoms/tunnelrpc/quic/protocol.md), [tunnelrpc/quic/request_server_stream](../../atoms/tunnelrpc/quic/request_server_stream.md), [tunnelrpc/quic/cloudflared_client](../../atoms/tunnelrpc/quic/cloudflared_client.md) |
 
 ## Transport Difference Matrix
 
 | Aspect | HTTP2 path | QUIC stream path | QUIC datagram v2 | QUIC datagram v3 |
 | --- | --- | --- | --- | --- |
+| **Plane** | **mixed** — proxy data streams + transport control upgrade | **mixed** — proxy data streams + transport control stream | **proxy data** — UDP session datagrams | **proxy data** — UDP/ICMP session datagrams |
 | Session model | Request/response stream with upgrade handling | Bidirectional QUIC streams + control stream | Datagram session object per registered UDP session | Request-ID session-manager/muxer model |
 | Startup entrypoint | `serveHTTP2` and HTTP2 connection server | `serveQUIC` and `quicConnection.Serve` | `NewDatagramV2Connection` with session serve loops | `NewDatagramV3Connection` backed by v3 manager/muxer |
-| Control-plane coupling | Control stream upgrade and configuration update route | QUIC control stream and request stream APIs | tunnelrpc session client manages register/unregister | v3 manager + datagram registration semantics |
+| Transport control coupling | Control stream upgrade and configuration update route | QUIC control stream and request stream APIs | tunnelrpc session client manages register/unregister | v3 manager + datagram registration semantics |
 | Failure/fallback strategy | Included in supervisor protocol fallback path | Included in supervisor protocol fallback path | Depends on QUIC stream transport health and RPC session responses | Depends on QUIC v3 manager/muxer and datagram lifecycle outcomes |
 | Metadata framing | HTTP headers and response metadata wrappers | Connect request/response framing over request streams | Session trace/idle hints + datagram payload forwarding | RequestID/datagram envelopes + migration/rate-limited semantics |
 | Concurrency profile | HTTP handler and stream coordination | Stream accept loop + per-stream handlers | Per-session goroutine loops and close conditions | Poll/process loops for datagrams and ICMP with shared session map |

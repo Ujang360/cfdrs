@@ -7,6 +7,8 @@
 
 ## Scope
 
+This catalog primarily covers **out-of-band** service orchestration infrastructure — see [proxy-data-taxonomy](../../proxy-data-taxonomy.md). The overwatch service registry manages application lifecycle and config-driven replacement, operating outside the tunnel wire.
+
 This catalog is the dedicated service-orchestration view centered on the `overwatch` module and its runtime callers.
 
 For this catalog, overwatch behavior includes:

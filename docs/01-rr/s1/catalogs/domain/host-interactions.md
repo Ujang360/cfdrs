@@ -7,6 +7,8 @@
 
 ## Scope
 
+This catalog primarily covers **out-of-band** host infrastructure — see [proxy-data-taxonomy](../../proxy-data-taxonomy.md). Filesystem operations, service management, and subprocess diagnostics are out-of-band; ICMP/QUIC OS paths touch the proxy data and transport control planes at the host boundary.
+
 This catalog captures host-facing interactions where cloudflared crosses process and platform boundaries: filesystem, signals, subprocesses, service managers, host diagnostics commands, watcher notifications, and OS-specific syscall/API paths.
 
 For this catalog, host interactions include:

@@ -7,6 +7,8 @@
 
 ## Scope
 
+This catalog covers the **transport control plane** — see [proxy-data-taxonomy](../../proxy-data-taxonomy.md). The supervisor exclusively manages tunnel lifecycle and protocol fallback — it never touches proxy data directly. All proxy data flows through connection handlers that the supervisor starts, but the supervisor's own control loop is purely transport control.
+
 This catalog is a dedicated deep dive on supervisor-owned control behavior: controller objects, connection orchestration loops, protocol fallback, reconnect control, and coordinated shutdown.
 
 For this catalog, supervisor behavior includes:

@@ -6,7 +6,7 @@
 This document catalogs every cloudflared feature or behavior that varies by
 operating system, container runtime, init system, or build-time feature flag.
 Each entry links to the baseline audit atom that describes the Go
-implementation in detail.
+implementation in detail. This catalog is primarily **out-of-band** infrastructure — see [proxy-data-taxonomy](../../proxy-data-taxonomy.md). Platform-specific build tags and service management operate outside the tunnel wire, though FIPS TLS and QUIC socket tuning touch the transport control plane.
 
 Atom links are relative to [atoms/](../../atoms/).
 

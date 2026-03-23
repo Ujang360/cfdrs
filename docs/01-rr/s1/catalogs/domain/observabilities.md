@@ -6,6 +6,8 @@
 
 ## Scope
 
+This catalog spans **all three planes** from the observability perspective — see [proxy-data-taxonomy](../../proxy-data-taxonomy.md). Tracing propagation through proxied requests is proxy data observability; connection event logging is transport control observability; diagnostic collection and management stream logging are out-of-band.
+
 This catalog records observability behavior represented in the baseline atom corpus.
 
 Observability for this catalog includes:

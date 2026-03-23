@@ -7,6 +7,8 @@
 
 ## Scope
 
+This catalog spans **all three planes** from the testing perspective — see [proxy-data-taxonomy](../../proxy-data-taxonomy.md). The four sub-catalogs approximate a plane split: [tests-transport](tests-transport.md) is primarily transport control, [tests-proxy-ingress](tests-proxy-ingress.md) is primarily proxy data, [tests-sessions-packets](tests-sessions-packets.md) is primarily proxy data, and [tests-infrastructure](tests-infrastructure.md) is primarily out-of-band/mixed.
+
 This catalog documents the complete upstream Go test suite as a behavioral contract oracle for the cloudflared Rust rewrite. Every test function encodes at least one behavioral invariant that the Rust port must preserve.
 
 The catalog is organized into four sub-catalogs by architectural domain:

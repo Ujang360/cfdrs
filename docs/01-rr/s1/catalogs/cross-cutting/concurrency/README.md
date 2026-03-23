@@ -7,6 +7,8 @@
 
 ## Scope
 
+This catalog spans **both the proxy data and transport control planes** from the concurrency perspective — see [proxy-data-taxonomy](../../../proxy-data-taxonomy.md). Goroutine spawn sites serve proxy data (stream handlers, datagram loops, session goroutines), transport control (registration, backoff, protocol fallback, reconnect), or out-of-band (management, diagnostics, auto-update) purposes. The topology is a cross-cutting lens, not a plane-specific catalog.
+
 This catalog records the concurrent actor topology of cloudflared: how many goroutines exist at each layer, what their lifetimes are, how they communicate (channels, errgroups, contexts, sync primitives), and the structural patterns (fan-out, fan-in, pipeline, select loops, supervisor restart) that the Rust async runtime must replicate.
 
 - Direct evidence: goroutine spawn sites (`go func()`), channel declarations, `errgroup.WithContext`, `sync.WaitGroup`, `context.Context` cancellation trees, `select` multiplexing loops, and `signal.Signal` one-shot coordination.

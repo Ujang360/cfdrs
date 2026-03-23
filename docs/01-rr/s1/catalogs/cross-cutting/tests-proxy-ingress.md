@@ -5,6 +5,8 @@
 
 ## Scope
 
+This sub-catalog primarily covers **proxy data** plane tests — see [proxy-data-taxonomy](../../proxy-data-taxonomy.md). Proxy routing, ingress rule parsing, origin services, ICMP proxying, SOCKS5, and carrier/WebSocket tests verify proxy data behavior; supervisor and orchestration tests verify transport control behavior at the proxy boundary.
+
 This sub-catalog documents behavioral contracts encoded in proxy routing, ingress rule parsing, origin services, ICMP proxying, SOCKS5, carrier/WebSocket, orchestration, and supervisor tests.
 
 Packages covered: `proxy`, `ingress`, `orchestration`, `supervisor`, `socks`, `carrier`.

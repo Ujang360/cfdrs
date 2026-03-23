@@ -6,6 +6,8 @@
 
 ## Scope
 
+This catalog primarily covers **transport control plane** infrastructure — see [proxy-data-taxonomy](../../proxy-data-taxonomy.md). TLS setup, certificate management, and origin CA trust are transport control prerequisites; no cryptographic operations are proxy-data-specific in cloudflared.
+
 This catalog records cryptography-related usage in the baseline audit corpus.
 
 - Direct evidence: imports explicitly listed in behavior-atom documents for non-vendor, non-test Go implementation files.

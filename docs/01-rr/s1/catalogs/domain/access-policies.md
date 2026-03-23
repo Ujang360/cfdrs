@@ -7,6 +7,8 @@
 
 ## Scope
 
+This catalog primarily covers **out-of-band** access infrastructure — see [proxy-data-taxonomy](../../proxy-data-taxonomy.md). JWT validation, token management, and access-login flows operate outside the tunnel wire. The ingress access-policy middleware does intersect the proxy data path at request time, making this catalog mixed at the boundary.
+
 This catalog documents policy-bearing behavior that gates access decisions in cloudflared: IP allow/deny rule evaluation, hostname/service access policy validation, JWT/AUD verification paths, and token issuance/verification/transfer contracts used by access-facing command and ingress surfaces.
 
 For this catalog, access-policy behavior includes:

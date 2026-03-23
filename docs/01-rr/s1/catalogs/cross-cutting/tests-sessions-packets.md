@@ -5,6 +5,8 @@
 
 ## Scope
 
+This sub-catalog primarily covers **proxy data** plane tests — see [proxy-data-taxonomy](../../proxy-data-taxonomy.md). QUIC v3 datagram handling, session lifecycle, packet encoding/decoding, flow limiting, and stream handling all verify proxy data behavior.
+
 This sub-catalog documents behavioral contracts encoded in QUIC v3 datagram handling, session lifecycle, datagram muxer, session manager, legacy datagram sessions (v1/v2), packet encoding/decoding, flow limiting, and stream handling tests.
 
 Packages covered: `quic/v3`, `datagramsession`, `packet`, `flow`, `stream`.

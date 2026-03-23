@@ -7,6 +7,8 @@
 
 ## Scope
 
+This catalog primarily covers **out-of-band** API interactions — see [proxy-data-taxonomy](../../proxy-data-taxonomy.md). Tunnel CRUD, route management, and management token APIs operate outside the tunnel wire. The management HTTP/WebSocket service is also out-of-band (local HTTP, not tunneled).
+
 This catalog describes upstream-facing API contracts used or served by cloudflared in the baseline corpus.
 
 For this catalog, upstream API contracts include:

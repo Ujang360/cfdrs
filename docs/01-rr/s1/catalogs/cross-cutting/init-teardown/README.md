@@ -7,6 +7,8 @@
 
 ## Scope
 
+This catalog spans **both the proxy data and transport control planes** from the startup/shutdown perspective — see [proxy-data-taxonomy](../../../proxy-data-taxonomy.md). TLS setup and edge discovery are transport control initialization; ingress rule loading and origin service startup are proxy data infrastructure; management service startup is out-of-band. The startup DAG and shutdown sequence cross all three planes.
+
 This catalog records the initialization dependency chain, startup phase ordering, shutdown signal propagation, teardown sequencing, and circular-dependency risk analysis across the cloudflared codebase. The goal is to document what starts first, what depends on what being alive, and what order things shut down — critical for avoiding circular init or teardown deadlocks in the Rust port.
 
 - Direct evidence: constructor functions (`New*`), Go `init()` functions, `Run()`/`Serve()` entry points, `Close()`/`Shutdown()`/`Stop()` methods, `defer` cleanup chains, context cancellation hierarchy, `gracefulShutdownC` propagation, and signal handling.

@@ -7,6 +7,8 @@
 
 ## Scope
 
+This catalog covers the **proxy data plane** — see [proxy-data-taxonomy](../../proxy-data-taxonomy.md). Ingress is the proxy data routing layer: every rule match, middleware gate, and origin dispatch operates exclusively on end-user traffic arriving from the tunnel.
+
 This catalog is a dedicated ingress deep dive. It documents how cloudflared evaluates ingress rules, applies middleware, selects and starts origin services, and routes HTTP/TCP/WS/ICMP packets to local or remote targets.
 
 For this catalog, ingress behavior includes:

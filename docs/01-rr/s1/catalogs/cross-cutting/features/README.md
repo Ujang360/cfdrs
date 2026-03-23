@@ -7,6 +7,8 @@
 
 ## Scope
 
+This catalog spans **all three planes** from the stakeholder perspective — see [proxy-data-taxonomy](../../../proxy-data-taxonomy.md). Origin services and ingress are proxy data; edge registration, protocol negotiation, and HA coordination are transport control; management dashboard, monitoring, CLI, and platform services are out-of-band. Each stakeholder section maps to one or more planes.
+
 This catalog indexes the complete feature surface of cloudflared organized by the external actors (stakeholders) that interact with a running connector instance or its CLI. Each stakeholder section documents the contracts, message flows, and behavioral atoms that govern the interaction boundary.
 
 For this catalog, *feature* means an externally observable capability or interaction contract — not the Go `features` package alone (though that package is one contract documented here).

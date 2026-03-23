@@ -7,6 +7,8 @@
 
 ## Scope
 
+This catalog spans **both the proxy data and transport control planes** from the shared-state perspective — see [proxy-data-taxonomy](../../proxy-data-taxonomy.md). Proxy data state includes `Orchestrator.proxy` (the current origin proxy) and session manager registries; transport control state includes `connectedFuse`, `tunnelsForHA`, `protocolFallback`, and `ConnTracker`; out-of-band state includes management session active flags. The catalog is a cross-cutting concurrency lens.
+
 This catalog is the dedicated concurrency and parallelism view of the baseline. It focuses on shared mutable state, synchronization primitives, channel-driven coordination, and goroutine lifecycle orchestration.
 
 For this catalog, shared-state behavior includes:
@@ -63,18 +65,18 @@ flowchart LR
 
 ## Shared-State Controller Inventory
 
-| Controller object | Shared state under control | Concurrency contract |
-| --- | --- | --- |
-| `Supervisor` | `tunnelErrors`, `tunnelsConnecting`, per-index fallback state | Manages multi-connection worker fanout with channel fan-in and selective retry scheduling. |
-| `EdgeTunnelServer` | reconnect and shutdown channels, edge address state, tracker references | Runs protocol handlers concurrently, reconciles reconnect signals, and classifies recoverable failures. |
-| `protocolFallback` | current protocol, retry counter, fallback flag | Wraps backoff progression and protocol transition safety between retries. |
-| `booleanFuse` and `connectedFuse` | one-shot connection success state | Guarantees single-write latch semantics and deterministic wake-up of waiting goroutines. |
-| `sessionManager` (`quic/v3`) | request-id keyed session map | Synchronizes register/get/unregister operations over shared session registry. |
-| `datagramConn` (`quic/v3`) | read/write loops + session and ICMP queues | Serves datagrams in parallel loops while coordinating registration and payload handlers. |
-| `session` (`management`) | active flag and buffered stream channel | Applies atomic active-state checks with select-based non-blocking insertion semantics. |
-| `ConnTracker` | active connection index and protocol history map | Maintains observer-driven connection state safely for concurrent reads/writes. |
-| `flowLimiter` | active flow count and dynamic limit | Enforces bounded concurrency with synchronized acquire/release operations. |
-| `Orchestrator` | current proxy reference and versioned config snapshots | Coordinates update, swap, and deferred close behavior across runtime readers. |
+| Controller object | Plane | Shared state under control | Concurrency contract |
+| --- | --- | --- | --- |
+| `Supervisor` | transport-control | `tunnelErrors`, `tunnelsConnecting`, per-index fallback state | Manages multi-connection worker fanout with channel fan-in and selective retry scheduling. |
+| `EdgeTunnelServer` | transport-control | reconnect and shutdown channels, edge address state, tracker references | Runs protocol handlers concurrently, reconciles reconnect signals, and classifies recoverable failures. |
+| `protocolFallback` | transport-control | current protocol, retry counter, fallback flag | Wraps backoff progression and protocol transition safety between retries. |
+| `booleanFuse` and `connectedFuse` | transport-control | one-shot connection success state | Guarantees single-write latch semantics and deterministic wake-up of waiting goroutines. |
+| `sessionManager` (`quic/v3`) | proxy-data | request-id keyed session map | Synchronizes register/get/unregister operations over shared session registry. |
+| `datagramConn` (`quic/v3`) | proxy-data | read/write loops + session and ICMP queues | Serves datagrams in parallel loops while coordinating registration and payload handlers. |
+| `session` (`management`) | out-of-band | active flag and buffered stream channel | Applies atomic active-state checks with select-based non-blocking insertion semantics. |
+| `ConnTracker` | transport-control | active connection index and protocol history map | Maintains observer-driven connection state safely for concurrent reads/writes. |
+| `flowLimiter` | proxy-data | active flow count and dynamic limit | Enforces bounded concurrency with synchronized acquire/release operations. |
+| `Orchestrator` | mixed | current proxy reference and versioned config snapshots | Coordinates update, swap, and deferred close behavior across runtime readers. |
 
 ## Parallel Worker Lifecycle
 

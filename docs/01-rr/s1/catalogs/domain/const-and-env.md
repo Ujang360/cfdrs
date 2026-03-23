@@ -7,6 +7,8 @@
 
 ## Scope
 
+This catalog spans **both the proxy data and transport control planes** from the constants/environment perspective — see [proxy-data-taxonomy](../../proxy-data-taxonomy.md). Transport/protocol constants and timeout/cadence constants shape transport control; ingress and origin-facing constants affect proxy data; environment variables for service paths and CLI behavior are out-of-band infrastructure.
+
 This catalog documents behaviorally relevant constants and environment-variable surfaces in cloudflared: symbolic keys, protocol and header constants, timeout and cadence constants, and process-environment inputs that shape runtime behavior.
 
 For this catalog, const-and-env behavior includes:

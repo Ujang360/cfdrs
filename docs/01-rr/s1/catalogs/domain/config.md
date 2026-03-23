@@ -7,6 +7,8 @@
 
 ## Scope
 
+This catalog spans **both the proxy data and transport control planes** from the configuration perspective — see [proxy-data-taxonomy](../../proxy-data-taxonomy.md). Proxy data config includes ingress rules, WARP routing, and origin timeouts; transport control config includes protocol selection, edge addresses, and retry parameters; out-of-band config includes management service settings and diagnostic configuration.
+
 This catalog documents cloudflared configuration behavior end-to-end: where configuration comes from, how precedence is applied, when values are refreshed, and how updates propagate to runtime components.
 
 For this catalog, config behavior includes:

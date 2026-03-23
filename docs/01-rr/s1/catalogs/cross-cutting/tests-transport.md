@@ -5,6 +5,8 @@
 
 ## Scope
 
+This sub-catalog primarily covers **transport control** and **mixed** plane tests — see [proxy-data-taxonomy](../../proxy-data-taxonomy.md). Connection establishment, protocol selection, TLS configuration, and tunnel RPC tests verify transport control behavior; header serialization and WebSocket tests verify proxy data behavior at the transport boundary.
+
 This sub-catalog documents behavioral contracts encoded in transport-layer tests: connection establishment, QUIC server acceptance, HTTP/2 stream handling, header serialization, tunnel RPC, protocol selection, TLS configuration, and WebSocket fundamentals.
 
 Packages covered: `connection`, `quic` (non-v3), `tunnelrpc`, `tlsconfig`, `websocket`.

@@ -7,6 +7,8 @@
 
 ## Scope
 
+This catalog primarily covers **out-of-band** deployment infrastructure — see [proxy-data-taxonomy](../../proxy-data-taxonomy.md). Build packaging, service installation, credential discovery, and auto-update operate outside the tunnel wire. CA certificate pool construction supports transport control (TLS setup).
+
 This catalog documents the full deployment lifecycle of cloudflared: how the binary is built and packaged, where it is installed, how credential and certificate files are discovered and laid out on disk, how configuration files are located by path-search logic, how the auto-update mechanism works across platforms, and what runtime directories and file ownership conventions apply.
 
 For this catalog, deployment behavior includes:

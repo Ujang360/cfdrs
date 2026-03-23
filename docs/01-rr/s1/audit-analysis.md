@@ -404,6 +404,40 @@ Density measures atom coverage efficiency: unique atoms per 100 lines of catalog
 - Medium-density catalogs (6 of 30) form the mid-band, confirming balanced prose-to-reference ratios for domain-focused catalogs with moderate breadth. [catalogs/cross-cutting/features](catalogs/cross-cutting/features/README.md) enters the medium-density tier at 21.0 atoms per 100 lines. Its 614 lines are balanced between 34 H3 subsections, 4 Mermaid diagrams, per-stakeholder contract tables, and 127 atom references — producing a density consistent with its analytical (rather than enumerative) intent.
 - [catalogs/cross-cutting/wire-protocol](catalogs/cross-cutting/wire-protocol/README.md) enters the low-density tier at 10.5 atoms per 100 lines. Its 725 lines — the second-longest cross-cutting catalog after concurrency (686) — are dominated by 33 H3 subsections, 5 Mermaid state-machine and architecture diagrams, ASCII-art datagram frame layouts, and extensive wire-constant tables. The low density reflects the catalog's emphasis on precise byte-level framing documentation and state-machine narration rather than atom enumeration.
 
+## 8) Proxy Data Classification
+
+See [proxy-data-taxonomy](proxy-data-taxonomy.md) for the full classification framework.
+
+All 30 catalogs have been annotated with a three-plane classification: **proxy data**, **transport control**, and **out-of-band**. The 47 hub atoms (membership ≥ 8) are classified in the taxonomy's Hub Atom Classification Index.
+
+### Catalog Distribution by Primary Plane
+
+| Primary plane | Count | Catalogs |
+| --- | --- | --- |
+| proxy-data | 4 | proxying, ingress, sessions, (tests-sessions-packets) |
+| transport-control | 2 | supervisor, (tests-transport) |
+| out-of-band | 9 | upstream-api-contracts, cli, overwatch, access-policies, platforms, platform-substrates, deployments, host-interactions, (tests-infrastructure) |
+| mixed (spans multiple) | 15 | tunnels, tunnels-transport, capnp-rpc, edge-interactions, wire-protocol, state-machines, config, const-and-env, crypto, metrics, observabilities, shared-state, concurrency, error-propagation, init-teardown, porting-friction, features, tests, (tests-proxy-ingress) |
+
+### Jaccard Cluster Reinterpretation
+
+The 8 natural Jaccard clusters from the coverage graph map to the proxy-data taxonomy:
+
+| Cluster | Primary plane |
+| --- | --- |
+| Tunnel core | mixed (transport control + proxy data) |
+| Control plane | transport-control |
+| Concurrency/lifecycle | mixed (cross-cutting lens) |
+| Host/platform/deployment | out-of-band |
+| Error-propagation | mixed (cross-cutting lens) |
+| Wire-format layer | mixed (transport control + proxy data) |
+| Stakeholder contracts | mixed (all three planes) |
+| Independent atoms | varies per atom |
+
+### Key Insight
+
+The proxy-data classification reveals that the majority of cloudflared's architectural complexity lives at the **boundary between transport control and proxy data** — particularly in the tunnel core, wire-protocol, and RPC clusters. This boundary is where the Rust port must be most precise about type-level separation.
+
 ## Upstream Verification Summary
 
 All 21 domain catalogs were cross-referenced against both the [atoms](atoms) atom corpus and the [cloudflared 2026.3.0](https://github.com/cloudflare/cloudflared/tree/2026.3.0) upstream source to maximize accuracy, uncover behavioral nuances, and document variance.

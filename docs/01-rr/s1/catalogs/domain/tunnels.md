@@ -7,7 +7,9 @@
 
 ## Scope
 
-This catalog documents tunnel behavior as a dedicated surface across control plane, data plane, lifecycle orchestration, and protocol contracts.
+This catalog covers **both the proxy data and transport control planes** — see [proxy-data-taxonomy](../../proxy-data-taxonomy.md).
+
+This catalog documents tunnel behavior as a dedicated surface across transport control, proxy data, lifecycle orchestration, and protocol contracts.
 
 For this catalog, tunnel behavior includes:
 
@@ -75,15 +77,23 @@ sequenceDiagram
 
 ## Domain Map
 
+### Transport Control Domains
+
 | Domain | Description | Representative atoms |
 | --- | --- | --- |
 | Control-plane API | Tunnel CRUD, token acquisition, active-client and cleanup APIs. | [cfapi/tunnel](../../atoms/cfapi/tunnel.md), [cfapi/tunnel_filter](../../atoms/cfapi/tunnel_filter.md), [cmd/cloudflared/management/cmd](../../atoms/cmd/cloudflared/management/cmd.md) |
 | Runtime supervision | Multi-connection startup, reconnect loops, protocol fallback, and graceful stop. | [supervisor/supervisor](../../atoms/supervisor/supervisor.md), [supervisor/tunnel](../../atoms/supervisor/tunnel.md), [retry/backoffhandler](../../atoms/retry/backoffhandler.md) |
 | HA and identity | HA index coordination and tunnel ID observability. | [connection/tunnelsforha](../../atoms/connection/tunnelsforha.md), [supervisor/tunnelsforha](../../atoms/supervisor/tunnelsforha.md) |
-| Transport and streams | HTTP2/QUIC and datagram/session transports carrying tunnel traffic. | [connection/http2](../../atoms/connection/http2.md), [connection/quic](../../atoms/connection/quic.md), [quic/v3/session](../../atoms/quic/v3/session.md), [datagramsession/session](../../atoms/datagramsession/session.md) |
-| RPC protocol | Registration/session/configuration RPC contracts and Cap'n Proto schema. | [tunnelrpc/registration_client](../../atoms/tunnelrpc/registration_client.md), [tunnelrpc/quic/protocol](../../atoms/tunnelrpc/quic/protocol.md), [tunnelrpc/proto/tunnelrpc.capnp](../../atoms/tunnelrpc/proto/tunnelrpc.capnp) |
-| Ingress over tunnel | Rule matching and origin dispatch as tunnel entry points; detailed proxy implementation in [proxying](proxying.md). | [ingress/ingress](../../atoms/ingress/ingress.md), [ingress/rule](../../atoms/ingress/rule.md), [ingress/origin_proxy](../../atoms/ingress/origin_proxy.md) |
+| RPC protocol — transport control | Registration, configuration, and graceful-shutdown RPC contracts. | [tunnelrpc/registration_client](../../atoms/tunnelrpc/registration_client.md), [tunnelrpc/quic/protocol](../../atoms/tunnelrpc/quic/protocol.md), [tunnelrpc/proto/tunnelrpc.capnp](../../atoms/tunnelrpc/proto/tunnelrpc.capnp) |
 | Quick tunnel mode | Anonymous quick provisioning and constrained runtime shaping. | [cmd/cloudflared/tunnel/quick_tunnel](../../atoms/cmd/cloudflared/tunnel/quick_tunnel.md) |
+
+### Proxy Data Domains
+
+| Domain | Description | Representative atoms |
+| --- | --- | --- |
+| Transport and streams | HTTP2/QUIC and datagram/session transports carrying proxy data. | [connection/http2](../../atoms/connection/http2.md), [connection/quic](../../atoms/connection/quic.md), [quic/v3/session](../../atoms/quic/v3/session.md), [datagramsession/session](../../atoms/datagramsession/session.md) |
+| RPC protocol — proxy data | Session registration RPCs (`RegisterUdpSession`/`UnregisterUdpSession`) that establish proxy data channels. | [tunnelrpc/quic/session_client](../../atoms/tunnelrpc/quic/session_client.md), [tunnelrpc/quic/session_server](../../atoms/tunnelrpc/quic/session_server.md), [tunnelrpc/pogs/session_manager](../../atoms/tunnelrpc/pogs/session_manager.md) |
+| Ingress over tunnel | Rule matching and origin dispatch as tunnel entry points; detailed proxy implementation in [proxying](proxying.md). | [ingress/ingress](../../atoms/ingress/ingress.md), [ingress/rule](../../atoms/ingress/rule.md), [ingress/origin_proxy](../../atoms/ingress/origin_proxy.md) |
 
 ## Control-Plane Tunnel API Contracts
 
@@ -127,9 +137,9 @@ Primary evidence: [connection/protocol](../../atoms/connection/protocol.md), [co
 
 | RPC surface | Contracted behavior |
 | --- | --- |
-| Registration RPC | `registerConnection(auth, tunnelId, connIndex, options)` establishes per-connection edge binding and returns either connection details or structured connection error (with retry signals). |
-| Configuration RPC | `updateLocalConfiguration(config)` provides remote config update channel to active tunnel runtime. |
-| Session RPC | `registerUdpSession` and `unregisterUdpSession` manage UDP session lifecycle over control streams. |
+| Registration RPC | `registerConnection(auth, tunnelId, connIndex, options)` establishes per-connection edge binding and returns either connection details or structured connection error (with retry signals). [transport-control] |
+| Configuration RPC | `updateLocalConfiguration(config)` provides remote config update channel to active tunnel runtime. [transport-control] |
+| Session RPC | `registerUdpSession` and `unregisterUdpSession` manage UDP session lifecycle over control streams. [proxy-data] |
 | Schema evolution | `tunnelrpc.capnp` retains deprecated legacy registration/authentication structures for protocol compatibility while exposing current `RegistrationServer`, `SessionManager`, and `ConfigurationManager` contracts. |
 | Connection metadata | `ConnectionOptions` includes client identity, origin local IP, replace-existing behavior, compression quality, and previous-attempt counters. |
 

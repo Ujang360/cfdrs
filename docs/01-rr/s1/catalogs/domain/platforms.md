@@ -7,6 +7,8 @@
 
 ## Scope
 
+This catalog primarily covers **out-of-band** platform infrastructure — see [proxy-data-taxonomy](../../proxy-data-taxonomy.md). Service lifecycle, host diagnostics, and token browser-launch are out-of-band; ICMP handling and QUIC socket tuning touch the proxy data and transport control planes at the OS boundary.
+
 This catalog documents platform-aware behavior in cloudflared runtime surfaces that diverge by OS, init system, container runtime, networking stack, and host utility availability.
 
 For this catalog, platform behavior includes:

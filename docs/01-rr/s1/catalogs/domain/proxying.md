@@ -7,7 +7,9 @@
 
 ## Scope
 
-This catalog captures complete proxying behavior represented in the baseline atom corpus.
+This catalog covers the **proxy data plane** — see [proxy-data-taxonomy](../../proxy-data-taxonomy.md).
+
+Proxying IS the proxy data plane: every atom in this catalog exists to forward end-user traffic (HTTP, WebSocket, TCP, UDP, ICMP) between the tunnel wire and local origins. The only transport control concern that appears here is the data-path subset of tunnelrpc session streams, which are classified as proxy data because they establish proxy data channels.
 
 Complete for this catalog means all non-vendor, non-test behavior atoms that implement or orchestrate:
 
@@ -177,10 +179,10 @@ The [tunnels](tunnels.md) and proxying catalogs share a structural seam: tunnel 
 
 | Boundary | Kept in tunnels | Kept in proxying | Rationale |
 | --- | --- | --- | --- |
-| Tunnel registration RPC | `tunnelrpc/registration_*`, `pogs/registration_server`, `pogs/configuration_manager`, `proto/*.capnp` | — | Registration and configuration management are tunnel lifecycle operations, not request forwarding |
-| Connection lifecycle events | `connection/tunnelsforha`, `connection/event`, `connection/json` | — | HA slot tracking, lifecycle events, and control-stream JSON are tunnel management concerns |
-| Data-path RPC streams | `tunnelrpc/quic/protocol`, `quic/session_*`, `quic/request_*`, `quic/cloudflared_*` | Same | Request/session stream framing is equally relevant to tunnel transport and proxy relay |
-| Proxy implementation | — | `proxy/*`, `carrier/*`, `websocket/*`, `stream/*`, `packet/*`, `socks/*`, `hello/*` | Origin relay, packet forwarding, and protocol bridging are proxying concerns |
+| Tunnel registration RPC [transport-control] | `tunnelrpc/registration_*`, `pogs/registration_server`, `pogs/configuration_manager`, `proto/*.capnp` | — | Registration and configuration management are transport control operations, not proxy data forwarding |
+| Connection lifecycle events [transport-control] | `connection/tunnelsforha`, `connection/event`, `connection/json` | — | HA slot tracking, lifecycle events, and control-stream JSON are transport control concerns |
+| Data-path RPC streams [proxy-data] | `tunnelrpc/quic/protocol`, `quic/session_*`, `quic/request_*`, `quic/cloudflared_*` | Same | Request/session stream framing is proxy data \u2014 these atoms establish and serve proxy data channels |
+| Proxy implementation [proxy-data] | — | `proxy/*`, `carrier/*`, `websocket/*`, `stream/*`, `packet/*`, `socks/*`, `hello/*` | Origin relay, packet forwarding, and protocol bridging are proxy data concerns |
 | Ingress detail | `ingress/ingress`, `ingress/rule`, `ingress/origin_proxy`, `ingress/origin_service`, `ingress/packet_router`, `ingress/config` | Full ingress set (19 atoms) | Tunnels retains rule matching and origin dispatch entry points; proxying retains the complete implementation surface |
 
 Post-pruning Jaccard similarity: $J \approx 0.36$ (down from $J = 0.65$). The remaining overlap concentrates in transport atoms (`connection/*`, `quic/*`, `datagramsession/*`) that genuinely serve both domains.

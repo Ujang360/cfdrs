@@ -7,6 +7,8 @@
 
 ## Scope
 
+This catalog spans **both the proxy data and transport control planes** from the porting-friction perspective — see [proxy-data-taxonomy](../../../proxy-data-taxonomy.md). Some Go idioms are plane-specific: context propagation patterns differ for proxy-data goroutines (stream handlers, session loops) vs transport-control goroutines (supervisor, reconnect); error classification trees cross both planes. The friction analysis is a cross-cutting lens.
+
 This catalog inventories Go language idioms in cloudflared that have no direct Rust equivalent, where the Go-to-Rust translation is structurally painful. These are not behavioral patterns but rather language-level friction surfaces: implicit interface satisfaction, `init()` functions, build tags as feature flags, `defer` cleanup chains, `sync.Once` closures, `context.Context` propagation, error handling conventions, type switches, nil semantics, struct embedding, and `[]byte`/string conversion overhead. The goal is to give the Rust port a concrete map of every translation hazard so none are discovered late.
 
 - Direct evidence: interface definitions, `init()` bodies, platform-gated files, `defer` statements, `sync.Once` fields, `context.Context` parameters, `(value, error)` returns, `switch err.(type)` blocks, nil-interface checks, struct embedding, and `[]byte` parameters.

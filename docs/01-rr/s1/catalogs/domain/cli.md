@@ -7,6 +7,8 @@
 
 ## Scope
 
+This catalog primarily covers **out-of-band** infrastructure — see [proxy-data-taxonomy](../../proxy-data-taxonomy.md). CLI command dispatch, flag parsing, service lifecycle management, and token workflows operate outside the tunnel wire. The CLI orchestrates tunnel creation (transport control) and configures ingress rules (proxy data) but the CLI itself is an out-of-band interface.
+
 This catalog documents cloudflared CLI behavior surfaces that define command routing, flag/config ingestion, command-family entrypoints, operator output, service-mode actions, and update/management token workflows.
 
 For this catalog, CLI behavior includes:

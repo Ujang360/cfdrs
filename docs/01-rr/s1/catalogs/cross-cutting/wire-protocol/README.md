@@ -7,6 +7,8 @@
 
 ## Scope
 
+This catalog covers **both the proxy data and transport control planes** at the wire level — see [proxy-data-taxonomy](../../../proxy-data-taxonomy.md). Wire-level framing intersects both planes: transport handshake and registration RPC are transport control, while request/response streams and datagram envelopes carry proxy data.
+
 This catalog documents **wire-level state machines and framing contracts** between cloudflared and Cloudflare edge, organized by transport type and communication class.
 
 For this catalog, wire protocol behavior includes:
@@ -90,17 +92,17 @@ flowchart TB
 
 ## Communication Class Summary
 
-| Class | Transport | Wire mechanism | Primary atoms |
-| --- | --- | --- | --- |
-| **Admin/Control** | HTTP/2 control stream, QUIC RPC stream | Cap'n Proto RPC (RegisterConnection, SendLocalConfiguration, GracefulShutdown) | [connection/control](../../../atoms/connection/control.md), [tunnelrpc/registration_client](../../../atoms/tunnelrpc/registration_client.md), [tunnelrpc/registration_server](../../../atoms/tunnelrpc/registration_server.md) |
-| **Configuration** | HTTP/2 config update, QUIC RPC | JSON body (HTTP/2) or Cap'n Proto UpdateConfiguration (QUIC) | [connection/http2](../../../atoms/connection/http2.md), [tunnelrpc/quic/cloudflared_client](../../../atoms/tunnelrpc/quic/cloudflared_client.md), [tunnelrpc/pogs/configuration_manager](../../../atoms/tunnelrpc/pogs/configuration_manager.md) |
-| **Session management** | QUIC RPC (v2) or datagram frame (v3) | Cap'n Proto Register/UnregisterUdpSession (v2), binary registration datagram (v3) | [tunnelrpc/quic/session_client](../../../atoms/tunnelrpc/quic/session_client.md), [quic/v3/datagram](../../../atoms/quic/v3/datagram.md), [quic/v3/muxer](../../../atoms/quic/v3/muxer.md) |
-| **Data (HTTP)** | HTTP/2 request streams, QUIC data streams | HTTP/2 request/response with serialized headers; QUIC ConnectRequest/ConnectResponse with metadata | [connection/http2](../../../atoms/connection/http2.md), [connection/quic_connection](../../../atoms/connection/quic_connection.md), [tunnelrpc/quic/request_server_stream](../../../atoms/tunnelrpc/quic/request_server_stream.md) |
-| **Data (UDP)** | QUIC datagrams | v2 suffix-muxed or v3 prefix-typed binary frames | [quic/datagramv2](../../../atoms/quic/datagramv2.md), [quic/v3/datagram](../../../atoms/quic/v3/datagram.md), [datagramsession/session](../../../atoms/datagramsession/session.md), [quic/v3/session](../../../atoms/quic/v3/session.md) |
-| **Data (ICMP)** | QUIC datagrams | v2 raw IP packet type or v3 dedicated ICMP type byte | [quic/v3/icmp](../../../atoms/quic/v3/icmp.md), [quic/datagramv2](../../../atoms/quic/datagramv2.md) |
-| **Telemetry** | Internal events + Prometheus | Connection events, RPC timing, datagram metrics, QUIC transport metrics | [connection/event](../../../atoms/connection/event.md), [connection/metrics](../../../atoms/connection/metrics.md), [tunnelrpc/metrics/metrics](../../../atoms/tunnelrpc/metrics/metrics.md), [quic/v3/metrics](../../../atoms/quic/v3/metrics.md) |
-| **Management** | HTTP + WebSocket | REST endpoints + WebSocket log stream with JWT auth | [management/service](../../../atoms/management/service.md), [management/events](../../../atoms/management/events.md), [management/session](../../../atoms/management/session.md) |
-| **Discovery** | DNS SRV/TXT | Protocol percentages and edge address resolution | [edgediscovery/edgediscovery](../../../atoms/edgediscovery/edgediscovery.md), [edgediscovery/protocol](../../../atoms/edgediscovery/protocol.md) |
+| Class | Plane | Transport | Wire mechanism | Primary atoms |
+| --- | --- | --- | --- | --- |
+| **Admin/Control** | transport-control | HTTP/2 control stream, QUIC RPC stream | Cap'n Proto RPC (RegisterConnection, SendLocalConfiguration, GracefulShutdown) | [connection/control](../../../atoms/connection/control.md), [tunnelrpc/registration_client](../../../atoms/tunnelrpc/registration_client.md), [tunnelrpc/registration_server](../../../atoms/tunnelrpc/registration_server.md) |
+| **Configuration** | transport-control | HTTP/2 config update, QUIC RPC | JSON body (HTTP/2) or Cap'n Proto UpdateConfiguration (QUIC) | [connection/http2](../../../atoms/connection/http2.md), [tunnelrpc/quic/cloudflared_client](../../../atoms/tunnelrpc/quic/cloudflared_client.md), [tunnelrpc/pogs/configuration_manager](../../../atoms/tunnelrpc/pogs/configuration_manager.md) |
+| **Session management** | proxy-data | QUIC RPC (v2) or datagram frame (v3) | Cap'n Proto Register/UnregisterUdpSession (v2), binary registration datagram (v3) | [tunnelrpc/quic/session_client](../../../atoms/tunnelrpc/quic/session_client.md), [quic/v3/datagram](../../../atoms/quic/v3/datagram.md), [quic/v3/muxer](../../../atoms/quic/v3/muxer.md) |
+| **Data (HTTP)** | proxy-data | HTTP/2 request streams, QUIC data streams | HTTP/2 request/response with serialized headers; QUIC ConnectRequest/ConnectResponse with metadata | [connection/http2](../../../atoms/connection/http2.md), [connection/quic_connection](../../../atoms/connection/quic_connection.md), [tunnelrpc/quic/request_server_stream](../../../atoms/tunnelrpc/quic/request_server_stream.md) |
+| **Data (UDP)** | proxy-data | QUIC datagrams | v2 suffix-muxed or v3 prefix-typed binary frames | [quic/datagramv2](../../../atoms/quic/datagramv2.md), [quic/v3/datagram](../../../atoms/quic/v3/datagram.md), [datagramsession/session](../../../atoms/datagramsession/session.md), [quic/v3/session](../../../atoms/quic/v3/session.md) |
+| **Data (ICMP)** | proxy-data | QUIC datagrams | v2 raw IP packet type or v3 dedicated ICMP type byte | [quic/v3/icmp](../../../atoms/quic/v3/icmp.md), [quic/datagramv2](../../../atoms/quic/datagramv2.md) |
+| **Telemetry** | out-of-band | Internal events + Prometheus | Connection events, RPC timing, datagram metrics, QUIC transport metrics | [connection/event](../../../atoms/connection/event.md), [connection/metrics](../../../atoms/connection/metrics.md), [tunnelrpc/metrics/metrics](../../../atoms/tunnelrpc/metrics/metrics.md), [quic/v3/metrics](../../../atoms/quic/v3/metrics.md) |
+| **Management** | out-of-band | HTTP + WebSocket | REST endpoints + WebSocket log stream with JWT auth | [management/service](../../../atoms/management/service.md), [management/events](../../../atoms/management/events.md), [management/session](../../../atoms/management/session.md) |
+| **Discovery** | out-of-band | DNS SRV/TXT | Protocol percentages and edge address resolution | [edgediscovery/edgediscovery](../../../atoms/edgediscovery/edgediscovery.md), [edgediscovery/protocol](../../../atoms/edgediscovery/protocol.md) |
 
 ## Intentional Catalog Overlap
 

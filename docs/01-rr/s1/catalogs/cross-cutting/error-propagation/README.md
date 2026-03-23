@@ -7,6 +7,8 @@
 
 ## Scope
 
+This catalog spans **both the proxy data and transport control planes** from the error-propagation perspective — see [proxy-data-taxonomy](../../../proxy-data-taxonomy.md). Connection-layer errors (registration failure, protocol fallback, reconnect) are transport control; proxy-layer errors (origin unreachable, stream timeout, flow rate limit) are proxy data; supervisor errors are transport control; management errors are out-of-band. Error classification is a cross-cutting lens.
+
 This catalog records how errors are defined, classified, propagated, absorbed, and recovered throughout the cloudflared codebase. Go's pervasive `if err != nil` pattern hides implicit decision trees where the _same_ error value may be retried, swallowed, logged, reclassified, or escalated depending on context. This catalog makes those implicit trees explicit.
 
 - Direct evidence: error type definitions, sentinel errors, type-switch classification sites, panic recovery, error absorption points, and error wrapping/context additions.

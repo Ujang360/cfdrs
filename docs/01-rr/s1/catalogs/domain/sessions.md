@@ -7,11 +7,14 @@
 
 ## Scope
 
+This catalog primarily covers the **proxy data plane** — see [proxy-data-taxonomy](../../proxy-data-taxonomy.md). Sessions are the UDP proxy data lifecycle: every datagram session (v2 and v3) exists to forward end-user UDP and ICMP traffic through the tunnel. Session registration RPCs (`RegisterUdpSession`/`UnregisterUdpSession`) are classified as proxy data because they establish proxy data channels, even though v2 registration travels over the transport control stream.
+
 This catalog documents session lifecycle and management behavior across transport, RPC, runtime orchestration, and management surfaces.
 
 For this catalog, session behavior includes:
 
-- UDP session registration and unregistration contracts,
+- UDP session registration and unregistration contracts (proxy data),
+- management-side session controls (out-of-band),
 - session creation, migration, idle timeout, and close semantics,
 - datagram transport handlers and session dispatch paths,
 - SessionManager RPC client/server and Cap'n Proto schema contracts,
@@ -192,6 +195,8 @@ The `ErrVithVariableSeverity` interface (note: typo in upstream source — "Vith
 ## Session Protocol Version Comparison
 
 ### V2 vs V3 Behavioral Differences
+
+Both v2 and v3 are **proxy data** paths. The key difference is how session registration occurs: v2 uses a transport control stream RPC to set up proxy data channels, while v3 registers sessions inline with datagram processing.
 
 | Aspect | V2 (datagramsession) | V3 (quic/v3) |
 | --- | --- | --- |

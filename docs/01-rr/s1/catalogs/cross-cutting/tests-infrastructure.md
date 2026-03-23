@@ -5,6 +5,8 @@
 
 ## Scope
 
+This sub-catalog primarily covers **out-of-band** and **mixed** plane tests — see [proxy-data-taxonomy](../../proxy-data-taxonomy.md). Management, diagnostics, edge discovery, cfapi, credentials, tokens, features, config, and overwatch tests verify out-of-band infrastructure; metrics and signal tests are cross-cutting.
+
 This sub-catalog documents behavioral contracts encoded in management service, diagnostics, edge discovery, cfapi, credentials, tokens, features, config, metrics, validation, logging, signals, file watching, overwatch, hello-world, and other support package tests.
 
 Packages covered: `management`, `diagnostic`, `edgediscovery`, `cfapi`, `credentials`, `token`, `features`, `config`, `client`, `metrics`, `validation`, `logger`, `signal`, `watcher`, `retry`, `overwatch`, `hello`, `sshgen`, `ipaccess`, `tracing`, `cmd`.

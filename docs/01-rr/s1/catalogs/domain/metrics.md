@@ -6,6 +6,8 @@
 
 ## Scope
 
+This catalog spans **all three planes** from the metrics perspective — see [proxy-data-taxonomy](../../proxy-data-taxonomy.md). Request/stream metrics are proxy data instrumentation; connection/registration/protocol metrics are transport control instrumentation; management and diagnostic endpoints are out-of-band.
+
 This catalog records metrics instrumentation behavior represented in the baseline atom corpus.
 
 - Direct evidence: behavior atoms that expose `metrics emission`, import Prometheus packages, or belong to the dedicated metrics module.
