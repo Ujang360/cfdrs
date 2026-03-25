@@ -238,9 +238,9 @@ criteria below:
 
 | Atom | Tier | Rationale |
 | --- | --- | --- |
-| [cmd/cloudflared/access/carrier](../s1/atoms/cmd/cloudflared/access/carrier.md) | Should | Access sidecar transport is normal authenticated-origin behavior. |
-| [cmd/cloudflared/access/cmd](../s1/atoms/cmd/cloudflared/access/cmd.md) | Should | Access CLI is normal authenticated-origin operator behavior. |
-| [cmd/cloudflared/access/validation](../s1/atoms/cmd/cloudflared/access/validation.md) | Should | Access input validation is normal authenticated-origin behavior. |
+| [cmd/cloudflared/access/carrier](../s1/atoms/cmd/cloudflared/access/carrier.md) | Should | Access sidecar transport is normal authenticated-origin behavior. Reclassified from Could: drop-in replacement contract requires `cloudflared access` commands to be present at S4. |
+| [cmd/cloudflared/access/cmd](../s1/atoms/cmd/cloudflared/access/cmd.md) | Should | Access CLI is normal authenticated-origin operator behavior. Reclassified from Could: drop-in replacement contract requires `cloudflared access` commands to be present at S4. |
+| [cmd/cloudflared/access/validation](../s1/atoms/cmd/cloudflared/access/validation.md) | Should | Access input validation is normal authenticated-origin behavior. Reclassified from Could: drop-in replacement contract requires `cloudflared access` commands to be present at S4. |
 | [cmd/cloudflared/cliutil/build_info](../s1/atoms/cmd/cloudflared/cliutil/build_info.md) | Should | Build info is normal operator-facing behavior but not required for tunnel traffic. |
 | [cmd/cloudflared/flags/flags](../s1/atoms/cmd/cloudflared/flags/flags.md) | Must | Flag parsing is required to configure the RR binary. |
 | [cmd/cloudflared/tail/cmd](../s1/atoms/cmd/cloudflared/tail/cmd.md) | Could | Remote log tailing is useful but not required for the tunnel core. |
@@ -302,18 +302,18 @@ criteria below:
 
 | Atom | Tier | Rationale |
 | --- | --- | --- |
-| [carrier/carrier](../s1/atoms/carrier/carrier.md) | Should | Access carrier transport is normal authenticated-origin behavior. |
-| [carrier/websocket](../s1/atoms/carrier/websocket.md) | Should | Access WebSocket carrier transport is normal authenticated-origin behavior. |
-| [credentials/origin_cert](../s1/atoms/credentials/origin_cert.md) | Should | Access origin-cert login flow is normal authenticated-origin behavior. |
+| [carrier/carrier](../s1/atoms/carrier/carrier.md) | Should | Access carrier transport is normal authenticated-origin behavior. Reclassified from Could: drop-in replacement contract requires `cloudflared access` commands to be present at S4. |
+| [carrier/websocket](../s1/atoms/carrier/websocket.md) | Should | Access WebSocket carrier transport is normal authenticated-origin behavior. Reclassified from Could: drop-in replacement contract requires `cloudflared access` commands to be present at S4. |
+| [credentials/origin_cert](../s1/atoms/credentials/origin_cert.md) | Should | Access origin-cert login flow is normal authenticated-origin behavior. Reclassified from Could: drop-in replacement contract requires `cloudflared access` commands to be present at S4. |
 | [ingress/middleware/jwtvalidator](../s1/atoms/ingress/middleware/jwtvalidator.md) | Should | Access JWT validation is normal protected-origin behavior. |
 | [ingress/middleware/middleware](../s1/atoms/ingress/middleware/middleware.md) | Should | Middleware composition is normal protected-origin behavior. |
 | [management/middleware](../s1/atoms/management/middleware.md) | Should | Management middleware is normal authenticated dashboard behavior. |
 | [management/token](../s1/atoms/management/token.md) | Should | Scoped token validation is normal authenticated dashboard behavior. |
-| [token/encrypt](../s1/atoms/token/encrypt.md) | Should | Local token encryption is normal Access credential behavior. |
-| [token/path](../s1/atoms/token/path.md) | Should | Local token path handling is normal Access credential behavior. |
-| [token/token](../s1/atoms/token/token.md) | Should | Browser-driven Access login is normal authenticated-origin behavior. |
-| [token/transfer](../s1/atoms/token/transfer.md) | Should | Token callback transfer is normal Access credential behavior. |
-| [validation/validation](../s1/atoms/validation/validation.md) | Should | Access input validation is normal authenticated-origin behavior. |
+| [token/encrypt](../s1/atoms/token/encrypt.md) | Should | Local token encryption is normal Access credential behavior. Reclassified from Could: drop-in replacement contract requires `cloudflared access` commands to be present at S4. |
+| [token/path](../s1/atoms/token/path.md) | Should | Local token path handling is normal Access credential behavior. Reclassified from Could: drop-in replacement contract requires `cloudflared access` commands to be present at S4. |
+| [token/token](../s1/atoms/token/token.md) | Should | Browser-driven Access login is normal authenticated-origin behavior. Reclassified from Could: drop-in replacement contract requires `cloudflared access` commands to be present at S4. |
+| [token/transfer](../s1/atoms/token/transfer.md) | Should | Token callback transfer is normal Access credential behavior. Reclassified from Could: drop-in replacement contract requires `cloudflared access` commands to be present at S4. |
+| [validation/validation](../s1/atoms/validation/validation.md) | Should | Access input validation is normal authenticated-origin behavior. Reclassified from Could: drop-in replacement contract requires `cloudflared access` commands to be present at S4. |
 
 ### Stakeholder 9 - Peer Connections (HA)
 
