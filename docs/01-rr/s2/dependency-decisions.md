@@ -229,7 +229,7 @@ level, zero-cost.
 datagram v2/v3 frame types (0x00–0x03), QUIC stream 6-byte preamble,
 Cap'n Proto frame boundaries.
 
-ADR-004 (open): combinator parser vs manual byte-buffer slicing.
+Decision recorded in [ADR-004](adr/004-parser-strategy-combinator-vs-manual.md).
 
 ---
 
@@ -297,7 +297,7 @@ WebSocket, carrier WebSocket proxy sessions.
 **Management HTTP server** — `/ping`, `/host_details`, `/metrics`,
 `/logs` (WebSocket). Not for proxy traffic.
 
-ADR-006 (open): full web framework vs raw HTTP for management server.
+Decision recorded in [ADR-006](adr/006-management-http-stack.md).
 
 ---
 
@@ -334,7 +334,7 @@ through frame type `0x03`. Pre-1.0 but actively developed.
 counters/gauges across connection, quic, supervisor, datagramsession,
 flow, ingress, tunnelrpc.
 
-ADR-003 (open): direct prometheus client vs metrics facade.
+Decision recorded in [ADR-003](adr/003-metrics-facade-vs-direct-prometheus.md).
 
 ### 4.4 Error Reporting ✅
 
@@ -434,8 +434,7 @@ supervisor orchestration and actor address-book graph.
 
 **Async-compatible retry with backoff** — IN.
 
-ADR-005 (open): library vs custom (~200 lines, Go has custom
-jitter/reset logic).
+Decision recorded in [ADR-005](adr/005-retry-backoff-library-vs-custom.md).
 
 ### SOCKS5 ✅ — ADR-007 Resolved
 
@@ -521,16 +520,29 @@ No Windows/macOS in this phase.
 
 ---
 
-## Open ADRs
+## S2.4 ADRs
 
-Decisions deferred to S2.4 for formal architectural decision records:
+Decision records produced in phase 2.4:
 
 | ADR | Decision | Origin | Blast Radius |
 | --- | --- | --- | --- |
-| ADR-003 | Prometheus client vs metrics facade | Layer 4.3 | Medium — all instrumented modules |
-| ADR-004 | Combinator parser vs manual byte-buffer slicing | Layer 2.6 | Medium — wire format parsing |
-| ADR-005 | Async backoff library vs custom implementation | Layer 7 | Low — retry logic |
-| ADR-006 | Full web framework vs raw HTTP for management server | Layer 3.6 | Low — management server only |
+| [ADR-003](adr/003-metrics-facade-vs-direct-prometheus.md) | Prometheus client vs metrics facade | Layer 4.3 | Medium — all instrumented modules |
+| [ADR-004](adr/004-parser-strategy-combinator-vs-manual.md) | Combinator parser vs manual byte-buffer slicing | Layer 2.6 | Medium — wire format parsing |
+| [ADR-005](adr/005-retry-backoff-library-vs-custom.md) | Async backoff library vs custom implementation | Layer 7 | Low — retry logic |
+| [ADR-006](adr/006-management-http-stack.md) | Full web framework vs raw HTTP for management server | Layer 3.6 | Low — management server only |
+
+Expanded decisions tracked in [ADR index](adr/README.md):
+
+| ADR | Decision focus | Origin |
+| --- | --- | --- |
+| [ADR-018](adr/018-quic-thread-affinity-enforcement.md) | QUIC thread-affinity enforcement | R2.6 / Layer 1.1 and 3.1 |
+| [ADR-019](adr/019-cancellation-timeout-propagation-contract.md) | Cancellation and timeout propagation contract | R1.2 |
+| [ADR-012](adr/012-error-taxonomy-and-recoverability-policy.md) | Error taxonomy and recoverability policy | R3.1 |
+| [ADR-013](adr/013-customduration-dual-format-contract.md) | CustomDuration dual-format serialization contract | R1.6 |
+| [ADR-014](adr/014-startup-dag-contract.md) | Startup DAG contract | R4.1 |
+| [ADR-015](adr/015-graceful-shutdown-contract.md) | Graceful shutdown contract | R4.2 |
+| [ADR-016](adr/016-session-migration-lifecycle.md) | Session migration lifecycle contract | R2.2 and R5.3 |
+| [ADR-017](adr/017-access-s4-drop-in-contract.md) | Access S4 drop-in replacement contract | Scope Access reclassification / R6.6 |
 
 ### Resolved ADRs
 
@@ -554,7 +566,7 @@ Decisions deferred to S2.4 for formal architectural decision records:
 | All 9 capability layers documented | ✅ |
 | Every decision traceable to S1 catalog evidence | ✅ |
 | Workspace feature flag architecture established | ✅ |
-| Open ADRs identified and forwarded to S2.4 | ✅ 4 open |
+| ADR-003/004/005/006 decision records authored in S2.4 | ✅ |
 | Resolved ADRs documented with rationale | ✅ ADR-007, ADR-009 |
 | Platform target decided | ✅ Linux x86-64, systemd |
 | Build-vs-buy evaluated for all domain capabilities | ✅ |

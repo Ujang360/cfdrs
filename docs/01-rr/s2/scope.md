@@ -224,6 +224,9 @@ criteria below:
   behind the tunnel core.
 - Won't: deferred beyond S4 or explicitly excluded from cfdrs.
 
+The Access drop-in replacement rationale is formalized in
+[ADR-017](adr/017-access-s4-drop-in-contract.md).
+
 ### Summary Counts
 
 | Tier | Count | Meaning in RR |
