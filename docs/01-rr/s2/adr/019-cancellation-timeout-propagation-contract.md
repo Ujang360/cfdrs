@@ -10,7 +10,7 @@
 
 ## Question
 
-How should cfdrs represent Go `context.Context` behavior consistently across async boundaries in Rust?
+How should [cfdrs](https://github.com/Ujang360/cfdrs) represent Go `context.Context` behavior consistently across async boundaries in Rust?
 
 ## Decision
 

@@ -17,7 +17,7 @@ policy, assignment strategy, and inter-EVL boundary rules?
 
 Deferred to S2.6 where crate boundaries are drawn from Jaccard
 clusters. High-level constraints already locked in dependency-decisions: single
-multi-thread tokio runtime, all threads pinned via `sched_setaffinity`, Tunnel
+multi-thread [tokio](https://crates.io/crates/tokio) runtime, all threads pinned via `sched_setaffinity`, Tunnel
 EVL (4 threads) + Proxy EVL (remaining cores), no connection migration, atomic
 counter load balancing at assignment time. S2.6 will formalize these into typed
 boundaries and crate-level ownership rules.

@@ -10,20 +10,20 @@
 
 ## Question
 
-Should cfdrs use Cloudflare's tokio-integrated QUIC (tokio-quiche)
+Should [cfdrs](https://github.com/Ujang360/cfdrs) use Cloudflare's tokio-integrated QUIC ([tokio-quiche](https://crates.io/crates/tokio-quiche))
 or a pure-Rust QUIC stack as the primary transport?
 
 ## Decision
 
-Use tokio-quiche as the primary QUIC transport. Zero-copy sends
+Use [tokio-quiche](https://crates.io/crates/tokio-quiche) as the primary QUIC transport. Zero-copy sends
 are mandatory. gcongestion is mandatory (implied by zero-copy). Pure-Rust QUIC
-is a conditional fallback only — activated if the tokio-quiche allocator link
+is a conditional fallback only — activated if the [tokio-quiche](https://crates.io/crates/tokio-quiche) allocator link
 conflict is unresolvable at S3 build time.
 
 ## Rationale and Evidence
 
-tokio-quiche is Cloudflare's own production QUIC stack, already
-integrated with tokio, providing zero-copy sends and Google congestion control.
+[tokio-quiche](https://crates.io/crates/tokio-quiche) is Cloudflare's own production QUIC stack, already
+integrated with [tokio](https://crates.io/crates/tokio), providing zero-copy sends and Google congestion control.
 The fallback path (pure-Rust QUIC + FIPS-capable TLS) is pre-identified and
 viable but not the active path. Evidence:
 

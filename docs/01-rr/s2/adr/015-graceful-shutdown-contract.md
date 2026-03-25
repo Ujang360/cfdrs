@@ -10,7 +10,7 @@
 
 ## Question
 
-How should cfdrs standardize shutdown behavior so actors and transport tasks terminate deterministically under graceful and forced stop paths?
+How should [cfdrs](https://github.com/Ujang360/cfdrs) standardize shutdown behavior so actors and transport tasks terminate deterministically under graceful and forced stop paths?
 
 ## Decision
 

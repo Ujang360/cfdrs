@@ -10,19 +10,19 @@
 
 ## Question
 
-Should cfdrs implement a cli-compat mode that matches urfave/cli
+Should [cfdrs](https://github.com/Ujang360/cfdrs) implement a cli-compat mode that matches urfave/cli
 behavioral cadence for flag parsing edge cases?
 
 ## Decision
 
 Deferred. `cli-compat` feature flag is defined in the workspace.
-The default build uses `cli-native` (idiomatic clap derive). cli-compat is
+The default build uses `cli-native` (idiomatic [clap](https://crates.io/crates/clap) derive). cli-compat is
 activated only if S4 parity tests reveal a behavioral divergence in flag parsing
-that cannot be resolved within the clap model.
+that cannot be resolved within the [clap](https://crates.io/crates/clap) model.
 
 ## Rationale and Evidence
 
-urfave/cli and clap have different edge-case behaviors around flag
+urfave/cli and [clap](https://crates.io/crates/clap) have different edge-case behaviors around flag
 ordering, shorthand aliasing, and help text formatting. These differences are
 unlikely to surface in primary tunnel operation but could appear in
 operator-facing parity tests. Implementing cli-compat speculatively wastes S3

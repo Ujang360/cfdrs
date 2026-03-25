@@ -10,7 +10,7 @@
 
 ## Question
 
-How should cfdrs enforce thread-affinity constraints for QUIC connection objects that are not safe to move across threads?
+How should [cfdrs](https://github.com/Ujang360/cfdrs) enforce thread-affinity constraints for QUIC connection objects that are not safe to move across threads?
 
 ## Decision
 

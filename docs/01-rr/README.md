@@ -1,6 +1,6 @@
 # RR — Rust Rewrite
 
-Phase 1 of the cfdrs program: rewriting
+Phase 1 of the [cfdrs](https://github.com/Ujang360/cfdrs) program: rewriting
 [cloudflare/cloudflared](https://github.com/cloudflare/cloudflared) in Rust.
 
 **Goal:** Produce a behaviorally equivalent Rust binary for the scoped

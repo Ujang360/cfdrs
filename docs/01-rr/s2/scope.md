@@ -222,7 +222,7 @@ criteria below:
   required for the minimal RR binary purpose.
 - Could: rare, adjunct, or quality-of-life behavior intentionally sequenced
   behind the tunnel core.
-- Won't: deferred beyond S4 or explicitly excluded from cfdrs.
+- Won't: deferred beyond S4 or explicitly excluded from [cfdrs](https://github.com/Ujang360/cfdrs).
 
 The Access drop-in replacement rationale is formalized in
 [ADR-017](adr/017-access-s4-drop-in-contract.md).
@@ -413,7 +413,7 @@ The Access drop-in replacement rationale is formalized in
 
 The list below records every explicit RR non-port while preserving the current
 stakeholder MoSCoW classification. Deferred items remain valid S1 evidence for
-later phases; excluded items are architectural decisions for cfdrs itself.
+later phases; excluded items are architectural decisions for [cfdrs](https://github.com/Ujang360/cfdrs) itself.
 
 ### RR-Deferred (FC / Post-S4 Backlog)
 
@@ -438,10 +438,10 @@ later phases; excluded items are architectural decisions for cfdrs itself.
 | Feature | Evidence | Justification |
 | --- | --- | --- |
 | SOCKS5 outbound client | [operator-and-platform](../s1/catalogs/cross-cutting/features/operator-and-platform.md), [api-monitoring-origin-dns](../s1/catalogs/cross-cutting/features/api-monitoring-origin-dns.md), [config/model](../s1/atoms/config/model.md), [cmd/cloudflared/access/carrier](../s1/atoms/cmd/cloudflared/access/carrier.md) | Deliberate Go omission. `access tcp` exposes a plain TCP listener, `Forwarder` has no SOCKS5 client fields, and the only upstream SOCKS5 surface is the ingress-side inbound proxy. |
-| Automatic update | [operator-and-platform](../s1/catalogs/cross-cutting/features/operator-and-platform.md), [platform-substrates](../s1/catalogs/cross-cutting/platform-substrates.md) | Permanently excluded by cfdrs design. The binary is expected to be managed by systemd and packaging workflows, not by self-replacement inside a security-sensitive daemon. |
-| `update` command | [operator-and-platform](../s1/catalogs/cross-cutting/features/operator-and-platform.md) | Depends on the auto-updater surface, which is permanently excluded from cfdrs. |
-| glommio runtime | [dependency-decisions](dependency-decisions.md) | Permanently excluded in S2.1 due to QUIC transport incompatibility and ecosystem lockout. |
-| Foundations crate as a direct dependency | [dependency-decisions](dependency-decisions.md) | Out as a direct dependency. It may appear transitively, but cfdrs does not depend on the full Cloudflare bootstrap facade directly. |
+| Automatic update | [operator-and-platform](../s1/catalogs/cross-cutting/features/operator-and-platform.md), [platform-substrates](../s1/catalogs/cross-cutting/platform-substrates.md) | Permanently excluded by [cfdrs](https://github.com/Ujang360/cfdrs) design. The binary is expected to be managed by systemd and packaging workflows, not by self-replacement inside a security-sensitive daemon. |
+| `update` command | [operator-and-platform](../s1/catalogs/cross-cutting/features/operator-and-platform.md) | Depends on the auto-updater surface, which is permanently excluded from [cfdrs](https://github.com/Ujang360/cfdrs). |
+| [glommio](https://crates.io/crates/glommio) runtime | [dependency-decisions](dependency-decisions.md) | Permanently excluded in S2.1 due to QUIC transport incompatibility and ecosystem lockout. |
+| Foundations crate as a direct dependency | [dependency-decisions](dependency-decisions.md) | Out as a direct dependency. It may appear transitively, but [cfdrs](https://github.com/Ujang360/cfdrs) does not depend on the full Cloudflare bootstrap facade directly. |
 | pprof handlers with Go semantics | [metrics/metrics](../s1/atoms/metrics/metrics.md), [management/service](../s1/atoms/management/service.md), [dependency-decisions](dependency-decisions.md) | Go `net/http/pprof` does not have a direct Rust equivalent with matching semantics. RR treats this as replaceable debug tooling rather than parity-critical behavior. |
 
 ## S2.2 Exit Gate
@@ -456,7 +456,7 @@ later phases; excluded items are architectural decisions for cfdrs itself.
 | Won't and non-port entries stay anchored to S1 findings or S2.1 decisions | Yes |
 | Two non-port buckets are complete: deferred and permanently excluded | Yes |
 | SOCKS5 outbound exclusion is justified with explicit Go evidence | Yes |
-| Auto-update and `update` command exclusions are justified as cfdrs design decisions | Yes |
+| Auto-update and `update` command exclusions are justified as [cfdrs](https://github.com/Ujang360/cfdrs) design decisions | Yes |
 
 ## Notes
 

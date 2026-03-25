@@ -8,7 +8,7 @@
 | Rust edition | 2024 (MSRV 1.85+) |
 
 This document records architectural dependency *capability* decisions
-for the cfdrs rewrite. Crate names are not finalized here — they are
+for the [cfdrs](https://github.com/Ujang360/cfdrs) rewrite. Crate names are not finalized here — they are
 decided in S2.6 when crate boundaries are drawn, or at first use in S3.
 
 **Maintenance:** This document remains open for post-2.1 additions.
@@ -79,12 +79,12 @@ Same pattern applies to `cli-native` / `cli-compat`.
 
 ### 1.1 Async Runtime ✅
 
-**tokio** — selected. `new_multi_thread()`, all threads pinned via
+**[tokio](https://crates.io/crates/tokio)** — selected. `new_multi_thread()`, all threads pinned via
 `sched_setaffinity` in `on_thread_start`. No `LocalSet`. No
 `new_current_thread` runtimes. Single multi-thread runtime for both
 Tunnel EVL and Proxy EVL threads. Everything `Send`.
 
-**glommio** — OUT permanently. QUIC transport incompatibility,
+**[glommio](https://crates.io/crates/glommio)** — OUT permanently. QUIC transport incompatibility,
 ecosystem lockout.
 
 **io_uring** — OUT for now. Kernel version floor concern. Revisit
@@ -95,11 +95,11 @@ post-S4 if benchmarks warrant.
 | Capability | Decision |
 | --- | --- |
 | Cancellation / context propagation | CancellationToken — maps 1:1 to Go's `context.WithCancel` and `graceShutdownC` broadcast |
-| Stream combinators | tokio stream utilities |
-| Async trait extensions, try_join | futures 0.3.x ecosystem |
+| Stream combinators | [tokio](https://crates.io/crates/tokio) stream utilities |
+| Async trait extensions, try_join | [futures](https://crates.io/crates/futures) 0.3.x ecosystem |
 | Async fn in traits | Rust 2024 native — no proc macro needed |
-| `dyn Trait` async | async-trait pattern — only where `dyn Trait` is unavoidable |
-| Custom futures / pinning | pin-project-lite pattern — zero dep preferred |
+| `dyn Trait` async | [async-trait](https://crates.io/crates/async-trait) pattern — only where `dyn Trait` is unavoidable |
+| Custom futures / pinning | [pin-project-lite](https://crates.io/crates/pin-project-lite) pattern — zero dep preferred |
 
 ### 1.3 Channels ✅
 
@@ -107,7 +107,7 @@ post-S4 if benchmarks warrant.
 Go-style select semantics, production-proven. Tunnel EVL → Proxy EVL
 `SessionAssignment` handoff uses a bounded channel of this type.
 
-**tokio channels** — used internally within async tasks (watch,
+**[tokio](https://crates.io/crates/tokio) channels** — used internally within async tasks (watch,
 oneshot, mpsc). Not for cross-EVL boundaries.
 
 Single-producer single-consumer alternatives — OUT. MPMC covers all
@@ -143,7 +143,7 @@ Known required features: `extended`, `local_dynamic_tls`, `no_thp`,
 
 **Conflict check:** The QUIC transport dependency tree may transitively
 pull in another allocator as an opt-in feature. That feature must not
-force `#[global_allocator]` on the binary — the cfdrs allocator
+force `#[global_allocator]` on the binary — the [cfdrs](https://github.com/Ujang360/cfdrs) allocator
 declaration wins. **Verify on first build in S3.**
 
 If link conflict is unresolvable at build time: fallback to pure-Rust
@@ -152,7 +152,7 @@ is pre-identified and viable.
 
 ### 1.7 Rate Limiting ✅
 
-**GCRA rate limiter** capability — tokio-aware. Replaces `flow/limiter`
+**GCRA rate limiter** capability — [tokio](https://crates.io/crates/tokio)-aware. Replaces `flow/limiter`
 (~200 Go lines). Token-bucket / GCRA algorithm, 64-bit atomic state.
 
 ### 1.8 Caching ✅
@@ -169,16 +169,16 @@ pool.
 
 | Capability | Decision |
 | --- | --- |
-| General serialization | serde ecosystem |
-| JSON | serde_json |
-| YAML | serde_yaml 0.9.x — deprecated but stable. Migrate when maintained fork reaches 0.1.x+ maturity. |
-| TOML | toml — parity TOML contracts, workspace config |
-| Cap'n Proto runtime | capnp **0.25.x** — updated from [shopping cart](dependency-shopping-cart.md) 0.20.x |
-| Cap'n Proto codegen | capnpc **0.25.x** — build-time |
-| Cap'n Proto RPC | capnp-rpc **0.25.x** — self-proxy service, same-process, actor-connected |
-| Protobuf | prost — datagram v2 tracing spans (frame type `0x03`). Passively maintained; migrate when official protobuf crate matures. |
+| General serialization | [serde](https://crates.io/crates/serde) ecosystem |
+| JSON | [serde_json](https://crates.io/crates/serde_json) |
+| YAML | [serde_yaml](https://crates.io/crates/serde_yaml) 0.9.x — deprecated but stable. Migrate when maintained fork reaches 0.1.x+ maturity. |
+| TOML | [toml](https://crates.io/crates/toml) — parity TOML contracts, workspace config |
+| Cap'n Proto runtime | [capnp](https://crates.io/crates/capnp) **0.25.x** — updated from [shopping cart](dependency-shopping-cart.md) 0.20.x |
+| Cap'n Proto codegen | [capnpc](https://crates.io/crates/capnpc) **0.25.x** — build-time |
+| Cap'n Proto RPC | [capnp-rpc](https://crates.io/crates/capnp-rpc) **0.25.x** — self-proxy service, same-process, actor-connected |
+| Protobuf | [prost](https://crates.io/crates/prost) — datagram v2 tracing spans (frame type `0x03`). Passively maintained; migrate when official protobuf crate matures. |
 
-**capnp-rpc** is treated as a self-proxy service variant — session-based,
+**[capnp-rpc](https://crates.io/crates/capnp-rpc)** is treated as a self-proxy service variant — session-based,
 dispatched through the same proxy invariant as all other tunnel traffic.
 Never granted architectural special status. Never classified as
 transport control.
@@ -198,12 +198,12 @@ Base64, hex encoding — IN.
 
 | Capability | Decision | Rationale |
 | --- | --- | --- |
-| Fixed-capacity stack collections | arrayvec — `ArrayString<N>` for known-max-length identifiers (ALPN, protocol names, metric labels). `ArrayVec<T, N>` for fixed-capacity hot-path collections. | Compile-time capacity, Copy-able |
-| Small-string optimization (dynamic) | compact_str pattern — SSO for dynamically-sized strings: config keys, header values, ingress rule hostnames | Inline ≤24 bytes, transparent heap fallback |
-| Small vec (heap fallback) | smallvec — header lists, datagram frame metadata, small hot-path collections | Inline N elements, heap fallback |
-| Byte-string operations | bstr — 150+ byte/string conversion sites from S1 porting-friction catalog | Go's implicit `[]byte` ↔ `string` |
-| Immutable SSO strings | OUT — arrayvec + compact_str cover the space | |
-| Fixed-size ASCII identifiers | OUT — arrayvec ArrayString covers this | |
+| Fixed-capacity stack collections | [arrayvec](https://crates.io/crates/arrayvec) — `ArrayString<N>` for known-max-length identifiers (ALPN, protocol names, metric labels). `ArrayVec<T, N>` for fixed-capacity hot-path collections. | Compile-time capacity, Copy-able |
+| Small-string optimization (dynamic) | [compact_str](https://crates.io/crates/compact_str) pattern — SSO for dynamically-sized strings: config keys, header values, ingress rule hostnames | Inline ≤24 bytes, transparent heap fallback |
+| Small vec (heap fallback) | [smallvec](https://crates.io/crates/smallvec) — header lists, datagram frame metadata, small hot-path collections | Inline N elements, heap fallback |
+| Byte-string operations | [bstr](https://crates.io/crates/bstr) — 150+ byte/string conversion sites from S1 porting-friction catalog | Go's implicit `[]byte` ↔ `string` |
+| Immutable SSO strings | OUT — [arrayvec](https://crates.io/crates/arrayvec) + [compact_str](https://crates.io/crates/compact_str) cover the space | |
+| Fixed-size ASCII identifiers | OUT — [arrayvec](https://crates.io/crates/arrayvec) ArrayString covers this | |
 | no_std fixed collections | OUT — Linux-only target, no no_std constraint | |
 
 **Stack overflow awareness:** TypeState machines, fat enum payloads,
@@ -237,13 +237,13 @@ Decision recorded in [ADR-004](adr/004-parser-strategy-combinator-vs-manual.md).
 
 ### 3.1 QUIC ✅
 
-**Cloudflare's tokio-integrated QUIC** capability — selected.
+**Cloudflare's [tokio](https://crates.io/crates/tokio)-integrated QUIC** capability — selected.
 
 Feature set decisions:
 
 - Zero-copy sends: **mandatory**
 - Google congestion control (gcongestion): **mandatory** (implied by zero-copy)
-- Extra QUIC listener metrics + tokio task metrics: behind `more-metrics` flag
+- Extra QUIC listener metrics + [tokio](https://crates.io/crates/tokio) task metrics: behind `more-metrics` flag
 
 The QUIC transport has **two dispatch paths on one connection:**
 
@@ -286,7 +286,7 @@ available). For cfapi REST calls and upstream API contracts.
 
 ### 3.5 WebSocket ✅
 
-Tokio-integrated WebSocket capability — IN. Management log stream
+[Tokio](https://crates.io/crates/tokio)-integrated WebSocket capability — IN. Management log stream
 WebSocket, carrier WebSocket proxy sessions.
 
 ### 3.6 Service / Middleware ✅
@@ -311,7 +311,7 @@ Bridge for third-party crates using the `log` crate — IN.
 
 Structured journald output — IN for Linux/systemd deployments.
 
-Error type span enrichment (captures active tracing span stack when
+Error type span enrichment (captures active [tracing](https://crates.io/crates/tracing) span stack when
 error is created) — IN.
 
 `logging-compat` path: custom subscriber Layer outputting
@@ -387,8 +387,8 @@ fixed at the rewrite boundary):**
 - `*net.OpError` + `"operation not permitted"` →
   `TransportError::EgressBlocked`
 
-**miette** — 🔲 open. Evaluate for CLI diagnostic display in S4.
-**eyre** — OUT.
+**[miette](https://crates.io/crates/miette)** — 🔲 open. Evaluate for CLI diagnostic display in S4.
+**[eyre](https://crates.io/crates/eyre)** — OUT.
 
 ---
 
@@ -400,7 +400,7 @@ trees.
 `cli-compat` — deferred. Add in S4 only if parity tests reveal
 behavioral gap vs urfave/cli cadence.
 
-**Timestamp / duration** — chrono ecosystem for formatting and parsing.
+**Timestamp / duration** — [chrono](https://crates.io/crates/chrono) ecosystem for formatting and parsing.
 Human-readable duration parsing for config values (`"5s"`, `"210s"`,
 `"1h"`).
 
@@ -422,7 +422,7 @@ Config search path (S1 evidence): `~/.cloudflared` →
 **Erlang-inspired typed actor framework** — selected. Supervision tree,
 upward error escalation.
 
-capnp-rpc self-proxy service: same OS process, own EVL, communicates
+[capnp-rpc](https://crates.io/crates/capnp-rpc) self-proxy service: same OS process, own EVL, communicates
 to high-level system actors via actor message passing. Treated as a
 special proxy variant — session-based, dispatched through the same
 proxy invariant. Never granted architectural special status.
@@ -478,7 +478,7 @@ Async DNS resolver, file watcher (config hot-reload), IP/CIDR matching,
 regex (ingress rule path matching), gzip compression, diagnostic zip
 bundling, FNV hashing (feature flag percentile rollout) — all IN.
 
-**No autoupdate** in cfdrs.
+**No autoupdate** in [cfdrs](https://github.com/Ujang360/cfdrs).
 
 **Foundations** (Cloudflare bootstrap crate) — OUT as direct
 dependency. Accepted as transitive dep from QUIC transport (single
@@ -510,7 +510,7 @@ No Windows/macOS in this phase.
 | --- | --- |
 | Unix syscall wrapper | IN — sched_setaffinity, socket options, ICMP raw sockets, ping-group detection, DF bit |
 | Raw FFI bindings | IN — where the safe wrapper does not cover |
-| Systemd readiness | **sd-notify** — READY=1 and STOPPING=1 only. Minimal. ADR-009 closed. |
+| Systemd readiness | **[sd-notify](https://crates.io/crates/sd-notify)** — READY=1 and STOPPING=1 only. Minimal. ADR-009 closed. |
 | UDP socket tuning | IN — QUIC UDP socket buffer sizes, DF bit, platform-specific options |
 | System info collection | IN — CPU, memory, disk, network for diagnostics |
 | File descriptor locking | IN — token file / credential exclusive access |
@@ -549,13 +549,13 @@ Expanded decisions tracked in [ADR index](adr/README.md):
 | ADR | Resolution | Rationale |
 | --- | --- | --- |
 | ADR-007 | SOCKS5 — build, not buy | S1 scope is minimal (~400 lines), WebSocket carrier integration, IP access policy not available in libraries |
-| ADR-009 | sd-notify — minimal sd_notify(3) | READY=1 + STOPPING=1 only, no full systemd service lifecycle |
+| ADR-009 | [sd-notify](https://crates.io/crates/sd-notify) — minimal sd_notify(3) | READY=1 + STOPPING=1 only, no full systemd service lifecycle |
 
 ### Tentative Evaluations
 
 | Candidate | Evaluation Window | Purpose |
 | --- | --- | --- |
-| miette | S4 | CLI diagnostic display enrichment |
+| [miette](https://crates.io/crates/miette) | S4 | CLI diagnostic display enrichment |
 
 ---
 
@@ -589,15 +589,15 @@ Phase 2.2 (Scoping) consumes the following from this document:
 
 | Priority | Capabilities |
 | --- | --- |
-| Must | tokio runtime, QUIC transport, Cap'n Proto RPC, actor framework, structured logging, typed errors |
+| Must | [tokio](https://crates.io/crates/tokio) runtime, QUIC transport, Cap'n Proto RPC, actor framework, structured logging, typed errors |
 | Should | MPMC channels, concurrent hashmap, bump arena, TinyLFU cache, GCRA rate limiter |
 | Could | logging-compat (zerolog JSON), cli-compat, runtime debugging (debug-console) |
-| Won't (this phase) | glommio runtime, io_uring, FIPS, autoupdate, Windows/macOS, 0-RTT |
+| Won't (this phase) | [glommio](https://crates.io/crates/glommio) runtime, io_uring, FIPS, autoupdate, Windows/macOS, 0-RTT |
 
 ### Non-Port Decisions
 
-- Auto-updater — not ported to cfdrs
+- Auto-updater — not ported to [cfdrs](https://github.com/Ujang360/cfdrs)
 - Foundations crate — OUT as direct dependency
-- glommio — OUT permanently (QUIC transport incompatibility)
+- [glommio](https://crates.io/crates/glommio) — OUT permanently (QUIC transport incompatibility)
 - Windows/macOS platform — excluded this phase
 - 0-RTT — deferred post-S4

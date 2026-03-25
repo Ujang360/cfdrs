@@ -10,7 +10,7 @@
 
 ## Question
 
-How should cfdrs represent cross-layer errors so retry, abort, and escalation behavior stays consistent with S1 semantics?
+How should [cfdrs](https://github.com/Ujang360/cfdrs) represent cross-layer errors so retry, abort, and escalation behavior stays consistent with S1 semantics?
 
 ## Decision
 

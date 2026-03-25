@@ -54,10 +54,10 @@ The architecture must accommodate feature-flagged deviations:
    output vs native `tracing` structured spans
 2. **`cli-compat` vs `cli-native`** — `urfave/cli` cadence match vs
    idiomatic `clap` derive
-3. **`runtime-tokio` vs `runtime-glommio`** — tokio multi-threaded vs
-   glommio thread-per-core (undecided)
+3. **`runtime-tokio` vs `runtime-glommio`** — [tokio](https://crates.io/crates/tokio) multi-threaded vs
+   [glommio](https://crates.io/crates/glommio) thread-per-core (undecided)
 4. **`quic-quinn` vs `quic-quiche`** — pure-Rust QUIC vs
-   Cloudflare's C-backed quiche
+   Cloudflare's C-backed [quiche](https://crates.io/crates/quiche)
 5. **Other deviations** — TBD in S2/2.4 ADRs
 
 These flags affect dependency selection. Where relevant, candidates are
@@ -84,11 +84,11 @@ they force.
 
 | Model | Description | Best Fit Areas | Main Risks | Recommended Crates |
 | --- | --- | --- | --- | --- |
-| Full Async | Async end-to-end runtime | tunnels, transport, ingress, supervisor | async contagion, trait complexity | tokio, futures, quinn/quiche |
-| Full Sync | Threaded/sync core services | small control utilities, CLI-only workflows | lower throughput, blocking I/O pressure | crossbeam, parking_lot, ureq |
-| Mixed | Async data plane + sync control plane | cloudflared-like split architecture | boundary complexity | tokio + crossbeam + flume |
-| Actor-Heavy | Message passing + supervised actors | overwatch, session lifecycle, supervisor FSM | framework lock-in, mailbox overhead | ractor, crossbeam-channel |
-| Hybrid Runtime | tokio default + targeted glommio lanes | Linux high-throughput hotspots | dual-runtime complexity | tokio + glommio + adapters |
+| Full Async | Async end-to-end runtime | tunnels, transport, ingress, supervisor | async contagion, trait complexity | [tokio](https://crates.io/crates/tokio), [futures](https://crates.io/crates/futures), [quinn](https://crates.io/crates/quinn)/[quiche](https://crates.io/crates/quiche) |
+| Full Sync | Threaded/sync core services | small control utilities, CLI-only workflows | lower throughput, blocking I/O pressure | [crossbeam](https://crates.io/crates/crossbeam), [parking_lot](https://crates.io/crates/parking_lot), [ureq](https://crates.io/crates/ureq) |
+| Mixed | Async data plane + sync control plane | cloudflared-like split architecture | boundary complexity | [tokio](https://crates.io/crates/tokio) + [crossbeam](https://crates.io/crates/crossbeam) + [flume](https://crates.io/crates/flume) |
+| Actor-Heavy | Message passing + supervised actors | overwatch, session lifecycle, supervisor FSM | framework lock-in, mailbox overhead | [ractor](https://crates.io/crates/ractor), [crossbeam-channel](https://crates.io/crates/crossbeam-channel) |
+| Hybrid Runtime | tokio default + targeted glommio lanes | Linux high-throughput hotspots | dual-runtime complexity | [tokio](https://crates.io/crates/tokio) + [glommio](https://crates.io/crates/glommio) + adapters |
 
 ### Concurrency and Synchronization Pressure Map
 
@@ -102,19 +102,19 @@ and actor suitability rating.
 | Datagram v2 session manager | actor or mixed | High | **Strong** | single-goroutine event loop in Go maps directly to actor mailbox |
 | Edge connection loops (HA×4) | full async | Medium | Weak | high I/O multiplexing, cancellation tokens, select-loop pattern |
 | QUIC transport layer | full async | Medium | Weak | stream/datagram I/O is inherently async |
-| HTTP/2 transport layer | full async | Medium | Weak | bidirectional stream relay, hyper is async-native |
+| HTTP/2 transport layer | full async | Medium | Weak | bidirectional stream relay, [hyper](https://crates.io/crates/hyper) is async-native |
 | Supervisor restart FSM | actor-heavy | Medium | **Strong** | explicit lifecycle messaging, restart policies, error escalation |
 | Overwatch service registry | actor-heavy | Medium | **Strong** | config-driven service replacement, supervised restart |
 | Tunnel orchestration | mixed (async + actor) | Medium | Moderate | config reload triggers re-orchestration across connections |
 | Config/reload pipeline | mixed | Low | Moderate | write-seldom/read-often; `arc-swap` or watch channel |
 | Feature flag resolver | full async | Low | Weak | periodic DNS+API fetch, broadcast to consumers |
 | Ingress rule engine | full sync (hot path) | Low | Weak | stateless rule evaluation per request; no shared mutable state |
-| Proxy request dispatch | full async | Low | Weak | per-request; no cross-request state; tower middleware chain |
+| Proxy request dispatch | full async | Low | Weak | per-request; no cross-request state; [tower](https://crates.io/crates/tower) middleware chain |
 | SOCKS5 proxy handler | full async | Low | Weak | per-connection; stateless after handshake |
 | ICMP proxy (v4 + v6) | mixed | Medium | Moderate | 2 router goroutines in Go; shared echo-ID tracking table |
 | WebSocket carrier relay | full async | Low | Weak | bidirectional pipe; no shared state |
 | Management HTTP server | full async | Low | Weak | small request volume; standard HTTP server |
-| Management WebSocket (logs) | full async | Low | Weak | single-session streaming; tracing Layer subscription |
+| Management WebSocket (logs) | full async | Low | Weak | single-session streaming; [tracing](https://crates.io/crates/tracing) Layer subscription |
 | Metrics collection/export | full sync or mixed | Low | Weak | atomic counters; Prometheus scrape is sync HTTP |
 | DNS resolution (edge SRV) | full async | Low | Weak | async DNS queries with caching |
 | DNS proxy (proxydns) | full async | Low | Weak | request/response forwarding |
@@ -134,10 +134,10 @@ assignments per subsystem group:
 | --- | --- | --- | --- |
 | **Session lifecycle** | datagram v2 mgr, v3 mgr, v3 muxer | Yes — `ractor` or custom | Go uses single-goroutine event loops; actor mailbox is 1:1 match; migration and registration are message-driven |
 | **Supervision tree** | supervisor FSM, overwatch, tunnel orchestration | Yes — `ractor` or custom | restart policies, error escalation, graceful shutdown ordering need supervision semantics |
-| **Transport I/O** | QUIC, HTTP/2, edge connections, WebSocket relay | No — tokio tasks + channels | high-throughput I/O; actor overhead (mailbox serialization) hurts; use `CancellationToken` for lifecycle |
-| **Request dispatch** | proxy, ingress, SOCKS5, tower middleware | No — tokio tasks | stateless per-request; tower `Service` trait provides composition without actor overhead |
+| **Transport I/O** | QUIC, HTTP/2, edge connections, WebSocket relay | No — [tokio](https://crates.io/crates/tokio) tasks + channels | high-throughput I/O; actor overhead (mailbox serialization) hurts; use `CancellationToken` for lifecycle |
+| **Request dispatch** | proxy, ingress, SOCKS5, tower middleware | No — [tokio](https://crates.io/crates/tokio) tasks | stateless per-request; tower `Service` trait provides composition without actor overhead |
 | **Platform services** | ICMP routers, config reload, auto-updater | Maybe — mixed | ICMP needs shared tracker table (actor-friendly); config reload is simple watch channel; auto-updater is sync |
-| **Observability** | metrics, tracing, management server | No — standard async | low contention; atomic counters; standard HTTP server patterns |
+| **Observability** | metrics, [tracing](https://crates.io/crates/tracing), management server | No — standard async | low contention; atomic counters; standard HTTP server patterns |
 | **CLI/oneshot** | CLI, diagnostics, SSH keygen, credential ops | No — sync | no concurrency needed; runs to completion |
 
 ### glommio Suitability per Subsystem
@@ -147,16 +147,16 @@ subsystems benefit from thread-per-core I/O:
 
 | Subsystem | glommio Benefit | Feasibility | Notes |
 | --- | --- | --- | --- |
-| QUIC datagram relay | **High** — eliminates cross-thread sync | Medium | requires io_uring QUIC adapter; no existing quinn/quiche glommio integration |
-| HTTP/2 stream relay | **High** — bidirectional copy is I/O-bound | Low | hyper assumes tokio; would need custom HTTP/2 layer |
+| QUIC datagram relay | **High** — eliminates cross-thread sync | Medium | requires io_uring QUIC adapter; no existing [quinn](https://crates.io/crates/quinn)/[quiche](https://crates.io/crates/quiche) [glommio](https://crates.io/crates/glommio) integration |
+| HTTP/2 stream relay | **High** — bidirectional copy is I/O-bound | Low | [hyper](https://crates.io/crates/hyper) assumes [tokio](https://crates.io/crates/tokio); would need custom HTTP/2 layer |
 | Session manager | Medium — reduces lock contention | Medium | actor mailbox can be thread-local |
 | Supervisor/overwatch | None | N/A | not I/O-bound |
 | Management server | None | N/A | low traffic |
 | CLI/diagnostics | None | N/A | not I/O-bound |
 
-**Recommendation:** glommio is viable only for the datagram relay hot
+**Recommendation:** [glommio](https://crates.io/crates/glommio) is viable only for the datagram relay hot
 path on Linux. The integration cost is high because the entire QUIC
-and HTTP ecosystem assumes tokio. Evaluate only if S4 benchmarks
+and HTTP ecosystem assumes [tokio](https://crates.io/crates/tokio). Evaluate only if S4 benchmarks
 reveal cross-thread contention as a real bottleneck.
 
 ### Abstraction Intensity Classes
@@ -165,7 +165,7 @@ reveal cross-thread contention as a real bottleneck.
 | --- | --- | --- |
 | Heavy | backend choice may change and touches many crates | transport facade, runtime facade, logging facade |
 | Moderate | external crates vary but API shape is stable | metrics facade, DNS resolver trait |
-| Light | crate is stable and low-risk | serde stack, uuid, percent-encoding |
+| Light | crate is stable and low-risk | [serde](https://crates.io/crates/serde) stack, [uuid](https://crates.io/crates/uuid), [percent-encoding](https://crates.io/crates/percent-encoding) |
 | Avoid | low-value wrappers that hide useful semantics | generic wrappers around `bytes`/`http` types |
 
 ### Crate/Module Partitioning Heuristics
@@ -184,7 +184,7 @@ reveal cross-thread contention as a real bottleneck.
 | --- | --- | --- | --- |
 | Decision Scatter | too many ad-hoc choices per crate | inconsistent cadence across modules | decision-class tables + ADR templates |
 | Abstraction Sprawl | facade overuse everywhere | slower delivery, hidden behavior | use abstraction intensity classes |
-| Runtime Bifurcation | tokio + glommio in same paths | debugging complexity | strict boundary crates and adapters |
+| Runtime Bifurcation | [tokio](https://crates.io/crates/tokio) + [glommio](https://crates.io/crates/glommio) in same paths | debugging complexity | strict boundary crates and adapters |
 | Synchronization Drift | mixed lock/message patterns | deadlocks and race windows | ownership-first partitioning |
 | Interface Explosion | too many public traits | higher review/context burden | API skinny core rule |
 
@@ -257,12 +257,12 @@ These crates form dependency chains where version bumps cascade:
 
 | Chain | Members | Coupling Risk |
 | --- | --- | --- |
-| hyper ecosystem | `hyper` 1.x → `http` 1.x → `http-body` 1.x → `http-body-util` 0.1.x | hyper major version bump forces all to update |
-| tokio ecosystem | `tokio` 1.x → `tokio-util`, `tokio-stream`, `tokio-rustls`, `tokio-tungstenite` | tokio major bump is workspace-wide event |
-| quinn + rustls | `quinn` 0.11.x → `rustls` 0.23.x → `ring` 0.17.x | quinn version pins rustls version |
-| quiche + boring | `quiche` 0.22.x → `boring-sys` 4.x → BoringSSL C build | quiche version pins BoringSSL revision |
-| tower stack | `tower` 0.5.x → `tower-layer` 0.3.x → `tower-http` 0.6.x | tower trait version shared across all middleware |
-| h3 + quinn | `h3` 0.0.x → `h3-quinn` 0.0.x → `quinn` 0.11.x | h3 pre-1.0 moves fast; quinn pins |
+| [hyper](https://crates.io/crates/hyper) ecosystem | `hyper` 1.x → `http` 1.x → `http-body` 1.x → `http-body-util` 0.1.x | [hyper](https://crates.io/crates/hyper) major version bump forces all to update |
+| [tokio](https://crates.io/crates/tokio) ecosystem | `tokio` 1.x → `tokio-util`, `tokio-stream`, `tokio-rustls`, `tokio-tungstenite` | [tokio](https://crates.io/crates/tokio) major bump is workspace-wide event |
+| [quinn](https://crates.io/crates/quinn) + [rustls](https://crates.io/crates/rustls) | `quinn` 0.11.x → `rustls` 0.23.x → `ring` 0.17.x | [quinn](https://crates.io/crates/quinn) version pins [rustls](https://crates.io/crates/rustls) version |
+| [quiche](https://crates.io/crates/quiche) + [boring](https://crates.io/crates/boring) | `quiche` 0.22.x → `boring-sys` 4.x → BoringSSL C build | [quiche](https://crates.io/crates/quiche) version pins BoringSSL revision |
+| [tower](https://crates.io/crates/tower) stack | `tower` 0.5.x → `tower-layer` 0.3.x → `tower-http` 0.6.x | [tower](https://crates.io/crates/tower) trait version shared across all middleware |
+| [h3](https://crates.io/crates/h3) + [quinn](https://crates.io/crates/quinn) | `h3` 0.0.x → `h3-quinn` 0.0.x → `quinn` 0.11.x | [h3](https://crates.io/crates/h3) pre-1.0 moves fast; [quinn](https://crates.io/crates/quinn) pins |
 | RustCrypto | `sha2`, `hmac`, `digest`, `p256`, `ecdsa` share `digest` 0.10.x trait | digest trait version must be consistent |
 | Cap'n Proto | `capnp` 0.20.x → `capnpc` 0.20.x → `capnp-rpc` 0.20.x | single maintainer; versions move in lockstep |
 | opentelemetry | `opentelemetry` 0.29.x → `opentelemetry_sdk` → `opentelemetry-otlp` → `tracing-opentelemetry` | pre-1.0 API churn; all versions must match |
@@ -271,13 +271,13 @@ These crates form dependency chains where version bumps cascade:
 
 | Pair | Synergy | Notes |
 | --- | --- | --- |
-| `tracing` + `tokio` | native async span propagation | tokio instruments tasks with tracing automatically |
-| `hyper` + `tower` | Service trait composition | hyper 1.x is designed around tower::Service |
-| `axum` + `tower` + `hyper` | full HTTP server stack | axum is built on both |
-| `reqwest` + `rustls`/`boring` | TLS backend selection | reqwest supports both via features |
-| `proptest` + `bytes` | wire format fuzzing | proptest strategies generate arbitrary byte sequences |
-| `dashmap` + `parking_lot` | concurrent data structures | dashmap uses parking_lot internally |
-| `clap` + `serde` | config/CLI merge | clap derive + serde derive on same structs |
+| `tracing` + `tokio` | native async span propagation | [tokio](https://crates.io/crates/tokio) instruments tasks with [tracing](https://crates.io/crates/tracing) automatically |
+| `hyper` + `tower` | Service trait composition | [hyper](https://crates.io/crates/hyper) 1.x is designed around tower::Service |
+| `axum` + `tower` + `hyper` | full HTTP server stack | [axum](https://crates.io/crates/axum) is built on both |
+| `reqwest` + `rustls`/`boring` | TLS backend selection | [reqwest](https://crates.io/crates/reqwest) supports both via features |
+| `proptest` + `bytes` | wire format fuzzing | [proptest](https://crates.io/crates/proptest) strategies generate arbitrary byte sequences |
+| `dashmap` + `parking_lot` | concurrent data structures | [dashmap](https://crates.io/crates/dashmap) uses [parking_lot](https://crates.io/crates/parking_lot) internally |
+| `clap` + `serde` | config/CLI merge | [clap](https://crates.io/crates/clap) derive + [serde](https://crates.io/crates/serde) derive on same structs |
 
 #### Version Pinning Strategy
 
@@ -323,15 +323,15 @@ decision — it colors every other layer.
 | [tokio](https://crates.io/crates/tokio) | 1.x | 5 | 5 | 5 | Plumbing | ALL 30 catalogs | `runtime-tokio` |
 | [glommio](https://crates.io/crates/glommio) | 0.9.x | 3 | 3 | 3 | Plumbing | ALL 30 catalogs | `runtime-glommio` |
 
-**tokio — Default path:**
+**[tokio](https://crates.io/crates/tokio) — Default path:**
 
 - Multi-threaded work-stealing scheduler
-- cloudflared's ~162 goroutines map to tokio tasks
-- Massive ecosystem: quinn, hyper, tungstenite, reqwest all assume tokio
+- cloudflared's ~162 goroutines map to [tokio](https://crates.io/crates/tokio) tasks
+- Massive ecosystem: [quinn](https://crates.io/crates/quinn), [hyper](https://crates.io/crates/hyper), [tungstenite](https://crates.io/crates/tungstenite), [reqwest](https://crates.io/crates/reqwest) all assume [tokio](https://crates.io/crates/tokio)
 - Select loops, channels, timers, signal handlers all have native support
 - Risk: ecosystem lock-in
 
-**glommio — Alternative path:**
+**[glommio](https://crates.io/crates/glommio) — Alternative path:**
 
 - Thread-per-core io_uring runtime (Linux-only)
 - Eliminates cross-thread synchronization entirely
@@ -341,10 +341,10 @@ decision — it colors every other layer.
 - ADR candidate: evaluate if thread-per-core model fits cloudflared's
   concurrency topology (162 tasks, 4 HA connections)
 
-**Pre-decision: tokio.** Glommio is Linux-only, incompatible with
-the quinn/hyper/reqwest ecosystem, and would require custom
-integration layers for every transport crate. Tokio is the only
-viable choice for cross-platform support. Glommio prototyping
+**Pre-decision: [tokio](https://crates.io/crates/tokio).** [Glommio](https://crates.io/crates/glommio) is Linux-only, incompatible with
+the [quinn](https://crates.io/crates/quinn)/[hyper](https://crates.io/crates/hyper)/[reqwest](https://crates.io/crates/reqwest) ecosystem, and would require custom
+integration layers for every transport crate. [Tokio](https://crates.io/crates/tokio) is the only
+viable choice for cross-platform support. [Glommio](https://crates.io/crates/glommio) prototyping
 deferred to S4 if contention benchmarks warrant it.
 
 ### 1.2 Async Utilities
@@ -428,9 +428,9 @@ deferred to S4 if contention benchmarks warrant it.
 
 **Notes:**
 
-- `tokio::signal` is native if we go full tokio — async
+- `tokio::signal` is native if we go full [tokio](https://crates.io/crates/tokio) — async
   SIGINT/SIGTERM handling, maps to Go's `signal.Notify()`
-- `signal-hook` is runtime-agnostic — works with glommio, crossbeam
+- `signal-hook` is runtime-agnostic — works with [glommio](https://crates.io/crates/glommio), [crossbeam](https://crates.io/crates/crossbeam)
   event loops, or bare threads
 - `ctrlc` is simplest, cross-platform Ctrl+C handling
 - Go has 3 signal-related goroutines (SIGINT, SIGTERM, stdin control)
@@ -463,7 +463,7 @@ deferred to S4 if contention benchmarks warrant it.
 - Token-bucket / GCRA rate limiter — replaces any custom rate
   limiting in connection acceptance, API call throttling, or proxy
   request gating
-- Async-aware (`governor` integrates with tokio via `clock` feature)
+- Async-aware (`governor` integrates with [tokio](https://crates.io/crates/tokio) via `clock` feature)
 - S1 shows rate-limiting concerns in `flow/limiter` (~200 Go lines)
   and connection-level admission control
 
@@ -479,7 +479,7 @@ deferred to S4 if contention benchmarks warrant it.
   size-bounded eviction (TinyLFU-inspired)
 - Replaces ad-hoc `sync.Map` or channel-based caching in Go
   (feature flags, edge address pool, API response caching)
-- Integrates with tokio runtime for async `get_with` / `try_get_with`
+- Integrates with [tokio](https://crates.io/crates/tokio) runtime for async `get_with` / `try_get_with`
 
 ---
 
@@ -540,8 +540,8 @@ deferred to S4 if contention benchmarks warrant it.
 - `bytes` for zero-copy buffer management — datagram v2/v3 wire
   frames, bidirectional stream relay, HTTP body chunking
 - `http` crate provides shared `Request<B>`, `Response<B>`,
-  `HeaderMap`, `StatusCode` types used by hyper, axum, reqwest,
-  tower — foundational HTTP vocabulary type
+  `HeaderMap`, `StatusCode` types used by [hyper](https://crates.io/crates/hyper), [axum](https://crates.io/crates/axum), [reqwest](https://crates.io/crates/reqwest),
+  [tower](https://crates.io/crates/tower) — foundational HTTP vocabulary type
 - `http-body` + `http-body-util` provide the `Body` trait and
   utilities for streaming HTTP bodies
 - `url` replaces Go `net/url` — used in ingress rule matching,
@@ -625,10 +625,10 @@ migration semantics.
 | [h3](https://crates.io/crates/h3) | 0.0.x | 4 | 2 | 4 | Behavioral | TT, WP, PRX | either |
 | [h3-quinn](https://crates.io/crates/h3-quinn) | 0.0.x | 4 | 2 | 4 | Behavioral | TT, WP | `quic-quinn` |
 
-**quinn — Pure Rust path:**
+**[quinn](https://crates.io/crates/quinn) — Pure Rust path:**
 
 - Pure Rust QUIC built on `rustls`
-- Native tokio integration, mature async API
+- Native [tokio](https://crates.io/crates/tokio) integration, mature async API
 - Supports QUIC datagrams (RFC 9221) — critical for v2/v3 wire format
 - Active maintainership (>10 contributors, djc + main team)
 - Does NOT support BoringSSL backend → FIPS path requires separate
@@ -642,7 +642,7 @@ migration semantics.
 - Used in production at Cloudflare scale (HTTP/3 edge)
 - Pure C library with Rust bindings via `quiche` crate (maintained
   by Cloudflare themselves)
-- `tokio-quiche` is the async tokio wrapper — part of the same
+- `tokio-quiche` is the async [tokio](https://crates.io/crates/tokio) wrapper — part of the same
   `cloudflare/quiche` repository, maintained by the same Cloudflare
   team. Younger than quiche core but actively developed with
   Cloudflare backing
@@ -652,7 +652,7 @@ migration semantics.
 **h3 — HTTP/3 layer:**
 
 - HTTP/3 implementation on top of any QUIC backend
-- `h3-quinn` adapts h3 to quinn's QUIC API
+- `h3-quinn` adapts h3 to [quinn](https://crates.io/crates/quinn)'s QUIC API
 - Relevant if edge protocol evolves to HTTP/3 (not current baseline
   but future-proofing)
 - **Do not adopt in S3** — pre-alpha (0.0.x), not in 2026.3.0
@@ -669,7 +669,7 @@ migration semantics.
 - UDP socket per connection index (cached/reused for firewall pinhole)
 - macOS dual-stack: separate `udp4`/`udp6` for DF bit
 
-**ADR required:** quinn vs quiche. Factors: FIPS weight, PQ curve
+**ADR required:** [quinn](https://crates.io/crates/quinn) vs [quiche](https://crates.io/crates/quiche). Factors: FIPS weight, PQ curve
 support, datagram API completeness, community health, async
 ergonomics, Cloudflare internal alignment.
 
@@ -719,8 +719,8 @@ ergonomics, Cloudflare internal alignment.
 - **FIPS:** `boring` — Rust bindings to BoringSSL, FIPS-validated
   crypto module with PQ curves
 - Both paths via Cargo features (`--features fips`)
-- `quinn` uses `rustls` natively; FIPS+QUIC needs either quinn with
-  boring backend (experimental) or `quiche` (native BoringSSL)
+- `quinn` uses `rustls` natively; FIPS+QUIC needs either [quinn](https://crates.io/crates/quinn) with
+  [boring](https://crates.io/crates/boring) backend (experimental) or `quiche` (native BoringSSL)
 - `webpki-roots` provides Mozilla CA bundle;
   `rustls-native-certs` reads system CA store
 - Go's CA assembly: system pool → Cloudflare embedded CAs (3 certs) →
@@ -786,9 +786,9 @@ ergonomics, Cloudflare internal alignment.
 
 - `tower::Service` trait is the composable middleware/service
   abstraction — enables layering metrics, timeouts, retries,
-  rate-limiting, tracing, concurrency limits as generic middleware
+  rate-limiting, [tracing](https://crates.io/crates/tracing), concurrency limits as generic middleware
 - If we build our own concurrency cadence (deviating from Go impl),
-  tower gives us a well-tested service composition framework
+  [tower](https://crates.io/crates/tower) gives us a well-tested service composition framework
 - `tower-http` provides ready-made HTTP middleware (CORS, compression,
   trace, timeout, auth)
 - cloudflared's management server has CORS (`*.cloudflare.com`, 300s
@@ -834,9 +834,9 @@ ergonomics, Cloudflare internal alignment.
   span-aware logging with async awareness — richer than zerolog
 - **`logging-compat` path:** We may build our own logging facade that
   outputs zerolog-compatible JSON for upstream log streaming while
-  using tracing internally for local diagnostics
+  using [tracing](https://crates.io/crates/tracing) internally for local diagnostics
 - `tracing-log` bridges the `log` crate to `tracing` — allows
-  third-party crates using `log` to emit into our tracing pipeline
+  third-party crates using `log` to emit into our [tracing](https://crates.io/crates/tracing) pipeline
 - `tracing-journald` is the direct path for Linux/systemd deployments
   that want structured logs in journald without text re-parsing
 - Management WebSocket log streaming requires a custom
@@ -845,7 +845,7 @@ ergonomics, Cloudflare internal alignment.
 - `ConnAwareLogger` from S1: chooses warn/error based on active
   connection count — custom `Layer` implementation
 - `tracing-error` enriches error types with `SpanTrace` context —
-  captures the active tracing span stack when an error is created,
+  captures the active [tracing](https://crates.io/crates/tracing) span stack when an error is created,
   bridging the observability and error-propagation catalogs
 
 ### 4.2 Distributed Tracing
@@ -1072,7 +1072,7 @@ matching, management log filter parsing
 - CORS: `*.cloudflare.com`, 300s max-age
 - Session gating: 1 concurrent management session, preemption allowed
 - Alternative: raw `hyper` — management server is relatively simple
-- ADR candidate: axum vs raw hyper
+- ADR candidate: [axum](https://crates.io/crates/axum) vs raw [hyper](https://crates.io/crates/hyper)
 
 ### 7.7 SOCKS5
 
@@ -1114,7 +1114,7 @@ lines, well-understood protocol.
 - `ractor` provides typed actors with supervision trees — good match
   for supervisor/tunnel/connection hierarchy
 - `actix` is more mature but heavier (ships its own runtime)
-- `kameo` is newer, built on tokio, smaller API surface
+- `kameo` is newer, built on [tokio](https://crates.io/crates/tokio), smaller API surface
 - ADR candidate: actor framework vs custom service registry; Go's
   overwatch is ~300 lines but the supervision semantics (restart
   policy, graceful shutdown, error escalation) benefit from a
@@ -1183,7 +1183,7 @@ lines, well-understood protocol.
 
 - `tokio-console` is a diagnostic tool for inspecting async runtime
   behavior (task scheduling, waker events, resource contention)
-- `console-subscriber` is the tracing Layer that feeds data to
+- `console-subscriber` is the [tracing](https://crates.io/crates/tracing) Layer that feeds data to
   tokio-console
 - Critical for S4 performance debugging: identifying task starvation,
   excessive wakeups, or lock contention in the async runtime
@@ -1553,15 +1553,15 @@ where $w_i$ is dimension weight and $s_i$ is 1–5 score.
 
 | Component | Buy Candidate | Build Candidate | Why It Matters |
 | --- | --- | --- | --- |
-| QUIC transport | quinn or quiche | custom transport layer | highest architecture blast radius |
+| QUIC transport | [quinn](https://crates.io/crates/quinn) or [quiche](https://crates.io/crates/quiche) | custom transport layer | highest architecture blast radius |
 | Session manager | dashmap + tokio/ractor | custom v2/v3 manager | synchronization and migration semantics |
 | ICMP handling | surge-ping + nix/socket2 | custom per-OS ICMP stack | heavy platform divergence |
-| Logging pipeline | tracing stack + journald | custom compat logger | parity output + ops integration |
-| CLI compatibility | clap | custom compat layer over clap | S4 behavioral parity expectations |
-| Actor/supervisor | ractor | custom service registry | supervision tree design lock-in |
-| Wire format parser | nom | manual bytes slicing | custom binary protocol, exact control needed |
-| HTTP management | axum | raw hyper handlers | complexity vs simplicity tradeoff |
-| Retry/backoff | backon | custom backoff handler | Go has custom jitter/reset logic |
+| Logging pipeline | [tracing](https://crates.io/crates/tracing) stack + journald | custom compat logger | parity output + ops integration |
+| CLI compatibility | [clap](https://crates.io/crates/clap) | custom compat layer over [clap](https://crates.io/crates/clap) | S4 behavioral parity expectations |
+| Actor/supervisor | [ractor](https://crates.io/crates/ractor) | custom service registry | supervision tree design lock-in |
+| Wire format parser | [nom](https://crates.io/crates/nom) | manual bytes slicing | custom binary protocol, exact control needed |
+| HTTP management | [axum](https://crates.io/crates/axum) | raw [hyper](https://crates.io/crates/hyper) handlers | complexity vs simplicity tradeoff |
+| Retry/backoff | [backon](https://crates.io/crates/backon) | custom backoff handler | Go has custom jitter/reset logic |
 | Auto-updater | self_update | custom per-platform updater | platform divergence + update suppression |
 
 ### Applied Scorecards (Maintainability-First Profile)
@@ -1571,7 +1571,7 @@ Performance 0.10, Cognitive 0.20, Portability 0.10, Exit 0.05.
 
 #### QUIC Transport
 
-| Dimension | Buy: quinn | Buy: quiche | Build: custom |
+| Dimension | Buy: [quinn](https://crates.io/crates/quinn) | Buy: [quiche](https://crates.io/crates/quiche) | Build: custom |
 | --- | --- | --- | --- |
 | Capability Fit | 4 (datagrams, streams, ALPN) | 5 (datagrams, FIPS, PQ native) | 5 (exact semantics) |
 | Integration Cost | 5 (tokio-native, pure Rust) | 4 (C FFI, tokio-quiche Cloudflare-maintained) | 1 (massive effort) |
@@ -1581,16 +1581,16 @@ Performance 0.10, Cognitive 0.20, Portability 0.10, Exit 0.05.
 | Portability | 5 (all platforms) | 3 (C build deps, FIPS Linux-primary) | 2 (per-platform work) |
 | Exit Flexibility | 4 (transport facade viable) | 3 (facade viable but FFI baggage) | 2 (locked to internal design) |
 
-**Weighted scores:** quinn = **4.20**, quiche = **3.55**, custom = **1.90**
-**Decision gate:** Adopt quinn (Buy > Build by 2.30); hedge with
+**Weighted scores:** [quinn](https://crates.io/crates/quinn) = **4.20**, [quiche](https://crates.io/crates/quiche) = **3.55**, custom = **1.90**
+**Decision gate:** Adopt [quinn](https://crates.io/crates/quinn) (Buy > Build by 2.30); hedge with
 transport facade trait to enable quiche swap for FIPS path.
 
 #### Session Manager (v2/v3)
 
-| Dimension | Buy: dashmap + ractor | Build: custom |
+| Dimension | Buy: dashmap + [ractor](https://crates.io/crates/ractor) | Build: custom |
 | --- | --- | --- |
 | Capability Fit | 3 (generic; migration/muxer logic is custom) | 5 (exact v2/v3 semantics) |
-| Integration Cost | 4 (dashmap easy; ractor learning curve) | 3 (moderate; well-scoped ~500 lines) |
+| Integration Cost | 4 (dashmap easy; [ractor](https://crates.io/crates/ractor) learning curve) | 3 (moderate; well-scoped ~500 lines) |
 | Ops Risk | 3 (ractor pre-1.0) | 3 (owned bug surface) |
 | Performance | 4 (dashmap sharding is fast) | 4 (can optimize for exact access pattern) |
 | Cognitive Load | 3 (framework concepts to learn) | 4 (team owns the mental model) |
@@ -1604,7 +1604,7 @@ and muxer logic as custom code. Keep actor framework optional.
 
 #### ICMP Handling
 
-| Dimension | Buy: surge-ping + nix | Build: custom per-OS |
+| Dimension | Buy: surge-ping + [nix](https://crates.io/crates/nix) | Build: custom per-OS |
 | --- | --- | --- |
 | Capability Fit | 3 (surge-ping is Linux-centric; no Windows ICMP API) | 5 (match all 3 OS paths exactly) |
 | Integration Cost | 3 (still need Windows custom) | 3 (600 lines; well-understood protocol) |
@@ -1621,10 +1621,10 @@ logic per-platform.
 
 #### Logging Pipeline
 
-| Dimension | Buy: tracing + journald | Build: custom compat |
+| Dimension | Buy: [tracing](https://crates.io/crates/tracing) + journald | Build: custom compat |
 | --- | --- | --- |
 | Capability Fit | 5 (structured spans, async-aware, ecosystem) | 4 (zerolog JSON exact match) |
-| Integration Cost | 4 (well-integrated with tokio ecosystem) | 3 (custom Layer + JSON formatter) |
+| Integration Cost | 4 (well-integrated with [tokio](https://crates.io/crates/tokio) ecosystem) | 3 (custom Layer + JSON formatter) |
 | Ops Risk | 5 (tracing is Rust standard) | 3 (maintenance burden for compat) |
 | Performance | 4 (negligible overhead) | 4 (negligible) |
 | Cognitive Load | 4 (well-known by Rust developers) | 3 (custom code to learn) |
@@ -1632,13 +1632,13 @@ logic per-platform.
 | Exit Flexibility | 4 (tracing is de facto standard) | 3 (locked to custom format) |
 
 **Weighted scores:** Buy = **4.45**, Build = **3.40**
-**Decision gate:** Adopt tracing stack (Buy > Build by 1.05).
+**Decision gate:** Adopt [tracing](https://crates.io/crates/tracing) stack (Buy > Build by 1.05).
 Build a thin `logging-compat` feature flag that adds zerolog JSON
 output as a custom `tracing-subscriber` Layer.
 
 #### Actor/Supervisor Framework
 
-| Dimension | Buy: ractor | Build: custom registry |
+| Dimension | Buy: [ractor](https://crates.io/crates/ractor) | Build: custom registry |
 | --- | --- | --- |
 | Capability Fit | 4 (typed actors, supervision trees) | 4 (exact Go overwatch semantics) |
 | Integration Cost | 3 (ractor API learning curve) | 4 (Go overwatch is ~300 lines) |
@@ -1651,7 +1651,7 @@ output as a custom `tracing-subscriber` Layer.
 **Weighted scores:** Buy = **3.15**, Build = **3.85**
 **Decision gate:** Build ourselves (Build > Buy by 0.70). Write a
 custom trait-based service registry matching Go's overwatch. Use
-`crossbeam-channel` or `tokio::mpsc` for messaging. Keep ractor as a
+`crossbeam-channel` or `tokio::mpsc` for messaging. Keep [ractor](https://crates.io/crates/ractor) as a
 future option behind facade.
 
 ---
@@ -1664,9 +1664,9 @@ Areas where custom implementation is likely preferable.
 | --- | --- | --- | --- |
 | SOCKS5 proxy | ~400 | `fast-socks5` (pre-1.0, T:3) | Small protocol; Go impl is minimal |
 | ICMP proxy | ~600 | `surge-ping` (pre-1.0, T:3) | Platform-divergent; need full raw-socket control |
-| Bidirectional stream relay | ~100 | `tokio::io::copy_bidirectional` | stdlib equivalent in tokio |
+| Bidirectional stream relay | ~100 | `tokio::io::copy_bidirectional` | stdlib equivalent in [tokio](https://crates.io/crates/tokio) |
 | Backoff handler | ~200 | `backon` (T:4) | Go has custom jitter; evaluate coverage |
-| Session manager (v2/v3) | ~500 | — | Custom concurrent registry with dashmap + tokio |
+| Session manager (v2/v3) | ~500 | — | Custom concurrent registry with dashmap + [tokio](https://crates.io/crates/tokio) |
 | Fuse/latch primitives | ~50 | — | Trivial with `tokio::sync::Notify` or `watch` |
 | Overwatch service manager | ~300 | `ractor` (T:3) | Go impl simple; actor framework may be overkill |
 | Auto-updater | ~400 | `self_update` (T:3) | Platform-specific logic; update suppression rules |
@@ -1675,8 +1675,8 @@ Areas where custom implementation is likely preferable.
 | Config precedence merge | ~200 | — | 5-layer merge logic is app-specific |
 | Flow/limiter | ~200 | `governor` (T:4) | Token-bucket rate limiting; evaluate governor coverage |
 | Edge address pool | ~300 | — | Region/priority/rotation logic is app-specific |
-| ConnAwareLogger | ~50 | — | Custom tracing `Layer` implementation |
-| CLI compat wrapper | ~500 | `clap` + custom | If `cli-compat` flag needed, wraps clap |
+| ConnAwareLogger | ~50 | — | Custom [tracing](https://crates.io/crates/tracing) `Layer` implementation |
+| CLI compat wrapper | ~500 | `clap` + custom | If `cli-compat` flag needed, wraps [clap](https://crates.io/crates/clap) |
 | Logging compat facade | ~300 | `tracing` + custom | If `logging-compat` flag needed, zerolog JSON |
 | cfapi envelope client | ~400 | `reqwest` + custom | Envelope pattern, pagination, error aggregation |
 | Diagnostic artifact bundle | ~200 | `zip` + `sysinfo` | Collection logic is app-specific |
@@ -1693,14 +1693,14 @@ feature-flagged alternatives:
 - Upstream management WebSocket log streaming needs a custom
   `tracing-subscriber` `Layer` regardless
 - Feature flag: `logging-compat` emits zerolog-compatible JSON,
-  `logging-native` emits rich tracing spans
+  `logging-native` emits rich [tracing](https://crates.io/crates/tracing) spans
 
 #### 2. CLI Facade
 
 - Abstraction over `clap` that can output `urfave/cli`-cadence help
   text and error messages for behavioral parity testing in S4
 - Feature flag: `cli-compat` matches Go output exactly,
-  `cli-native` uses idiomatic clap
+  `cli-native` uses idiomatic [clap](https://crates.io/crates/clap)
 
 #### 3. Transport Facade
 
@@ -1720,25 +1720,25 @@ cover it.
 | Catalog | Primary Dependencies | Layers |
 | --- | --- | --- |
 | access-policies | `jsonwebtoken`, `ipnet`, `reqwest`, `crypto_box`, `x25519-dalek`, `fd-lock`, `open` | 7, 8 |
-| capnp-rpc | `capnp`, `capnpc`, `capnp-rpc`, tokio/crossbeam | 2, 1 |
+| capnp-rpc | `capnp`, `capnpc`, `capnp-rpc`, [tokio](https://crates.io/crates/tokio)/[crossbeam](https://crates.io/crates/crossbeam) | 2, 1 |
 | cli | `clap`, `serde`, `serde_yaml`, `chrono`/`time` | 6, 2 |
-| config | `serde`, `serde_yaml`, `toml`, `serde_json`, `notify`, `clap`, tokio, `sha2` | 2, 6, 7 |
+| config | `serde`, `serde_yaml`, `toml`, `serde_json`, `notify`, `clap`, [tokio](https://crates.io/crates/tokio), `sha2` | 2, 6, 7 |
 | const-and-env | (stdlib `const`, `std::env`, `once_cell`) | 1 |
 | crypto | `rustls`/`boring`, `ring`, `sha2`, `hmac`, `p256`, `ecdsa`, `pem`, `x509-parser`, `ssh-key`, `webpki-roots`, `rand` | 3, 8 |
 | deployments | `clap`, `dirs`, `reqwest`, `plist`, `sd-notify`/`systemd`, `windows-service`, `flate2`, `self_update` | 6, 7, 9 |
 | edge-interactions | `hickory-resolver`, `quinn`/`quiche`, `hyper`/`h2`, `tokio-tungstenite`, `reqwest`, `capnp-rpc` | 3, 7 |
-| host-interactions | `notify`, `nix`, `socket2`, `fd-lock`, `sysinfo`, tokio::process | 7, 9 |
+| host-interactions | `notify`, `nix`, `socket2`, `fd-lock`, `sysinfo`, [tokio](https://crates.io/crates/tokio)::process | 7, 9 |
 | ingress | `hyper`, `tokio::net`, `tokio-tungstenite`, `hickory-resolver`, `socket2`, `regex`, `ipnet`, `url` | 3, 7 |
 | metrics | `prometheus-client`/`metrics`, `hyper`/`axum` | 4, 7 |
 | observabilities | `tracing`, `tracing-subscriber`, `tracing-journald`, `opentelemetry`-\*, `serde_json`, `sentry`, `foundations` | 4, 7 |
-| overwatch | tokio / `ractor`, custom service registry | 1, 7 |
+| overwatch | [tokio](https://crates.io/crates/tokio) / `ractor`, custom service registry | 1, 7 |
 | platforms | `nix`, `windows-service`, `windows-sys`, `socket2`, `sd-notify`/`systemd`, `plist`, `open`, `sysinfo` | 9 |
 | proxying | `hyper`/`h2`, `quinn`/`quiche`, `tokio-tungstenite`, `tokio::io`, `bytes`, custom SOCKS5/ICMP | 3, 7 |
-| sessions | `quinn`/`quiche` (datagram API), tokio, `uuid`, `dashmap`, `parking_lot`, `nom` | 3, 1, 2 |
-| shared-state | tokio::sync / `crossbeam-channel`, `dashmap`, `arc-swap`, `parking_lot` | 1 |
-| state-machines | (enum-based FSM — stdlib), tokio, `backon` | 1, 7 |
-| supervisor | tokio JoinSet / `ractor`, `backon`, `tracing`, cancellation tokens | 1, 7 |
-| tunnels | ALL transport crates, `reqwest`, `capnp-rpc`, tokio, `clap` | 3, 7 (integration) |
+| sessions | `quinn`/`quiche` (datagram API), [tokio](https://crates.io/crates/tokio), `uuid`, `dashmap`, `parking_lot`, `nom` | 3, 1, 2 |
+| shared-state | [tokio](https://crates.io/crates/tokio)::sync / `crossbeam-channel`, `dashmap`, `arc-swap`, `parking_lot` | 1 |
+| state-machines | (enum-based FSM — stdlib), [tokio](https://crates.io/crates/tokio), `backon` | 1, 7 |
+| supervisor | [tokio](https://crates.io/crates/tokio) JoinSet / `ractor`, `backon`, `tracing`, cancellation tokens | 1, 7 |
+| tunnels | ALL transport crates, `reqwest`, `capnp-rpc`, [tokio](https://crates.io/crates/tokio), `clap` | 3, 7 (integration) |
 | tunnels-transport | `quinn`/`quiche`, `hyper`/`h2`, `boring`/`rustls`, `bytes`, `base64` | 3, 2 |
 | upstream-api-contracts | `reqwest`, `serde`/`serde_json`, `axum`/`hyper`, `tokio-tungstenite`, `url` | 3, 7 |
 
@@ -1746,7 +1746,7 @@ cover it.
 
 | Catalog | Primary Dependencies | Layers |
 | --- | --- | --- |
-| concurrency | tokio / `crossbeam-channel` / `parking_lot`, `dashmap`, `arc-swap`, `futures` | 1 |
+| concurrency | [tokio](https://crates.io/crates/tokio) / `crossbeam-channel` / `parking_lot`, `dashmap`, `arc-swap`, `futures` | 1 |
 | error-propagation | `thiserror`, `anyhow`, `tracing`, `sentry` | 4, 5 |
 | features | `clap`, `hickory-resolver`, `jsonwebtoken`, `reqwest`, `serde`, `tokio-tungstenite`, `fnv` | 6, 7, 8 |
 | init-teardown | cancellation tokens, `tokio::signal` / `signal-hook`, `sd-notify`, `tracing` — note: `signal/safe_signal` maps to `tokio::sync::Notify` or `watch` (no external dep) | 1, 9 |
@@ -1784,7 +1784,7 @@ Decisions requiring formal ADRs in phase 2.4 based on this analysis:
 
 | # | Decision | Catalogs Affected | Risk |
 | --- | --- | --- | --- |
-| 1 | quinn vs quiche for QUIC transport | TUN, PRX, TT, SES, EDG, WP, SM, CON | Critical |
+| 1 | [quinn](https://crates.io/crates/quinn) vs [quiche](https://crates.io/crates/quiche) for QUIC transport | TUN, PRX, TT, SES, EDG, WP, SM, CON | Critical |
 | 2 | FIPS + QUIC integration strategy | CRY, TT, PS, WP | Critical |
 | 3 | Actor framework vs custom supervisor | OVW, SUP, SES | High |
 | 4 | tower-based middleware vs flat dispatch | PRX, ING, MET, OBS | Medium |
@@ -1794,16 +1794,16 @@ Decisions requiring formal ADRs in phase 2.4 based on this analysis:
 | 8 | ICMP: `surge-ping` vs custom raw socket | ING, PRX, PLT, PS | Medium |
 | 9 | Overwatch: `ractor` vs custom service registry | OVW, SUP | Medium |
 | 10 | CLI: `clap` native vs compat wrapper | CLI, CFG | Medium |
-| 11 | Logging: native tracing vs zerolog-compat facade | OBS, ALL modules | Medium |
+| 11 | Logging: native [tracing](https://crates.io/crates/tracing) vs zerolog-compat facade | OBS, ALL modules | Medium |
 | 12 | RustCrypto vs `ring` primitives | CRY | Low |
-| 13 | Non-async event loops: crossbeam for v2 session mgr | SES, CON | Medium |
+| 13 | Non-async event loops: [crossbeam](https://crates.io/crates/crossbeam) for v2 session mgr | SES, CON | Medium |
 | 14 | Auto-updater: `self_update` vs custom | DEP | Low |
 | 15 | Adopt `foundations` selectively vs fully custom bootstrap | OBS, CON, EP, DEP | Medium |
 | 16 | Keep `pingora` as selective dependency vs no adoption | PRX, TT, ING | Low |
 | 17 | Wire format parsing: `nom` vs manual `bytes` slicing | WP, SES, TT | Medium |
 | 18 | Runtime debugging: `tokio-console` feature gate strategy | CON, OBS | Low |
 
-**Pre-decided (not requiring ADR):** tokio runtime (§1.1),
+**Pre-decided (not requiring ADR):** [tokio](https://crates.io/crates/tokio) runtime (§1.1),
 `serde_yaml` 0.9.x (§2.1), `chrono` 0.4.x (§6.2), MSRV ≥ 1.75
 (§1.2), h3 deferred to FC (§3.1), mimalloc feature-flagged (§1.6).
 
@@ -1857,7 +1857,7 @@ layers. lib.rs categories reveal:
 | `smallvec` | Data structures | #4 | 47.7M | 2 | v2.0.0-alpha.12 in development |
 | `quinn` | Network programming | #7 | 17M | 3 | v0.11.9, has `rustls-aws-lc-rs-fips` feature |
 | `quiche` | Network programming | #52 | 179K | 3 | v0.26.1, **Cloudflare-owned**, uses BoringSSL, MSRV 1.85 |
-| `tokio-quiche` | Network programming | #1582 | 129K | 3 | v0.16.1, **Cloudflare-owned**, wraps quiche+tokio |
+| `tokio-quiche` | Network programming | #1582 | 129K | 3 | v0.16.1, **Cloudflare-owned**, wraps [quiche](https://crates.io/crates/quiche)+[tokio](https://crates.io/crates/tokio) |
 | `hyper` | Web programming | #1 (HTTP server) | 40.6M | 3 | **Category leader.** |
 | `h2` | Asynchronous | #2 | 36.1M | 3 | v0.4.13 |
 | `rustls` | Cryptography | #2 | 43.9M | 3 | v0.24.0-dev.0, recommends `aws-lc-rs` as default provider |
@@ -1871,7 +1871,7 @@ layers. lib.rs categories reveal:
 | `ipnet` | Network programming | #4 | 24.7M | 7 | v2.12.0, IPv4/IPv6 prefix types |
 | `ractor` | Asynchronous | #28 | 55K | 7 | v0.15.12, Erlang-inspired, used at Meta |
 | `aws-lc-rs` | Cryptography | #20 | 13.6M | 8 | v1.16.2, **FIPS via `fips` feature**, PQ crypto support |
-| `rustls-post-quantum` | Cryptography | #2382 | 6.7K | 8 | ML-KEM moved to rustls itself since v0.23.22 |
+| `rustls-post-quantum` | Cryptography | #2382 | 6.7K | 8 | ML-KEM moved to [rustls](https://crates.io/crates/rustls) itself since v0.23.22 |
 | `boring` | Cryptography | #35 | 238K | 8 | v5.0.2, **Cloudflare-owned**, `fips`+`mlkem`+`rpk` features |
 | `nix` | Unix APIs | #3 | 37M | 9 | v0.31.2, MSRV 1.69 |
 | `thiserror` | Rust patterns | #6 | 68.2M | 5 | v2.0.18, MSRV 1.68 |
@@ -1896,8 +1896,8 @@ layers. lib.rs categories reveal:
 - **`aws-lc-rs` is now the recommended default crypto provider for
   `rustls`** — not just `ring`. Has native FIPS support via `fips`
   feature flag and post-quantum crypto support. This strengthens
-  the quinn+rustls+aws-lc-rs FIPS path as a viable alternative to
-  boring+quiche
+  the [quinn](https://crates.io/crates/quinn)+[rustls](https://crates.io/crates/rustls)+[aws-lc-rs](https://crates.io/crates/aws-lc-rs) FIPS path as a viable alternative to
+  [boring](https://crates.io/crates/boring)+[quiche](https://crates.io/crates/quiche)
 - **`rustls-post-quantum`** — ML-KEM support has been moved into
   `rustls` itself since v0.23.22; use the `prefer-post-quantum`
   feature flag. The standalone crate is now mostly for ML-DSA via
@@ -1909,9 +1909,9 @@ layers. lib.rs categories reveal:
   Cloudflare-owned
 - **`quiche` v0.26.1** has `boringssl-boring-crate` feature allowing
   use of the `boring` crate for TLS — this simplifies the
-  boring+quiche integration story
+  [boring](https://crates.io/crates/boring)+[quiche](https://crates.io/crates/quiche) integration story
 - **`tokio-quiche` v0.16.1** is Cloudflare's official async wrapper
-  around quiche+boring; depends on the `foundations` crate
+  around [quiche](https://crates.io/crates/quiche)+[boring](https://crates.io/crates/boring); depends on the `foundations` crate
 - **`prost` is passively maintained** — maintainer expects the
   official `protobuf` crate to supersede it. Factor this into the
   protobuf decision for datagram v2 tracing spans
@@ -1955,7 +1955,7 @@ shopping cart — these represent ecosystem convergence points:
 | --- | --- | --- |
 | `quinn` / `quiche` | QUIC stack choice affects FIPS, PQ, datagram v2/v3 wire format, session lifecycle — touches 8+ catalogs | ADR-001 with prototype spike; transport facade trait |
 | `boring` / `rustls` | FIPS toggle must work at build time; PQ curve support varies (X25519MLKEM768 vs P256Kyber768Draft00) | Cargo feature split, CI matrix |
-| `tokio` | Runtime choice colors entire dependency graph; pre-decided (§1.1) but ecosystem lock-in remains a structural risk | Runtime facade trait if benchmarks warrant glommio |
+| `tokio` | Runtime choice colors entire dependency graph; pre-decided (§1.1) but ecosystem lock-in remains a structural risk | Runtime facade trait if benchmarks warrant [glommio](https://crates.io/crates/glommio) |
 | `capnp-rpc` | Single ecosystem maintainer; control plane depends entirely on it | Evaluate schema compat early; fallback: gRPC (scope explosion) |
 
 ### High-Risk Dependencies (significant effort to substitute)
@@ -1970,7 +1970,7 @@ shopping cart — these represent ecosystem convergence points:
 
 | Dependency | Risk | Mitigation |
 | --- | --- | --- |
-| `opentelemetry-*` | Pre-1.0, API churn | Isolate behind tracing layer |
+| `opentelemetry-*` | Pre-1.0, API churn | Isolate behind [tracing](https://crates.io/crates/tracing) layer |
 | `serde_yaml` / `serde_yml` | Upstream deprecation / version immaturity | ADR with migration path |
 | `prometheus-client` / `metrics` | API differences; metrics facade vs direct use | ADR; isolate behind trait |
 | `hickory-resolver` | Pre-1.0, occasional API changes | Isolate behind DNS trait |
@@ -1988,15 +1988,15 @@ crates, and most Layer 11 tooling crates.
 
 | Layer | Count | Examples |
 | --- | --- | --- |
-| 1 — Runtime/Concurrency | 25 | tokio, glommio, crossbeam, parking_lot, dashmap, hashbrown, mimalloc, governor, moka |
-| 2 — Serialization/Data | 19 | serde, capnp, bytes, uuid, url, http, smallvec, toml, nom, winnow |
-| 3 — Transport | 18 | quinn, quiche, hyper, h2, h3, rustls, boring, reqwest, tower, pingora, rustls-platform-verifier |
-| 4 — Observability | 13 | tracing, tracing-journald, tracing-error, opentelemetry, prometheus-client, metrics, sentry |
+| 1 — Runtime/Concurrency | 25 | [tokio](https://crates.io/crates/tokio), [glommio](https://crates.io/crates/glommio), [crossbeam](https://crates.io/crates/crossbeam), parking_lot, dashmap, hashbrown, mimalloc, governor, moka |
+| 2 — Serialization/Data | 19 | [serde](https://crates.io/crates/serde), capnp, bytes, uuid, url, http, smallvec, toml, [nom](https://crates.io/crates/nom), winnow |
+| 3 — Transport | 18 | [quinn](https://crates.io/crates/quinn), [quiche](https://crates.io/crates/quiche), [hyper](https://crates.io/crates/hyper), h2, h3, [rustls](https://crates.io/crates/rustls), [boring](https://crates.io/crates/boring), [reqwest](https://crates.io/crates/reqwest), [tower](https://crates.io/crates/tower), pingora, rustls-platform-verifier |
+| 4 — Observability | 13 | [tracing](https://crates.io/crates/tracing), tracing-journald, tracing-error, opentelemetry, prometheus-client, metrics, sentry |
 | 5 — Error Handling | 4 | thiserror, anyhow, miette, eyre |
-| 6 — CLI/Config | 6 | clap, chrono, time, humantime, dirs, dotenvy |
-| 7 — Domain | 17 | hickory, notify, ipnet, backon, regex, axum, ractor, flate2, cloudflare, foundations, self_update, tokio-console |
+| 6 — CLI/Config | 6 | [clap](https://crates.io/crates/clap), chrono, time, humantime, dirs, dotenvy |
+| 7 — Domain | 17 | hickory, notify, ipnet, [backon](https://crates.io/crates/backon), regex, [axum](https://crates.io/crates/axum), [ractor](https://crates.io/crates/ractor), flate2, cloudflare, foundations, self_update, tokio-console |
 | 8 — Crypto/Security | 19 | ring, sha2, p256, pem, jsonwebtoken, crypto_box, x25519-dalek |
-| 9 — Platform | 12 | nix, libc, systemd, windows-service, socket2, sysinfo |
+| 9 — Platform | 12 | [nix](https://crates.io/crates/nix), libc, systemd, windows-service, socket2, sysinfo |
 | 10 — Testing | 14 | proptest, mockall, criterion, wiremock, tempfile, insta |
 | 11 — Tooling/Guardrails | 4 | debtmap-cli, debtmap library, cargo-deny, cargo-audit |
 | **Total** | **151** | |

@@ -1,6 +1,6 @@
 # UM — Upstream Maintenance
 
-Phase 3 of the cfdrs program: catching up with
+Phase 3 of the [cfdrs](https://github.com/Ujang360/cfdrs) program: catching up with
 [cloudflare/cloudflared](https://github.com/cloudflare/cloudflared)
 mainline after the 2026.3.0 baseline.
 

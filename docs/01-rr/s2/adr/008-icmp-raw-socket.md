@@ -10,12 +10,12 @@
 
 ## Question
 
-Should cfdrs implement ICMP proxying using a third-party library
-or a custom implementation using nix raw sockets?
+Should [cfdrs](https://github.com/Ujang360/cfdrs) implement ICMP proxying using a third-party library
+or a custom implementation using [nix](https://crates.io/crates/nix) raw sockets?
 
 ## Decision
 
-Custom implementation using nix raw sockets. Same build-not-buy
+Custom implementation using [nix](https://crates.io/crates/nix) raw sockets. Same build-not-buy
 logic as ADR-007 (SOCKS5).
 
 ## Rationale and Evidence
@@ -23,9 +23,9 @@ logic as ADR-007 (SOCKS5).
 Linux ICMP path requires `SOCK_DGRAM` unprivileged sockets,
 ping-group detection via `/proc/sys/net/ipv4/ping_group_range`, per-platform
 echo-ID tracking, and integration with the datagram session packet router. No
-library wraps this surface correctly for the cfdrs deployment model. The Go
+library wraps this surface correctly for the [cfdrs](https://github.com/Ujang360/cfdrs) deployment model. The Go
 implementation is self-contained in `ingress/icmp_linux.go` using raw OS
-primitives. The nix crate is already decided in Layer 9 for `sched_setaffinity`,
+primitives. The [nix](https://crates.io/crates/nix) crate is already decided in Layer 9 for `sched_setaffinity`,
 socket options, and signal handling — ICMP raw sockets are a natural extension
 of that same capability. macOS and Windows ICMP paths are FC-deferred per
 [scope](../scope.md). Evidence:
@@ -38,6 +38,6 @@ of that same capability. macOS and Windows ICMP paths are FC-deferred per
 
 ## Consequences
 
-- S3.6 ingress implementation must use nix raw socket primitives
+- S3.6 ingress implementation must use [nix](https://crates.io/crates/nix) raw socket primitives
   directly. No ICMP library may be introduced without a new ADR.
   Platform-specific ICMP behavior for macOS and Windows remains FC-deferred.
