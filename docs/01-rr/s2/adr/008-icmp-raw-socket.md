@@ -11,12 +11,14 @@
 ## Question
 
 Should [cfdrs](../../../../README.md) implement ICMP proxying using a third-party library
-or a custom implementation using [nix](https://crates.io/crates/nix) raw sockets?
+or a custom implementation using [socket2](https://crates.io/crates/socket2) plus a dedicated unsafe boundary?
 
 ## Decision
 
-Custom implementation using [nix](https://crates.io/crates/nix) raw sockets. Same build-not-buy
-logic as ADR-007 (SOCKS5).
+Custom implementation using [socket2](https://crates.io/crates/socket2), with ICMP raw socket operations
+isolated inside a dedicated unsafe crate. Same build-not-buy logic as
+ADR-007 (SOCKS5). [nix](https://crates.io/crates/nix) remains in scope for `sched_setaffinity`, signal
+handling, and general socket options, but not for ICMP raw sockets.
 
 ## Rationale and Evidence
 
@@ -25,9 +27,12 @@ ping-group detection via `/proc/sys/net/ipv4/ping_group_range`, per-platform
 echo-ID tracking, and integration with the datagram session packet router. No
 library wraps this surface correctly for the [cfdrs](../../../../README.md) deployment model. The Go
 implementation is self-contained in `ingress/icmp_linux.go` using raw OS
-primitives. The [nix](https://crates.io/crates/nix) crate is already decided in Layer 9 for `sched_setaffinity`,
-socket options, and signal handling — ICMP raw sockets are a natural extension
-of that same capability. macOS and Windows ICMP paths are FC-deferred per
+primitives. The implementation boundary in Rust is explicit: all unsafe code
+(including ICMP raw socket handling) lives in a dedicated unsafe crate, while
+safe orchestration code stays in ingress/session crates. [socket2](https://crates.io/crates/socket2) provides the
+socket-level surface for this path. [nix](https://crates.io/crates/nix) remains Layer 9 baseline for
+`sched_setaffinity`, signal handling, and general socket options. macOS and
+Windows ICMP paths are FC-deferred per
 [scope](../scope.md). Evidence:
 
 - [dependency-decisions](../dependency-decisions.md) Layer 9
@@ -38,6 +43,9 @@ of that same capability. macOS and Windows ICMP paths are FC-deferred per
 
 ## Consequences
 
-- S3.6 ingress implementation must use [nix](https://crates.io/crates/nix) raw socket primitives
-  directly. No ICMP library may be introduced without a new ADR.
-  Platform-specific ICMP behavior for macOS and Windows remains FC-deferred.
+- S3.6 ingress implementation must use [socket2](https://crates.io/crates/socket2)-based ICMP raw socket plumbing
+  through the dedicated unsafe crate boundary. No ICMP library may be introduced
+  without a new ADR.
+- [nix](https://crates.io/crates/nix) usage stays for `sched_setaffinity`, signals, and general socket options,
+  but ICMP raw socket code must not use [nix](https://crates.io/crates/nix).
+- Platform-specific ICMP behavior for macOS and Windows remains FC-deferred.

@@ -53,7 +53,7 @@ logging-native  = []   # tracing-native structured spans
 logging-compat  = []   # zerolog-compatible JSON output
 
 cli-native      = []   # idiomatic clap-style derive
-cli-compat      = []   # urfave/cli cadence match (S4 if parity gap found)
+cli-compat      = []   # urfave/cli cadence match (FC phase only; informed by S4 parity results)
 
 # Capability flags — feature details deferred, future phases may change
 more-metrics    = []   # extra QUIC listener + tokio task metrics
@@ -397,8 +397,11 @@ fixed at the rewrite boundary):**
 **CLI framework** — `cli-native` flag. Derive-macro-based subcommand
 trees.
 
-`cli-compat` — deferred. Add in S4 only if parity tests reveal
-behavioral gap vs urfave/cli cadence.
+`cli-compat` — deferred to FC. S4 parity tests may reveal a
+behavioral gap vs urfave/cli cadence, but S4 does not implement it.
+
+`cli-compat` implementation window is FC, not S4. S4 only verifies and
+reports parity gaps.
 
 **Timestamp / duration** — [chrono](https://crates.io/crates/chrono) ecosystem for formatting and parsing.
 Human-readable duration parsing for config values (`"5s"`, `"210s"`,
@@ -508,8 +511,9 @@ No Windows/macOS in this phase.
 
 | Capability | Decision |
 | --- | --- |
-| Unix syscall wrapper | IN — sched_setaffinity, socket options, ICMP raw sockets, ping-group detection, DF bit |
-| Raw FFI bindings | IN — where the safe wrapper does not cover |
+| Unix syscall wrapper | IN — `sched_setaffinity`, signal handling, general socket options, ping-group detection, DF bit |
+| ICMP raw socket path | IN — [socket2](https://crates.io/crates/socket2)-based implementation, with all unsafe operations isolated in a dedicated unsafe crate; no [nix](https://crates.io/crates/nix) usage for ICMP |
+| Raw FFI bindings | IN — where the safe wrapper does not cover, and only inside the dedicated unsafe crate |
 | Systemd readiness | **[sd-notify](https://crates.io/crates/sd-notify)** — READY=1 and STOPPING=1 only. Minimal. ADR-009 closed. |
 | UDP socket tuning | IN — QUIC UDP socket buffer sizes, DF bit, platform-specific options |
 | System info collection | IN — CPU, memory, disk, network for diagnostics |
@@ -591,8 +595,8 @@ Phase 2.2 (Scoping) consumes the following from this document:
 | --- | --- |
 | Must | [tokio](https://crates.io/crates/tokio) runtime, QUIC transport, Cap'n Proto RPC, actor framework, structured logging, typed errors |
 | Should | MPMC channels, concurrent hashmap, bump arena, TinyLFU cache, GCRA rate limiter |
-| Could | logging-compat (zerolog JSON), cli-compat, runtime debugging (debug-console) |
-| Won't (this phase) | [glommio](https://crates.io/crates/glommio) runtime, io_uring, FIPS, autoupdate, Windows/macOS, 0-RTT |
+| Could | logging-compat (zerolog JSON), runtime debugging (debug-console) |
+| Won't (this phase) | cli-compat (deferred to FC), [glommio](https://crates.io/crates/glommio) runtime, io_uring, FIPS, autoupdate, Windows/macOS, 0-RTT |
 
 ### Non-Port Decisions
 
