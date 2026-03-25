@@ -10,7 +10,7 @@
 
 ## Question
 
-Should [cfdrs](https://github.com/Ujang360/cfdrs) implement ICMP proxying using a third-party library
+Should [cfdrs](../../../../README.md) implement ICMP proxying using a third-party library
 or a custom implementation using [nix](https://crates.io/crates/nix) raw sockets?
 
 ## Decision
@@ -23,7 +23,7 @@ logic as ADR-007 (SOCKS5).
 Linux ICMP path requires `SOCK_DGRAM` unprivileged sockets,
 ping-group detection via `/proc/sys/net/ipv4/ping_group_range`, per-platform
 echo-ID tracking, and integration with the datagram session packet router. No
-library wraps this surface correctly for the [cfdrs](https://github.com/Ujang360/cfdrs) deployment model. The Go
+library wraps this surface correctly for the [cfdrs](../../../../README.md) deployment model. The Go
 implementation is self-contained in `ingress/icmp_linux.go` using raw OS
 primitives. The [nix](https://crates.io/crates/nix) crate is already decided in Layer 9 for `sched_setaffinity`,
 socket options, and signal handling — ICMP raw sockets are a natural extension

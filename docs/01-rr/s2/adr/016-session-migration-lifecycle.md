@@ -10,7 +10,7 @@
 
 ## Question
 
-How should [cfdrs](https://github.com/Ujang360/cfdrs) model datagram session migration so token rebinding, cancellation, and v2 or v3 protocol behavior remain consistent under mixed traffic?
+How should [cfdrs](../../../../README.md) model datagram session migration so token rebinding, cancellation, and v2 or v3 protocol behavior remain consistent under mixed traffic?
 
 ## Decision
 

@@ -10,7 +10,7 @@
 
 ## Question
 
-Should [cfdrs](https://github.com/Ujang360/cfdrs) use a third-party async backoff library directly in runtime code, or maintain a small custom backoff implementation aligned to Go behavior?
+Should [cfdrs](../../../../README.md) use a third-party async backoff library directly in runtime code, or maintain a small custom backoff implementation aligned to Go behavior?
 
 ## Decision
 

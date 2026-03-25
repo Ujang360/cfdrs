@@ -10,7 +10,7 @@
 
 ## Question
 
-Should [cfdrs](https://github.com/Ujang360/cfdrs) implement a cli-compat mode that matches urfave/cli
+Should [cfdrs](../../../../README.md) implement a cli-compat mode that matches urfave/cli
 behavioral cadence for flag parsing edge cases?
 
 ## Decision

@@ -10,7 +10,7 @@
 
 ## Question
 
-How should [cfdrs](https://github.com/Ujang360/cfdrs) preserve parity for duration serialization where JSON expects integer seconds but YAML expects Go duration strings?
+How should [cfdrs](../../../../README.md) preserve parity for duration serialization where JSON expects integer seconds but YAML expects Go duration strings?
 
 ## Decision
 

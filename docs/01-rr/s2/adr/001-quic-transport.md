@@ -10,7 +10,7 @@
 
 ## Question
 
-Should [cfdrs](https://github.com/Ujang360/cfdrs) use Cloudflare's tokio-integrated QUIC ([tokio-quiche](https://crates.io/crates/tokio-quiche))
+Should [cfdrs](../../../../README.md) use Cloudflare's tokio-integrated QUIC ([tokio-quiche](https://crates.io/crates/tokio-quiche))
 or a pure-Rust QUIC stack as the primary transport?
 
 ## Decision

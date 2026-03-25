@@ -10,7 +10,7 @@
 
 ## Question
 
-Should [cfdrs](https://github.com/Ujang360/cfdrs) parse wire formats with a combinator-based parser framework, or rely on ad-hoc manual byte-buffer slicing across each protocol path?
+Should [cfdrs](../../../../README.md) parse wire formats with a combinator-based parser framework, or rely on ad-hoc manual byte-buffer slicing across each protocol path?
 
 ## Decision
 

@@ -10,7 +10,7 @@
 
 ## Question
 
-Should [cfdrs](https://github.com/Ujang360/cfdrs) management endpoints use a full web framework abstraction by default, or use a minimal raw HTTP stack tailored to the management surface only?
+Should [cfdrs](../../../../README.md) management endpoints use a full web framework abstraction by default, or use a minimal raw HTTP stack tailored to the management surface only?
 
 ## Decision
 

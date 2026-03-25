@@ -10,7 +10,7 @@
 
 ## Question
 
-Should [cfdrs](https://github.com/Ujang360/cfdrs) expose metrics through direct Prometheus client types, or through an internal facade API that hides backend-specific types from most crates?
+Should [cfdrs](../../../../README.md) expose metrics through direct Prometheus client types, or through an internal facade API that hides backend-specific types from most crates?
 
 ## Decision
 

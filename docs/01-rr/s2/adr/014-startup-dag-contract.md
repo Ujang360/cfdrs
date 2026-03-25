@@ -10,7 +10,7 @@
 
 ## Question
 
-How should [cfdrs](https://github.com/Ujang360/cfdrs) encode startup ordering so bootstrap dependencies remain deterministic across config, logging, observer, transport, and orchestration paths?
+How should [cfdrs](../../../../README.md) encode startup ordering so bootstrap dependencies remain deterministic across config, logging, observer, transport, and orchestration paths?
 
 ## Decision
 

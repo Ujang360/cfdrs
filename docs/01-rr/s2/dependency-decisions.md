@@ -8,7 +8,7 @@
 | Rust edition | 2024 (MSRV 1.85+) |
 
 This document records architectural dependency *capability* decisions
-for the [cfdrs](https://github.com/Ujang360/cfdrs) rewrite. Crate names are not finalized here — they are
+for the [cfdrs](../../../README.md) rewrite. Crate names are not finalized here — they are
 decided in S2.6 when crate boundaries are drawn, or at first use in S3.
 
 **Maintenance:** This document remains open for post-2.1 additions.
@@ -143,7 +143,7 @@ Known required features: `extended`, `local_dynamic_tls`, `no_thp`,
 
 **Conflict check:** The QUIC transport dependency tree may transitively
 pull in another allocator as an opt-in feature. That feature must not
-force `#[global_allocator]` on the binary — the [cfdrs](https://github.com/Ujang360/cfdrs) allocator
+force `#[global_allocator]` on the binary — the [cfdrs](../../../README.md) allocator
 declaration wins. **Verify on first build in S3.**
 
 If link conflict is unresolvable at build time: fallback to pure-Rust
@@ -478,7 +478,7 @@ Async DNS resolver, file watcher (config hot-reload), IP/CIDR matching,
 regex (ingress rule path matching), gzip compression, diagnostic zip
 bundling, FNV hashing (feature flag percentile rollout) — all IN.
 
-**No autoupdate** in [cfdrs](https://github.com/Ujang360/cfdrs).
+**No autoupdate** in [cfdrs](../../../README.md).
 
 **Foundations** (Cloudflare bootstrap crate) — OUT as direct
 dependency. Accepted as transitive dep from QUIC transport (single
@@ -596,7 +596,7 @@ Phase 2.2 (Scoping) consumes the following from this document:
 
 ### Non-Port Decisions
 
-- Auto-updater — not ported to [cfdrs](https://github.com/Ujang360/cfdrs)
+- Auto-updater — not ported to [cfdrs](../../../README.md)
 - Foundations crate — OUT as direct dependency
 - [glommio](https://crates.io/crates/glommio) — OUT permanently (QUIC transport incompatibility)
 - Windows/macOS platform — excluded this phase
