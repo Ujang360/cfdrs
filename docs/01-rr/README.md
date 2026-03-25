@@ -63,7 +63,7 @@ pass) + GPT 5.4 (verification pass).
 | --- | --- | --- | --- |
 | 2.1 | Dependencies vetting — plumbing + behavioral layers | [shopping cart](s2/dependency-shopping-cart.md), [decisions](s2/dependency-decisions.md) | Done |
 | 2.2 | Scoping — platform matrix, MoSCoW, explicit non-ports | [scope](s2/scope.md) | Done |
-| 2.3 | Risk register — probability × impact from catalogs | `s2/risks.md` | — |
+| 2.3 | Risk register — probability × impact from catalogs | [risks](s2/risks.md) | Done |
 | 2.4 | ADRs — one per decision, references catalog evidence | `s2/adr/NNN-*.md` | — |
 | 2.5 | Invariants — behavioral invariants → proptest properties | `s2/invariants.md` | — |
 | 2.6 | Architecture — crate boundaries from Jaccard clusters | `s2/architecture.md` | — |
