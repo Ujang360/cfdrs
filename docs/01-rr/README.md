@@ -14,7 +14,7 @@ scoped — what RR leaves behind becomes FC's starting point.
 | Stratum | Tag | Purpose | Status |
 | --------- | ----- | --------- | -------- |
 | 1 | [RAW](s1/README.md) | Go source behavior extraction | Closed |
-| 2 | SUBSTRATE | Rust-aware design decisions | Active |
+| 2 | [SUBSTRATE](#s2substrate--raw-materials-prepped-for-cooking) | Rust-aware design decisions | Active |
 | 3 | COOK | Rust implementation | Not started |
 | 4 | SERVING | Verification, conformance, deploy-ready | Not started |
 
@@ -54,17 +54,17 @@ Transform raw stratum into Rust-aware design decisions. Every artifact
 here is language-aware, paradigm-aware, ecosystem-aware. This is where
 Go behavior becomes Rust architecture.
 
-**Location:** `s2/`
+**Location:** [s2/](s2/)
 
 **Methodology:** Two-model handoff on all prompts — Sonnet 4.6 (first
 pass) + GPT 5.4 (verification pass).
 
 | Phase | Description | Artifact | Status |
 | --- | --- | --- | --- |
-| 2.1 | Dependencies vetting — plumbing + behavioral layers | [shopping cart](s2/dependency-shopping-cart.md), [decisions](s2/dependency-decisions.md) | Done |
+| 2.1 | Dependencies vetting — 9 capability layers, T/M/S scored | [shopping cart](s2/dependency-shopping-cart.md), [decisions](s2/dependency-decisions.md) | Done |
 | 2.2 | Scoping — platform matrix, MoSCoW, explicit non-ports | [scope](s2/scope.md) | Done |
-| 2.3 | Risk register — probability × impact from catalogs | [risks](s2/risks.md) | Done |
-| 2.4 | ADRs — one per decision, references catalog evidence | `s2/adr/NNN-*.md` | In progress |
+| 2.3 | Risk register — probability × impact from 6 catalog domains | [risks](s2/risks.md) | Done |
+| 2.4 | ADRs — architecture decisions, referenced to catalog evidence | [ADR index](s2/adr/README.md) | Active |
 | 2.5 | Invariants — behavioral invariants → proptest properties | [invariants](s2/invariants.md) | Active |
 | 2.6 | Architecture — crate boundaries from Jaccard clusters | `s2/architecture.md` | — |
 | 2.7 | Parity harness — TOML contracts, oracle, red-by-default | `s2/parity-design.md` | — |
@@ -72,30 +72,24 @@ pass) + GPT 5.4 (verification pass).
 | 2.9 | Environment + guardrails — workspace, style, CI/CD | `s2/environment.md` | — |
 | 2.10 | Coherency audit — full traceability chain | `s2/coherency-report.md` | — |
 
-### Dependency vetting layers (Phase 2.1)
+### Dependency capability layers (Phase 2.1)
 
-**Layer 1 — Plumbing:** Low Jaccard overlap, independent cluster, low-risk.
+The [dependency decisions](s2/dependency-decisions.md) document organizes
+capabilities into 9 layers, each traced to S1 catalog evidence and scored on
+trustworthy/maturity/security axes. Research and alternatives are in the
+[shopping cart](s2/dependency-shopping-cart.md).
 
-```text
-tokio, tokio-util, bytes, pin-project
-rustls / boring (FIPS-aware TLS)
-serde, serde_json, serde_yaml
-tracing, tracing-subscriber
-prometheus client
-clap
-anyhow / thiserror
-```
-
-**Layer 2 — Behavioral:** High Jaccard overlap, tunnel core + control
-plane clusters, high-stakes.
-
-```text
-quinn / tokio-quiche       ← QUIC (the critical decision)
-capnp                      ← Cap'n Proto RPC
-boring (BoringSSL)         ← PQ crypto surface
-hyper / h2                 ← HTTP2
-ractor / tokio channels    ← actor/supervision
-```
+| Layer | Scope | Key capabilities |
+| --- | --- | --- |
+| L1 | Runtime and Concurrency | tokio, parking_lot, arc-swap, dashmap, mimalloc |
+| L2 | Serialization and Data | serde, capnp 0.25.x, prost |
+| L3 | Transport | tokio-quiche (primary), hyper 1.x, h2 0.4.x, tower, BoringSSL |
+| L4 | Observability | tracing, prometheus-client, opentelemetry |
+| L5 | Error Handling | thiserror (lib), anyhow (binary only) |
+| L6 | CLI and Configuration | clap derive, chrono, dirs |
+| L7 | Domain-Specific | backon, ipnet, regex, axum, ractor, flate2/zip |
+| L8 | Crypto and Security | RustCrypto suite, jsonwebtoken, crypto_box |
+| L9 | Platform | nix, systemd (sd-notify), socket2 |
 
 ### Critical path (from hub atom analysis)
 
@@ -112,9 +106,40 @@ quic/v3/session             (12 catalogs) — QUIC session lifecycle
 supervisor/tunnel           (12 catalogs) — supervisor loop
 ```
 
+### Phase dependency flow
+
+Each S2 phase consumes prior outputs and produces inputs for downstream
+phases. The flow below governs phase sequencing:
+
+```text
+2.1 Decisions ──┬──→ 2.2 Scope ──┬──→ 2.3 Risks ──┬──→ 2.4 ADRs ──→ 2.5 Invariants
+                │               │               │               │
+                └───────────────┴───────────────┴───────────────┘
+                                        ↓
+                              2.6 Architecture
+                                        ↓
+                              2.7 Parity Harness
+                                        ↓
+                              2.8 Stages Plan
+                                        ↓
+                              2.9 Environment
+                                        ↓
+                              2.10 Coherency Audit
+```
+
+| Metric | Value |
+| --- | --- |
+| Dependency layers | 9 across [decisions](s2/dependency-decisions.md) |
+| Scope classifications | 127 feature atoms (33 Must / 68 Should / 18 Could / 8 Won't) |
+| Platform atoms | 31 ([scope](s2/scope.md)) |
+| Risks | 31 across 6 domains ([risks](s2/risks.md)) |
+| ADRs | 19 total — 14 decided, 1 open, 2 deferred, 2 resolved inline |
+| Invariants | 29 (6 architectural + 23 domain) across 10 prefixes |
+
 **Exit gate:** Features traceable to scope. Scope traceable to ADRs.
 ADRs traceable to crates. Crates traceable to stages. Parity harness
-covers all scoped features. No orphaned decisions. Full coherency chain.
+covers all scoped features. No orphaned decisions. Full coherency chain
+validated by phase 2.10.
 
 ## S3/COOK — Implementation
 
