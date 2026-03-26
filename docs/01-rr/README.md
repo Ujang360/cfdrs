@@ -65,7 +65,7 @@ pass) + GPT 5.4 (verification pass).
 | 2.2 | Scoping — platform matrix, MoSCoW, explicit non-ports | [scope](s2/scope.md) | Done |
 | 2.3 | Risk register — probability × impact from catalogs | [risks](s2/risks.md) | Done |
 | 2.4 | ADRs — one per decision, references catalog evidence | `s2/adr/NNN-*.md` | In progress |
-| 2.5 | Invariants — behavioral invariants → proptest properties | `s2/invariants.md` | — |
+| 2.5 | Invariants — behavioral invariants → proptest properties | [invariants](s2/invariants.md) | Active |
 | 2.6 | Architecture — crate boundaries from Jaccard clusters | `s2/architecture.md` | — |
 | 2.7 | Parity harness — TOML contracts, oracle, red-by-default | `s2/parity-design.md` | — |
 | 2.8 | Stages plan — phased from critical path + dep graph | `s2/stages/phase-*.md` | — |

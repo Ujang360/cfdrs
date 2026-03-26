@@ -5,6 +5,7 @@
 | Baseline | cloudflare/cloudflared @ tag `2026.3.0` |
 | Phase | 01-RR / S2 — SUBSTRATE |
 | S2.1 status | Closed |
+| Produces | Inputs to [scope](scope.md) S2.2, [risks](risks.md) S2.3, [adr](adr/README.md) S2.4, [invariants](invariants.md) S2.5 |
 | Rust edition | 2024 (MSRV 1.85+) |
 
 This document records architectural dependency *capability* decisions

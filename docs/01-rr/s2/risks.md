@@ -6,7 +6,7 @@
 | Phase | 01-RR / S2 - SUBSTRATE |
 | S2.3 status | Closed |
 | Consumes | [scope](scope.md), [dependency-decisions](dependency-decisions.md), [porting-friction](../s1/catalogs/cross-cutting/porting-friction/README.md), [concurrency](../s1/catalogs/cross-cutting/concurrency/README.md), [error-propagation](../s1/catalogs/cross-cutting/error-propagation/README.md), [init-teardown](../s1/catalogs/cross-cutting/init-teardown/README.md), [wire-protocol](../s1/catalogs/cross-cutting/wire-protocol/README.md), [audit-analysis](../s1/audit-analysis.md) |
-| Produces | Inputs to S2.4 ADRs and S2.6 architecture |
+| Produces | Inputs to [adr](adr/README.md) S2.4, [invariants](invariants.md) S2.5, and S2.6 architecture |
 
 This document converts S1 cross-cutting evidence and S2.1/S2.2 constraints into
 an implementation risk matrix for S3 planning.

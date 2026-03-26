@@ -6,6 +6,7 @@
 | Phase | 01-RR / S2 - SUBSTRATE |
 | S2.2 status | Closed |
 | Consumes | [dependency-decisions](dependency-decisions.md) Section 2.2 entry conditions |
+| Produces | Inputs to [risks](risks.md) S2.3, [adr](adr/README.md) S2.4, [invariants](invariants.md) S2.5 |
 | RR target | Linux x86-64, systemd only |
 | Version floors | kernel >= 5.10, glibc >= 2.31, systemd >= 247 |
 

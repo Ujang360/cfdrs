@@ -5,6 +5,7 @@
 | Baseline | cloudflare/cloudflared @ tag `2026.3.0` |
 | Phase | 01-RR / S2 - SUBSTRATE |
 | Artifact | ADR corpus for phase 2.4 |
+| Produces | Inputs to [invariants](../invariants.md) S2.5 and S2.6 architecture |
 
 This directory stores phase 2.4 architecture decision records.
 
