@@ -14,7 +14,7 @@ How should [cfdrs](../../../../README.md) represent Go `context.Context` behavio
 
 ## Decision
 
-Define one standard propagation contract: explicit cancellation token plus explicit timeout value at EVL and actor boundaries. Do not use ad-hoc mixed patterns per module.
+Define one standard propagation contract: explicit cancellation token plus explicit timeout value at worker group and actor boundaries. Do not use ad-hoc mixed patterns per module.
 
 ## Alternatives Considered
 

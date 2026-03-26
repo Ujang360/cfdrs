@@ -83,7 +83,7 @@ Same pattern applies to `cli-native` / `cli-compat`.
 **[tokio](https://crates.io/crates/tokio)** — selected. `new_multi_thread()`, all threads pinned via
 `sched_setaffinity` in `on_thread_start`. No `LocalSet`. No
 `new_current_thread` runtimes. Single multi-thread runtime for both
-Tunnel EVL and Proxy EVL threads. Everything `Send`.
+Transport worker group and Proxy worker group threads. Everything `Send`.
 
 **[glommio](https://crates.io/crates/glommio)** — OUT permanently. QUIC transport incompatibility,
 ecosystem lockout.
@@ -104,12 +104,12 @@ post-S4 if benchmarks warrant.
 
 ### 1.3 Channels ✅
 
-**MPMC channel** capability decided for all EVL and Actor boundaries.
-Go-style select semantics, production-proven. Tunnel EVL → Proxy EVL
-`SessionAssignment` handoff uses a bounded channel of this type.
+**MPMC channel** capability decided for all worker group and Actor boundaries.
+Go-style select semantics, production-proven. Transport worker group → Proxy
+worker group `SessionAssignment` handoff uses a bounded channel of this type.
 
 **[tokio](https://crates.io/crates/tokio) channels** — used internally within async tasks (watch,
-oneshot, mpsc). Not for cross-EVL boundaries.
+oneshot, mpsc). Not for cross-worker-group boundaries.
 
 Single-producer single-consumer alternatives — OUT. MPMC covers all
 cases.
@@ -371,13 +371,13 @@ std::process::ExitCode
                   → fatal errors map here at binary boundary.
                     Each fatal variant gets a typed exit code.
 
-? operator        → NEVER at EVL or Actor boundary.
-                    EVLs handle errors internally, send typed
-                    actor messages upward. Error never escapes
-                    the EVL via propagation.
+? operator        → NEVER at worker group or Actor boundary.
+                    Worker groups handle errors internally, send
+                    typed actor messages upward. Error never
+                    escapes the worker group via propagation.
 
 ? operator        → allowed inside pure computation within a task,
-                    never crossing the task/EVL boundary.
+                    never crossing the task/worker-group boundary.
 ```
 
 **Go string-match heuristics → typed variants in Rust (S1 quirks
@@ -426,12 +426,12 @@ Config search path (S1 evidence): `~/.cloudflared` →
 **Erlang-inspired typed actor framework** — selected. Supervision tree,
 upward error escalation.
 
-[capnp-rpc](https://crates.io/crates/capnp-rpc) self-proxy service: same OS process, own EVL, communicates
-to high-level system actors via actor message passing. Treated as a
-special proxy variant — session-based, dispatched through the same
-proxy invariant. Never granted architectural special status.
+[capnp-rpc](https://crates.io/crates/capnp-rpc) self-proxy service: same OS process, own worker group,
+communicates to high-level system actors via actor message passing.
+Treated as a special proxy variant — session-based, dispatched through
+the same proxy invariant. Never granted architectural special status.
 
-Session managers: custom for session-based EVL. Actor framework for
+Session managers: custom for session-based worker group. Actor framework for
 supervisor orchestration and actor address-book graph.
 
 ### Backoff / Retry ✅

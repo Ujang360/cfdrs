@@ -66,7 +66,7 @@ pass) + GPT 5.4 (verification pass).
 | 2.3 | Risk register — probability × impact from 6 catalog domains | [risks](s2/risks.md) | Done |
 | 2.4 | ADRs — architecture decisions, referenced to catalog evidence | [ADR index](s2/adr/README.md) | Active |
 | 2.5 | Invariants — behavioral invariants → proptest properties | [invariants](s2/invariants.md) | Active |
-| 2.6 | Architecture — crate boundaries from Jaccard clusters | `s2/architecture.md` | — |
+| 2.6 | Architecture — crate boundaries from Jaccard clusters | [architecture](s2/architecture.md) | Active |
 | 2.7 | Parity harness — TOML contracts, oracle, red-by-default | `s2/parity-design.md` | — |
 | 2.8 | Stages plan — phased from critical path + dep graph | `s2/stages/phase-*.md` | — |
 | 2.9 | Environment + guardrails — workspace, style, CI/CD | `s2/environment.md` | — |

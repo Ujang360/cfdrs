@@ -5,7 +5,7 @@
 | Baseline | cloudflare/cloudflared @ tag `2026.3.0` |
 | Phase | 01-RR / S2 - SUBSTRATE |
 | Artifact | ADR corpus for phase 2.4 |
-| Produces | Inputs to [invariants](../invariants.md) S2.5 and S2.6 architecture |
+| Produces | Inputs to [invariants](../invariants.md) S2.5 and S2.6 [architecture](../architecture.md) |
 
 This directory stores phase 2.4 architecture decision records.
 
@@ -34,7 +34,7 @@ This directory stores phase 2.4 architecture decision records.
 | [ADR-008](008-icmp-raw-socket.md) | ICMP raw socket | R2.6 | Decided |
 | ADR-009 | [sd-notify](https://crates.io/crates/sd-notify) — minimal vs full [systemd](https://crates.io/crates/systemd) crate | — | Resolved inline |
 | [ADR-010](010-cli-compat.md) | CLI compatibility mode | — | Deferred — FC |
-| [ADR-011](011-evl-architecture.md) | EVL architecture | — | Open — S2.6 |
+| [ADR-011](011-worker-group-architecture.md) | Worker group architecture | R2.6 | Decided |
 | [ADR-012](012-error-taxonomy-and-recoverability-policy.md) | Error taxonomy and recoverability policy | R3.1 | Decided |
 | [ADR-013](013-customduration-dual-format-contract.md) | CustomDuration dual-format contract | R1.6 | Decided |
 | [ADR-014](014-startup-dag-contract.md) | Startup DAG contract | R4.1 | Decided |

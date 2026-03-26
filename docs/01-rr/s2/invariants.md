@@ -130,9 +130,9 @@ proptest! {
 }
 ```
 
-### ARCH-3 - EVL Boundary Error Invariant
+### ARCH-3 - Worker Group Boundary Error Invariant
 
-**Statement:** The `?` operator must never be used at an EVL boundary or actor
+**Statement:** The `?` operator must never be used at a worker group boundary or actor
 message boundary. Errors at these boundaries must be classified internally and
 escalated via typed actor messages. `?` is permitted only inside pure
 computation within a task, never at the point where a task interacts with the
@@ -219,7 +219,7 @@ proptest! {
 
 ### ARCH-6 - Cancellation Propagation Invariant
 
-**Statement:** Every async boundary that crosses an EVL, transport, or actor
+**Statement:** Every async boundary that crosses a worker group, transport, or actor
 message boundary must propagate both an explicit cancellation token and an
 explicit timeout value. Dropping a future is not an acceptable substitute for a
 boundary contract. The same boundary must not mix incompatible cancellation
@@ -1049,7 +1049,7 @@ proptest! {
 | --- | --- | --- | --- |
 | ARCH-1 | Proxy Data Boundary | Architectural | property |
 | ARCH-2 | Thread Affinity | Architectural | compile-time + property |
-| ARCH-3 | EVL Boundary Error | Architectural | compile-time + property |
+| ARCH-3 | Worker Group Boundary Error | Architectural | compile-time + property |
 | ARCH-4 | Fat Enum Dispatch | Architectural | compile-time + property |
 | ARCH-5 | Bump Arena Discipline | Architectural | property |
 | ARCH-6 | Cancellation Propagation | Architectural | scenario |
