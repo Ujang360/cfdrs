@@ -68,7 +68,7 @@ pass) + GPT 5.4 (verification pass).
 | 2.5 | Invariants — behavioral invariants → proptest properties | [invariants](s2/invariants.md) | Closed |
 | 2.6 | Architecture — crate boundaries from Jaccard clusters | [architecture](s2/architecture.md) | Closed |
 | 2.7 | Parity harness — TOML contracts, oracle, red-by-default | [parity-design](s2/parity-design.md) | Closed |
-| 2.8 | Stages plan — phased from critical path + dep graph | `s2/stages/phase-*.md` | — |
+| 2.8 | Stages plan — phased from critical path + dep graph | [stages](s2/stages/README.md) | Active |
 | 2.9 | Environment + guardrails — workspace, style, CI/CD | `s2/environment.md` | — |
 | 2.10 | Coherency audit — full traceability chain | `s2/coherency-report.md` | — |
 
