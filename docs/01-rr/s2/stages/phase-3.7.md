@@ -6,6 +6,7 @@
 | Scope | Management HTTP/WebSocket service, system diagnostics |
 | Entry condition | Stage 3.5 exit gate passed AND stage 3.6 exit gate passed |
 | Exit condition | All 6 Must-tier contracts green |
+| Context risk | High (~96K practical) — split into 2 sub-stages; Extended agent recommended |
 
 ---
 

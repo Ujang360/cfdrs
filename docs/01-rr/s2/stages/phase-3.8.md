@@ -6,6 +6,7 @@
 | Scope | Binary assembly, CLI command tree, startup DAG, shutdown |
 | Entry condition | All prior stages (3.0–3.7) exit gates passed |
 | Exit condition | All 9 Must-tier contracts green |
+| Context risk | Critical (~192K practical) — split into 3 sub-stages mandatory; pre-build API summaries |
 
 ---
 

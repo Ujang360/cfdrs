@@ -152,19 +152,19 @@ progressively.
 **Methodology:** AI-assisted — first-pass generation + verification.
 One crate per session. Parity TOML written before implementation.
 
-| Stage | Scope | Crates | Must | Should | Skip | Fuzz | Total | Phase doc |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 3.0 | Foundation | 3 | 6 | 0 | 0 | 0 | 6 | [phase-3.0](s2/stages/phase-3.0.md) |
-| 3.1 | Independent crates | 7 | 6 | 46 | 11 | 1 | 64 | [phase-3.1](s2/stages/phase-3.1.md) |
-| 3.2 | Control plane | 1 | 10 | 0 | 0 | 0 | 10 | [phase-3.2](s2/stages/phase-3.2.md) |
-| 3.3 | Transport | 2 | 30 | 8 | 6 | 0 | 44 | [phase-3.3](s2/stages/phase-3.3.md) |
-| 3.4 | Sessions | 1 | 52 | 11 | 0 | 6 | 69 | [phase-3.4](s2/stages/phase-3.4.md) |
-| 3.5 | Config runtime + supervisor | 2 | 1 | 19 | 0 | 0 | 20 | [phase-3.5](s2/stages/phase-3.5.md) |
-| 3.6 | Ingress proxy | 1 | 37 | 26 | 0 | 1 | 64 | [phase-3.6](s2/stages/phase-3.6.md) |
-| 3.7 | Management + diagnostics | 2 | 6 | 32 | 1 | 0 | 39 | [phase-3.7](s2/stages/phase-3.7.md) |
-| 3.8 | Application + CLI | 5 | 9 | 2 | 0 | 0 | 11 | [phase-3.8](s2/stages/phase-3.8.md) |
-| 3.9 | Platform integration | 1 | 0 | 0 | 0 | 0 | 0 | [phase-3.9](s2/stages/phase-3.9.md) |
-| **Total** | | **25** | **157** | **144** | **18** | **8** | **327** | |
+| Stage | Scope | Crates | Must | Should | Skip | Fuzz | Total | Context | Phase doc |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 3.0 | Foundation | 3 | 6 | 0 | 0 | 0 | 6 | Low | [phase-3.0](s2/stages/phase-3.0.md) |
+| 3.1 | Independent crates | 7 | 6 | 46 | 11 | 1 | 64 | Medium | [phase-3.1](s2/stages/phase-3.1.md) |
+| 3.2 | Control plane | 1 | 10 | 0 | 0 | 0 | 10 | Medium | [phase-3.2](s2/stages/phase-3.2.md) |
+| 3.3 | Transport | 2 | 30 | 8 | 6 | 0 | 44 | High | [phase-3.3](s2/stages/phase-3.3.md) |
+| 3.4 | Sessions | 1 | 52 | 11 | 0 | 6 | 69 | Critical | [phase-3.4](s2/stages/phase-3.4.md) |
+| 3.5 | Config runtime + supervisor | 2 | 1 | 19 | 0 | 0 | 20 | High | [phase-3.5](s2/stages/phase-3.5.md) |
+| 3.6 | Ingress proxy | 1 | 37 | 26 | 0 | 1 | 64 | Critical | [phase-3.6](s2/stages/phase-3.6.md) |
+| 3.7 | Management + diagnostics | 2 | 6 | 32 | 1 | 0 | 39 | High | [phase-3.7](s2/stages/phase-3.7.md) |
+| 3.8 | Application + CLI | 5 | 9 | 2 | 0 | 0 | 11 | Critical | [phase-3.8](s2/stages/phase-3.8.md) |
+| 3.9 | Platform integration | 1 | 0 | 0 | 0 | 0 | 0 | Low | [phase-3.9](s2/stages/phase-3.9.md) |
+| **Total** | | **25** | **157** | **144** | **18** | **8** | **327** | | |
 
 > **Note:** `common-sys` (the 26th crate) is consumed transitively by stages 3.3,
 > 3.4, and 3.7 but has no standalone parity contracts — its safe API surface is

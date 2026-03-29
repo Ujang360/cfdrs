@@ -6,6 +6,7 @@
 | Scope | Orchestrator, config authority negotiation, HA supervisor |
 | Entry condition | Stage 3.1 exit gate passed AND stage 3.3 exit gate passed AND stage 3.4 exit gate passed |
 | Exit condition | 1 Must-tier contract green |
+| Context risk | High (~104K practical) — split into 2 sub-stages; Extended agent recommended |
 
 ---
 

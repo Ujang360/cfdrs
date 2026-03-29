@@ -6,6 +6,7 @@
 | Scope | UDP datagram sessions, muxer, ICMP router, session migration |
 | Entry condition | Stage 3.3 exit gate passed (30/30 Must green) |
 | Exit condition | All 52 Must-tier contracts green |
+| Context risk | Critical (~168K practical) — split into 3 sub-stages mandatory |
 
 ---
 

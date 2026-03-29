@@ -6,6 +6,7 @@
 | Scope | QUIC transport, edge discovery, TLS, connection lifecycle |
 | Entry condition | Stage 3.0 exit gate passed AND stage 3.2 exit gate passed |
 | Exit condition | All 30 Must-tier contracts green |
+| Context risk | High (~112K practical) — split into 2 sub-stages; Extended agent recommended |
 
 ---
 

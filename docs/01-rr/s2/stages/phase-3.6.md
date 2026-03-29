@@ -6,6 +6,7 @@
 | Scope | Request proxying, ingress rules, origin services, SOCKS5, carrier |
 | Entry condition | Stage 3.3 exit gate passed AND stage 3.5 exit gate passed |
 | Exit condition | All 37 Must-tier contracts green |
+| Context risk | Critical (~160K practical) — split into 3 sub-stages mandatory |
 
 ---
 

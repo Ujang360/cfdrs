@@ -6,6 +6,7 @@
 | Scope | Cap'n Proto RPC wire encoding, registration client/server |
 | Entry condition | Stage 3.0 exit gate passed (6/6 Must green) |
 | Exit condition | All 10 Must-tier contracts green |
+| Context risk | Medium (~56K practical) — single session fits; grep over full reads |
 
 ---
 

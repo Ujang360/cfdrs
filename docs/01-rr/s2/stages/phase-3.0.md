@@ -6,6 +6,7 @@
 | Scope | Shared types, error taxonomy, trait interfaces |
 | Entry condition | S2 exit gate passed (phase 2.10) |
 | Exit condition | All 6 Must-tier contracts green |
+| Context risk | Low (~40K practical) — single session per crate |
 
 ---
 

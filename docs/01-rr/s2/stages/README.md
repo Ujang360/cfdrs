@@ -105,23 +105,162 @@ lifecycle and gate criteria.
 
 ## Per-Stage Summary
 
-| Stage | Scope | Crates | Must | Should | Skip | Fuzz | Total | Phase doc |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 3.0 | Foundation | 3 | 6 | 0 | 0 | 0 | 6 | [phase-3.0](phase-3.0.md) |
-| 3.1 | Independent crates | 7 | 6 | 46 | 11 | 1 | 64 | [phase-3.1](phase-3.1.md) |
-| 3.2 | Control plane | 1 | 10 | 0 | 0 | 0 | 10 | [phase-3.2](phase-3.2.md) |
-| 3.3 | Transport | 2 | 30 | 8 | 6 | 0 | 44 | [phase-3.3](phase-3.3.md) |
-| 3.4 | Sessions | 1 | 52 | 11 | 0 | 6 | 69 | [phase-3.4](phase-3.4.md) |
-| 3.5 | Config runtime + supervisor | 2 | 1 | 19 | 0 | 0 | 20 | [phase-3.5](phase-3.5.md) |
-| 3.6 | Ingress proxy | 1 | 37 | 26 | 0 | 1 | 64 | [phase-3.6](phase-3.6.md) |
-| 3.7 | Management + diagnostics | 2 | 6 | 32 | 1 | 0 | 39 | [phase-3.7](phase-3.7.md) |
-| 3.8 | Application + CLI | 5 | 9 | 2 | 0 | 0 | 11 | [phase-3.8](phase-3.8.md) |
-| 3.9 | Platform integration | 1 | 0 | 0 | 0 | 0 | 0 | [phase-3.9](phase-3.9.md) |
-| **Total** | | **25** | **157** | **144** | **18** | **8** | **327** | |
+| Stage | Scope | Crates | Must | Should | Skip | Fuzz | Total | Context | Phase doc |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 3.0 | Foundation | 3 | 6 | 0 | 0 | 0 | 6 | Low | [phase-3.0](phase-3.0.md) |
+| 3.1 | Independent crates | 7 | 6 | 46 | 11 | 1 | 64 | Medium | [phase-3.1](phase-3.1.md) |
+| 3.2 | Control plane | 1 | 10 | 0 | 0 | 0 | 10 | Medium | [phase-3.2](phase-3.2.md) |
+| 3.3 | Transport | 2 | 30 | 8 | 6 | 0 | 44 | High | [phase-3.3](phase-3.3.md) |
+| 3.4 | Sessions | 1 | 52 | 11 | 0 | 6 | 69 | Critical | [phase-3.4](phase-3.4.md) |
+| 3.5 | Config runtime + supervisor | 2 | 1 | 19 | 0 | 0 | 20 | High | [phase-3.5](phase-3.5.md) |
+| 3.6 | Ingress proxy | 1 | 37 | 26 | 0 | 1 | 64 | Critical | [phase-3.6](phase-3.6.md) |
+| 3.7 | Management + diagnostics | 2 | 6 | 32 | 1 | 0 | 39 | High | [phase-3.7](phase-3.7.md) |
+| 3.8 | Application + CLI | 5 | 9 | 2 | 0 | 0 | 11 | Critical | [phase-3.8](phase-3.8.md) |
+| 3.9 | Platform integration | 1 | 0 | 0 | 0 | 0 | 0 | Low | [phase-3.9](phase-3.9.md) |
+| **Total** | | **25** | **157** | **144** | **18** | **8** | **327** | | |
 
 **Note:** `common-sys` (the 26th crate) is consumed transitively by
 stages 3.3, 3.4, and 3.7 but has no standalone parity contracts — its
 safe API surface is verified through its consumer crates.
+
+---
+
+## Context Budget Estimates
+
+AI agent context windows are a hard constraint. Every session
+accumulates tokens from: doc reads, parity TOMLs, source code,
+compiler feedback, conversation history, and tool output overhead.
+Empirically the practical session footprint runs **8–10× the static
+content minimum** once tool round-trips and conversation growth are
+included.
+
+### Agent usable budgets
+
+| Agent class | Context window | Usable budget |
+| --- | --- | --- |
+| Standard (Copilot) | ~128K tokens | ~80K tokens |
+| Extended (Claude Code, Codex) | ~200K tokens | ~120K tokens |
+
+### Risk tiers (against 80K binding constraint)
+
+| Tier | Practical load | Headroom (80K) | Action |
+| --- | --- | --- | --- |
+| Low | ≤40K | >50% | Single session per crate |
+| Medium | 40–80K | 0–50% | Plan → breakdown before entry |
+| High | 80–120K | Exceeds 80K | Sub-stage split mandatory; Extended agent recommended |
+| Critical | >120K | Exceeds both | Sub-stage split mandatory; pre-built API summaries |
+
+### Per-stage estimates
+
+Static content minimum includes: phase doc, referenced ADRs,
+relevant invariants and risks, parity TOML contracts (~150 tokens
+per contract), and upstream crate API surface reads. The practical
+column applies the ×8 calibration factor.
+
+| Stage | Static min | Practical (×8) | Tier (80K) | Tier (120K) | Sub-stages |
+| --- | --- | --- | --- | --- | --- |
+| 3.0 | ~5K | ~40K | Low | Low | — |
+| 3.1 | ~8K | ~64K | Medium | Low | 5 |
+| 3.2 | ~7K | ~56K | Medium | Low | — |
+| 3.3 | ~14K | ~112K | High | Medium | 2 |
+| 3.4 | ~21K | ~168K | Critical | Critical | 3 |
+| 3.5 | ~13K | ~104K | High | Medium | 2 |
+| 3.6 | ~20K | ~160K | Critical | Critical | 3 |
+| 3.7 | ~12K | ~96K | High | Medium | 2 |
+| 3.8 | ~24K | ~192K | Critical | Critical | 3 |
+| 3.9 | ~6K | ~48K | Low | Low | — |
+
+### Stage entry protocol
+
+Every stage follows the same entry sequence:
+
+1. **Plan** — Read the phase doc, referenced ADRs, and relevant
+   invariants. Confirm the session fits the agent's usable budget.
+2. **Breakdown** — For Medium+ stages, split into sub-stages along
+   contract domain boundaries. Each sub-stage must fit within the
+   agent's usable budget as a standalone session.
+3. **Execute** — One sub-stage per session. Carry forward only the
+   sub-stage's parity contracts and the crate's public API surface
+   from prior sub-stages. Do not reload the full phase doc.
+
+### Sub-stage recommendations
+
+Stages at Medium or above should be broken down before entry.
+These breakdowns are recommendations — the cook may adjust based
+on actual session measurements.
+
+#### Stage 3.1 — Independent crates (Medium, 5 sub-stages)
+
+| Sub-stage | Crates | Contracts | Domain |
+| --- | --- | --- | --- |
+| 3.1a | common-signal | 2 Must | Lifecycle signals |
+| 3.1b | common-retry | 6 Should | Backoff semantics |
+| 3.1c | common-observability, tunnel-metrics | 13 Should, 1 Fuzz | Metrics + tracing |
+| 3.1d | common-cfapi, common-token | 2 Must, 25 Should, 11 Skip | Credentials + API |
+| 3.1e | config-core | 2 Must | Config parsing |
+
+Sequencing: 3.1a first (dependency), then 3.1b–3.1e in parallel.
+
+#### Stage 3.3 — Transport (High, 2 sub-stages)
+
+| Sub-stage | Crates | Contracts | Domain |
+| --- | --- | --- | --- |
+| 3.3a | common-sys, tunnel-transport | 13 Must, 3 Should, 6 Skip | QUIC + edge discovery |
+| 3.3b | tunnel-connection | 17 Must, 5 Should | Connection lifecycle |
+
+Sequencing: strictly sequential (3.3b depends on 3.3a).
+
+#### Stage 3.4 — Sessions (Critical, 3 sub-stages)
+
+| Sub-stage | Scope | Contracts | Domain |
+| --- | --- | --- | --- |
+| 3.4a | Datagram encode/decode, muxer registration | ~20 Must | Wire format + muxer |
+| 3.4b | Session manager event loop, serve semantics | ~22 Must | State machine |
+| 3.4c | Migration, pipes, close, fuzz | ~10 Must, 6 Fuzz | Lifecycle edges |
+
+Sequencing: 3.4a → 3.4b → 3.4c (state machine depends on wire
+format; migration depends on state machine).
+
+#### Stage 3.5 — Config runtime + supervisor (High, 2 sub-stages)
+
+| Sub-stage | Crates | Contracts | Domain |
+| --- | --- | --- | --- |
+| 3.5a | config-runtime | 17 Should | Orchestrator + config authority |
+| 3.5b | tunnel-supervisor | 1 Must, 2 Should | HA supervisor + protocol fallback |
+
+Sequencing: parallel (no mutual dependency).
+
+#### Stage 3.6 — Ingress proxy (Critical, 3 sub-stages)
+
+| Sub-stage | Scope | Contracts | Domain |
+| --- | --- | --- | --- |
+| 3.6a | Ingress rules, origin taxonomy, validation | ~10 Must | Parsing + auth |
+| 3.6b | HTTP/WS/TCP proxy dispatch, SOCKS5 | ~21 Must, 1 Fuzz | Protocol dispatch |
+| 3.6c | WebSocket carrier, error mapping | ~6 Must | Carrier + errors |
+
+Sequencing: 3.6a → 3.6b → 3.6c (dispatch depends on rule
+matching; carrier depends on dispatch).
+
+#### Stage 3.7 — Management + diagnostics (High, 2 sub-stages)
+
+| Sub-stage | Crates | Contracts | Domain |
+| --- | --- | --- | --- |
+| 3.7a | tunnel-management | 6 Must, 21 Should | Management HTTP + WebSocket |
+| 3.7b | host-diagnostic | 11 Should, 1 Skip | System diagnostics |
+
+Sequencing: parallel (no mutual dependency).
+
+#### Stage 3.8 — Application + CLI (Critical, 3 sub-stages)
+
+| Sub-stage | Crates | Contracts | Domain |
+| --- | --- | --- | --- |
+| 3.8a | operator-cli-common, operator-cli-native | 6 Must, 2 Should | CLI command tree |
+| 3.8b | operator-cli-compat, operator-cli | — | Feature-flag diamond |
+| 3.8c | app | 3 Must | Binary assembly + startup DAG |
+
+Sequencing: 3.8a → 3.8b → 3.8c. For 3.8c, pre-build an API
+surface summary from stages 3.0–3.7 before entering the session
+to avoid re-reading all upstream crates.
 
 ---
 

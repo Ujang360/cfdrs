@@ -6,6 +6,7 @@
 | Scope | Standalone crates with no tunnel behavioral dependencies |
 | Entry condition | Stage 3.0 exit gate passed (6/6 Must green) |
 | Exit condition | All 6 Must-tier contracts green |
+| Context risk | Medium (~64K practical) — plan → breakdown into 5 sub-stages before entry |
 
 ---
 

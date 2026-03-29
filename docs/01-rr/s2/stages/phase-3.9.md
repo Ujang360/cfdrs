@@ -6,6 +6,7 @@
 | Scope | Systemd service lifecycle, FIPS build variant |
 | Entry condition | Stage 3.8 exit gate passed (9/9 Must green) |
 | Exit condition | Platform-specific integration tests pass |
+| Context risk | Low (~48K practical) — single session |
 
 ---
 
