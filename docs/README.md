@@ -6,7 +6,7 @@ baseline-pinned to tag `2026.3.0`.
 ## Project Lifecycle
 
 ```text
-RR  Rust Rewrite          ← active, S1/RAW closed
+RR  Rust Rewrite          ← active, S2/SUBSTRATE phase 2.7
 FC  Feature Complete      ← TBD
 UM  Upstream Maintenance  ← TBD
 ```
@@ -18,7 +18,7 @@ documentation stratum set. The repo is designed to outlive all three.
 
 | # | Code | Name | Status |
 | --- | ------ | ------ | -------- |
-| 1 | [RR](01-rr/README.md) | Rust Rewrite | Active — S2/SUBSTRATE in progress |
+| 1 | [RR](01-rr/README.md) | Rust Rewrite | Active — S2/SUBSTRATE phase 2.7 |
 | 2 | [FC](02-fc/README.md) | Feature Complete | TBD |
 | 3 | [UM](03-um/README.md) | Upstream Maintenance | TBD |
 
@@ -32,9 +32,9 @@ RR ─────────────────────────�
 │   47 hub atoms · 8 Jaccard clusters · tests oracle
 │   └── exit gate: PASSED
 │
-├── S2/SUBSTRATE    🔨 ACTIVE
-│   ✅ Dependencies · Scope · Risks · ADRs · Invariants
-│   Architecture · Parity harness · Stages · Environment · Coherency
+├── S2/SUBSTRATE    🔨 ACTIVE (phase 2.7)
+│   ✅ Dependencies · Scope · Risks · ADRs · Invariants · Architecture
+│   ← Parity harness · Stages · Environment · Coherency
 │   └── exit gate: full traceability chain
 │
 ├── S3/COOK         ○ NOT STARTED

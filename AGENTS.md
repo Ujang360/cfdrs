@@ -9,7 +9,7 @@ This repository follows a four-stratum program lifecycle:
 
 ```text
 S1/RAW       CLOSED    docs/01-rr/s1/    — Go behavior baseline
-S2/SUBSTRATE ACTIVE    docs/01-rr/s2/    — Rust-aware design
+S2/SUBSTRATE ACTIVE    docs/01-rr/s2/    — Rust-aware design (phase 2.7)
 S3/COOK      PENDING   codebase          — Implementation
 S4/SERVING   PENDING   docs/01-rr/s4/    — Verification
 ```

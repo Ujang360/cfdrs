@@ -6,7 +6,7 @@
 | Phase | 01-RR / S2 - SUBSTRATE |
 | S2.6 status | Closed |
 | Consumes | [scope](scope.md), [dependency-decisions](dependency-decisions.md), [adr/](adr/README.md), [invariants](invariants.md), [risks](risks.md) |
-| Produces | Crate boundary map, dependency graph, worker group ownership model, ADR-011 resolution |
+| Produces | Crate boundary map, dependency graph, worker group ownership model, ADR-011 resolution. Inputs to S2.7 parity harness and S2.8 stages plan |
 
 This document fixes the crate boundary decisions for cfdrs. Every S3
 implementation session targets exactly one crate. Every crate maps to
