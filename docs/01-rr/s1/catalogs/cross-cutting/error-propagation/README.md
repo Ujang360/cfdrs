@@ -7,6 +7,8 @@
 
 ## Scope
 
+This catalog spans **both the proxy data and transport control planes** from the error-propagation perspective — see [proxy-data-taxonomy](../../../proxy-data-taxonomy.md). Connection-layer errors (registration failure, protocol fallback, reconnect) are transport control; proxy-layer errors (origin unreachable, stream timeout, flow rate limit) are proxy data; supervisor errors are transport control; management errors are out-of-band. Error classification is a cross-cutting lens.
+
 This catalog records how errors are defined, classified, propagated, absorbed, and recovered throughout the cloudflared codebase. Go's pervasive `if err != nil` pattern hides implicit decision trees where the _same_ error value may be retried, swallowed, logged, reclassified, or escalated depending on context. This catalog makes those implicit trees explicit.
 
 - Direct evidence: error type definitions, sentinel errors, type-switch classification sites, panic recovery, error absorption points, and error wrapping/context additions.
@@ -73,7 +75,7 @@ flowchart TB
 Defined in [connection/errors.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/connection/errors.go) — [atoms/connection/errors](../../../atoms/connection/errors.md).
 
 | Type | Classification | Unwrap | Purpose |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `DupConnRegisterTunnelError` | Retriable (address rotation) | No | Already connected to this server; try another address. Value type (not pointer). Sentinel: `errDuplicationConnection`. |
 | `EdgeQuicDialError` | Fatal in `serveConnection`, retriable in `startFirstTunnel` | Yes (`Cause`) | QUIC dial failure wrapping the underlying `quic.Transport` or TLS error. |
 | `ServerRegisterTunnelError` | Conditional (`Permanent` field) | No | Registration rejection from edge. `Permanent` flag determines retry eligibility. Factory: `serverRegistrationErrorFromRPC(err)`. |
@@ -86,7 +88,7 @@ Defined in [connection/errors.go](https://github.com/cloudflare/cloudflared/blob
 Defined in [supervisor/tunnel.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/supervisor/tunnel.go) — [atoms/supervisor/tunnel](../../../atoms/supervisor/tunnel.md).
 
 | Type | Classification | Unwrap | Purpose |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `ConnectivityError` | Conditional (`reachedMaxRetries`) | No | Created by `ipAddrFallback.ShouldGetNewAddress()` when network-level errors exhaust retries. `HasReachedMaxRetries()` determines protocol fallback. |
 | `unrecoverableError` | Fatal (permanent) | No | Wraps errors that must not be retried. `serveTunnel` returns `recoverable = !permanent` for this type. |
 | `ReconnectSignal` | Recoverable (forced) | No | External control message forcing reconnect with optional delay (`DelayBeforeReconnect()`). Always `recoverable = true`. |
@@ -96,7 +98,7 @@ Defined in [supervisor/tunnel.go](https://github.com/cloudflare/cloudflared/blob
 Defined in [tunnelrpc/pogs/errors.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/tunnelrpc/pogs/errors.go) — [atoms/tunnelrpc/pogs/errors](../../../atoms/tunnelrpc/pogs/errors.md).
 
 | Type | Classification | Unwrap | Purpose |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `RetryableError` | Retriable (with delay) | Yes (`err`) | Wraps any error with a `Delay time.Duration` field. Factory: `RetryErrorAfter(err, delay)`. Cap'n Proto RPC `ConnectionError.RetryAfter()` maps to this. |
 | `RPCError` | Non-retriable | Yes (`err`) | Marks errors from the RPC subsystem itself (marshaling, transport) vs. remote operation failure. Factory: `wrapRPCError(err)`, `newRPCError(format, args...)`. |
 
@@ -105,7 +107,7 @@ Defined in [tunnelrpc/pogs/errors.go](https://github.com/cloudflare/cloudflared/
 Defined in [edgediscovery/edgediscovery.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/edgediscovery/edgediscovery.go) — [atoms/edgediscovery/edgediscovery](../../../atoms/edgediscovery/edgediscovery.md).
 
 | Type | Classification | Unwrap | Purpose |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `ErrNoAddressesLeft` | Conditional (static vs. dynamic edge) | No | Sentinel — address pool exhausted. `startFirstTunnel` retries only when using static edge addresses; dynamic edge returns immediately. |
 | `DialError` | Retriable (connectivity) | — | Edge TCP/UDP dial failure. Triggers address rotation + connectivity error tracking in `ipAddrFallback`. |
 
@@ -114,7 +116,7 @@ Defined in [edgediscovery/edgediscovery.go](https://github.com/cloudflare/cloudf
 Defined in [quic/v3/datagram_errors.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/quic/v3/datagram_errors.go) — [atoms/quic/v3/datagram_errors](../../../atoms/quic/v3/datagram_errors.md).
 
 | Sentinel | Purpose |
-|---|---|
+| --- | --- |
 | `ErrInvalidDatagramType` | Unexpected datagram type byte. |
 | `ErrDatagramHeaderTooSmall` | Datagram too small (< `datagramTypeLen` bytes). |
 | `ErrDatagramPayloadTooLarge` | Payload exceeds maximum datagram size. |
@@ -132,7 +134,7 @@ Wrapping helpers: `wrapMarshalErr(err)` and `wrapUnmarshalErr(err)` add context 
 ### Session-Layer Error Types
 
 | Type | Source | Purpose |
-|---|---|---|
+| --- | --- | --- |
 | `SessionCloseErr` (v3) | [quic/v3/session.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/quic/v3/session.go) — [atoms/quic/v3/session](../../../atoms/quic/v3/session.md) | Sentinel: session's `Close()` was called directly. |
 | `SessionIdleErr` (v3) | [quic/v3/session.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/quic/v3/session.go) — [atoms/quic/v3/session](../../../atoms/quic/v3/session.md) | Typed struct with `Is()` support. Idle timeout exceeded (`defaultCloseIdleAfter = 210s`). |
 | `SessionIdleErr` (v2 function) | [datagramsession/session.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/datagramsession/session.go) — [atoms/datagramsession/session](../../../atoms/datagramsession/session.md) | Factory function returning `fmt.Errorf` — no `Is()` support. Same 210s default. |
@@ -142,7 +144,7 @@ Wrapping helpers: `wrapMarshalErr(err)` and `wrapUnmarshalErr(err)` add context 
 ### CLI-Layer Error Types
 
 | Type | Source | Purpose |
-|---|---|---|
+| --- | --- | --- |
 | `usageError` | [cmd/cloudflared/cliutil/errors.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/cmd/cloudflared/cliutil/errors.go) — [atoms/cmd/cloudflared/cliutil/errors](../../../atoms/cmd/cloudflared/cliutil/errors.md) | CLI argument/flag validation errors. Factory: `UsageError(format, args...)`. |
 
 ### Management WebSocket Error Classification
@@ -150,7 +152,7 @@ Wrapping helpers: `wrapMarshalErr(err)` and `wrapUnmarshalErr(err)` add context 
 Defined in [management/events.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/management/events.go) — [atoms/management/events](../../../atoms/management/events.md).
 
 | Function | Purpose |
-|---|---|
+| --- | --- |
 | `IsClosed(err, log)` | Returns `true` if `err` is a `websocket.CloseError`; logs non-normal closures at debug level. |
 | `AsClosed(err)` | Returns `*websocket.CloseError` or `nil`. For callers that need the close code/reason. |
 

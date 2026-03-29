@@ -7,6 +7,8 @@
 
 ## Scope
 
+This catalog spans **all three planes** from the stakeholder perspective — see [proxy-data-taxonomy](../../../proxy-data-taxonomy.md). Origin services and ingress are proxy data; edge registration, protocol negotiation, and HA coordination are transport control; management dashboard, monitoring, CLI, and platform services are out-of-band. Each stakeholder section maps to one or more planes.
+
 This catalog indexes the complete feature surface of cloudflared organized by the external actors (stakeholders) that interact with a running connector instance or its CLI. Each stakeholder section documents the contracts, message flows, and behavioral atoms that govern the interaction boundary.
 
 For this catalog, *feature* means an externally observable capability or interaction contract — not the Go `features` package alone (though that package is one contract documented here).
@@ -164,7 +166,7 @@ flowchart LR
 ## Stakeholder Interaction Matrix
 
 | Stakeholder | Reads from | Writes to | Behavioral catalogs |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Operator / Human | stdout, config files, credentials | CLI commands, config files, stdin | [cli](../cli.md), [config](../config.md), [deployments](../deployments/README.md) |
 | Cloudflare Edge | Registration responses, proxied requests | Registration, config export, proxy responses | [edge-interactions](../edge-interactions.md), [tunnels](../tunnels.md), [tunnels-transport](../tunnels-transport.md) |
 | Dashboard & API | cfapi responses, management service data | cfapi requests, remote config updates | [upstream-api-contracts](../upstream-api-contracts.md), [observabilities](../observabilities.md) |

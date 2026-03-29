@@ -120,7 +120,7 @@ flowchart TD
 Determines whether QUIC should be abandoned for HTTP/2 fallback:
 
 | Error pattern | Matches | Mechanism |
-|---|---|---|
+| --- | --- | --- |
 | `*quic.IdleTimeoutError` | Yes | `errors.As` unwrap |
 | `*quic.TransportError` | Yes | `errors.As` unwrap |
 | `*net.OpError` wrapping "operation not permitted" | Yes | `errors.As` + `strings.Contains` on inner error |

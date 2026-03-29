@@ -10,6 +10,48 @@
 
 Configuration, identity, and credential handling behavior.
 
+## Struct Definitions
+
+### Forwarder
+
+Client-side listener configuration for forwarding traffic to the edge.
+Used by `cmd/cloudflared/access/carrier.go` (`StartForwarder`) and
+`cmd/cloudflared/app_forward_service.go` (`NewForwardService`).
+
+| Field | Type | JSON tag | YAML tag | Purpose |
+| --- | --- | --- | --- | --- |
+| URL | string | `url` | — | Origin URL of the Access application on the edge |
+| Listener | string | `listener` | — | Local `host:port` address to bind the forwarding listener |
+| TokenClientID | string | `service_token_id` | `serviceTokenID` | Access service-token client ID for headless auth |
+| TokenSecret | string | `secret_token_id` | `serviceTokenSecret` | Access service-token secret for headless auth |
+| Destination | string | `destination` | — | Bastion-mode jump destination header value |
+| IsFedramp | bool | `is_fedramp` | `isFedramp` | Routes token flow through FedRAMP-compliant endpoint |
+
+### Tunnel
+
+Tunnel-start configuration for a single tunnel entry.
+
+| Field | Type | JSON tag | YAML tag | Purpose |
+| --- | --- | --- | --- | --- |
+| URL | string | `url` | — | Local origin URL to proxy |
+| Origin | string | `origin` | — | Alternate origin specifier |
+| ProtocolType | string | `type` | — | Protocol selection hint |
+
+### Root
+
+Top-level service configuration; contains global settings and
+collections of `Forwarder` and `Tunnel` entries.
+
+| Field | Type | JSON tag | YAML tag | Purpose |
+| --- | --- | --- | --- | --- |
+| LogDirectory | string | `log_directory` | `logDirectory,omitempty` | Directory path for log files |
+| LogLevel | string | `log_level` | `logLevel,omitempty` | Logging verbosity level |
+| Forwarders | []Forwarder | `forwarders,omitempty` | `forwarders,omitempty` | List of access-forwarder configs |
+| Tunnels | []Tunnel | `tunnels,omitempty` | `tunnels,omitempty` | List of tunnel-start configs |
+
+Note: the `resolver` key is reserved for a removed feature (proxy-dns)
+and should not be used.
+
 ## Entry Points
 
 - (*Forwarder) Hash() string (line 36)

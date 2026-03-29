@@ -9,6 +9,7 @@
 
 - [audit-analysis](audit-analysis.md) — seven-dimension coverage analysis
 - [atom-graphs](atom-graphs.md) — behavior-group flow diagrams
+- [proxy-data-taxonomy](proxy-data-taxonomy.md) — three-plane classification (proxy data, transport control, out-of-band) applied across all 30 catalogs
 
 ## Domain Catalogs
 

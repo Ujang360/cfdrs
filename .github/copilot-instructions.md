@@ -1,12 +1,7 @@
 # Copilot Instructions
 
-These markdown rules are mandatory for documentation changes.
+Read and follow [AGENTS.md](../AGENTS.md) — it is the single source of
+truth for all agent behavior in this repository.
 
-## Markdown Rules
-
-- Always link documents in markdown with markdown links, except if the reference is self referential.
-- Always fix markdown lint problems.
-
-## Cross-Agent Alignment
-
-The same rules are shared in [AGENTS.md](../AGENTS.md) so Claude, Codex, and Copilot follow one policy.
+This file exists so GitHub Copilot auto-loads the policy on session start.
+Do not duplicate rules here; keep them in [AGENTS.md](../AGENTS.md).

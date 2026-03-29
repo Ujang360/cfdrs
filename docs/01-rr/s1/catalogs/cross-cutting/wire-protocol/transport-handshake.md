@@ -38,7 +38,7 @@ stateDiagram-v2
 ## TLS and Crypto Wire Contracts
 
 | Surface | Wire-level detail | Primary evidence |
-|---|---|---|
+| --- | --- | --- |
 | SNI server names | HTTP/2 edge: `h2.cftunnel.com`; QUIC edge: `quic.cftunnel.com`; deprecated h2mux: `cftunnel.com` (unused). | [connection/protocol](../../../atoms/connection/protocol.md) |
 | ALPN next-protos | QUIC requires `["argotunnel"]` as ALPN protocol identifier. | [connection/protocol](../../../atoms/connection/protocol.md), [connection/quic](../../../atoms/connection/quic.md) |
 | Default TLS curve | `tls.CurveP256` with Cloudflare-optimized comment; differs from Go default ordering. | [tlsconfig/tlsconfig](../../../atoms/tlsconfig/tlsconfig.md) |
@@ -75,7 +75,7 @@ flowchart TD
 ### Protocol Selector Modes
 
 | Mode | Trigger | Wire behavior |
-|---|---|---|
+| --- | --- | --- |
 | Static | Explicit `--protocol quic` or `http2` | Fixed protocol, no edge negotiation |
 | Default | `--protocol auto` with `--token` | Starts QUIC, falls back QUIC → HTTP2 on failure |
 | Remote | `--protocol auto` without `--token` | FNV-32a hash of account tag vs edge-published percentage; refreshes at 1-hour TTL |
@@ -89,7 +89,7 @@ Primary evidence: [connection/protocol](../../../atoms/connection/protocol.md), 
 ## Edge Discovery Wire Contracts
 
 | Method | Wire action | Stickiness |
-|---|---|---|
+| --- | --- | --- |
 | `ResolveEdge(region, ipVersion)` | DNS SRV lookup for edge address candidates | N/A |
 | `StaticEdge(hostnames)` | User-provided `--edge` hostnames (testing) | N/A |
 | `GetAddr(connIndex)` | Return same address for this connection index | Connection-sticky |
@@ -103,7 +103,7 @@ Primary evidence: [edgediscovery/edgediscovery](../../../atoms/edgediscovery/edg
 ## Upstream-Verified Wire Constants
 
 | Constant | Value | Source | Wire significance |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `edgeH2TLSServerName` | `h2.cftunnel.com` | [connection/protocol.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/connection/protocol.go) | HTTP/2 edge TLS SNI |
 | `edgeQUICServerName` | `quic.cftunnel.com` | [connection/protocol.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/connection/protocol.go) | QUIC edge TLS SNI |
 | QUIC ALPN | `["argotunnel"]` | [connection/protocol.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/connection/protocol.go) | Required ALPN for QUIC handshake |

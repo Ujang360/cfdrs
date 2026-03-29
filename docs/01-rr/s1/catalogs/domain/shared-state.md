@@ -7,6 +7,8 @@
 
 ## Scope
 
+This catalog spans **both the proxy data and transport control planes** from the shared-state perspective — see [proxy-data-taxonomy](../../proxy-data-taxonomy.md). Proxy data state includes `Orchestrator.proxy` (the current origin proxy) and session manager registries; transport control state includes `connectedFuse`, `tunnelsForHA`, `protocolFallback`, and `ConnTracker`; out-of-band state includes management session active flags. The catalog is a cross-cutting concurrency lens.
+
 This catalog is the dedicated concurrency and parallelism view of the baseline. It focuses on shared mutable state, synchronization primitives, channel-driven coordination, and goroutine lifecycle orchestration.
 
 For this catalog, shared-state behavior includes:
@@ -53,7 +55,7 @@ flowchart LR
 ## Primitive Taxonomy
 
 | Primitive family | Typical role | Representative atoms |
-|---|---|---|
+| --- | --- | --- |
 | Mutex and map guards | Protect shared maps/counters for active sessions, tunnel indexes, and dedup or limiter state. | [tunnelstate/conntracker](../../atoms/tunnelstate/conntracker.md), [quic/v3/manager](../../atoms/quic/v3/manager.md), [supervisor/tunnelsforha](../../atoms/supervisor/tunnelsforha.md), [flow/limiter](../../atoms/flow/limiter.md) |
 | Channels and select loops | Coordinate reconnect, shutdown, event fan-in, and producer or consumer pipelines. | [supervisor/supervisor](../../atoms/supervisor/supervisor.md), [supervisor/tunnel](../../atoms/supervisor/tunnel.md), [management/service](../../atoms/management/service.md), [quic/v3/muxer](../../atoms/quic/v3/muxer.md) |
 | One-shot synchronization | Latch first-success/terminal state transitions and wake waiters deterministically. | [supervisor/fuse](../../atoms/supervisor/fuse.md), [supervisor/tunnel](../../atoms/supervisor/tunnel.md) |
@@ -63,18 +65,18 @@ flowchart LR
 
 ## Shared-State Controller Inventory
 
-| Controller object | Shared state under control | Concurrency contract |
-|---|---|---|
-| `Supervisor` | `tunnelErrors`, `tunnelsConnecting`, per-index fallback state | Manages multi-connection worker fanout with channel fan-in and selective retry scheduling. |
-| `EdgeTunnelServer` | reconnect and shutdown channels, edge address state, tracker references | Runs protocol handlers concurrently, reconciles reconnect signals, and classifies recoverable failures. |
-| `protocolFallback` | current protocol, retry counter, fallback flag | Wraps backoff progression and protocol transition safety between retries. |
-| `booleanFuse` and `connectedFuse` | one-shot connection success state | Guarantees single-write latch semantics and deterministic wake-up of waiting goroutines. |
-| `sessionManager` (`quic/v3`) | request-id keyed session map | Synchronizes register/get/unregister operations over shared session registry. |
-| `datagramConn` (`quic/v3`) | read/write loops + session and ICMP queues | Serves datagrams in parallel loops while coordinating registration and payload handlers. |
-| `session` (`management`) | active flag and buffered stream channel | Applies atomic active-state checks with select-based non-blocking insertion semantics. |
-| `ConnTracker` | active connection index and protocol history map | Maintains observer-driven connection state safely for concurrent reads/writes. |
-| `flowLimiter` | active flow count and dynamic limit | Enforces bounded concurrency with synchronized acquire/release operations. |
-| `Orchestrator` | current proxy reference and versioned config snapshots | Coordinates update, swap, and deferred close behavior across runtime readers. |
+| Controller object | Plane | Shared state under control | Concurrency contract |
+| --- | --- | --- | --- |
+| `Supervisor` | transport-control | `tunnelErrors`, `tunnelsConnecting`, per-index fallback state | Manages multi-connection worker fanout with channel fan-in and selective retry scheduling. |
+| `EdgeTunnelServer` | transport-control | reconnect and shutdown channels, edge address state, tracker references | Runs protocol handlers concurrently, reconciles reconnect signals, and classifies recoverable failures. |
+| `protocolFallback` | transport-control | current protocol, retry counter, fallback flag | Wraps backoff progression and protocol transition safety between retries. |
+| `booleanFuse` and `connectedFuse` | transport-control | one-shot connection success state | Guarantees single-write latch semantics and deterministic wake-up of waiting goroutines. |
+| `sessionManager` (`quic/v3`) | proxy-data | request-id keyed session map | Synchronizes register/get/unregister operations over shared session registry. |
+| `datagramConn` (`quic/v3`) | proxy-data | read/write loops + session and ICMP queues | Serves datagrams in parallel loops while coordinating registration and payload handlers. |
+| `session` (`management`) | out-of-band | active flag and buffered stream channel | Applies atomic active-state checks with select-based non-blocking insertion semantics. |
+| `ConnTracker` | transport-control | active connection index and protocol history map | Maintains observer-driven connection state safely for concurrent reads/writes. |
+| `flowLimiter` | proxy-data | active flow count and dynamic limit | Enforces bounded concurrency with synchronized acquire/release operations. |
+| `Orchestrator` | mixed | current proxy reference and versioned config snapshots | Coordinates update, swap, and deferred close behavior across runtime readers. |
 
 ## Parallel Worker Lifecycle
 
@@ -119,7 +121,7 @@ flowchart TD
 ```
 
 | Surface | Synchronization semantics |
-|---|---|
+| --- | --- |
 | `stream/PipeBidirectional` | Coordinates two uni-directional copy loops with shared status and second-leg timeout bound. |
 | `datagramsession/Session.Serve` | Runs transport and destination copy loops with close-condition wait and idle timer gates. |
 | `management/service` websocket loop | Splits event-read and log-stream loops while enforcing stream start/session-limit gates. |
@@ -129,7 +131,7 @@ flowchart TD
 ## Concurrency Risk Matrix
 
 | Risk pattern | Mitigation pattern in baseline |
-|---|---|
+| --- | --- |
 | Lost reconnect signal during shutdown races | `select` over reconnect, graceful shutdown, and context done in listener loops. |
 | Duplicate session registration races | Explicit already-registered / migration / rate-limited handling in v3 datagram session manager and mux paths. |
 | Retry storms and synchronized reconnect spikes | backoff with max retry limits and grace periods (`retry/backoffhandler`). |
@@ -140,7 +142,7 @@ flowchart TD
 ## Module Coverage Density
 
 | Module | Concurrency-focused atom count |
-|---|---:|
+| --- | ---: |
 | cmd | 6 |
 | connection | 7 |
 | quic | 5 |
@@ -214,7 +216,7 @@ flowchart TD
 The `Signal` type in [signal/safe_signal.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/signal/safe_signal.go) is a one-shot event primitive (33 lines, stable since 2018):
 
 | Method | Semantics |
-|---|---|
+| --- | --- |
 | `New(ch chan struct{})` | Wraps an existing channel with `sync.Once` guard |
 | `Notify()` | Closes the channel via `sync.Once.Do`; subsequent calls are no-ops |
 | `Wait()` | Returns the underlying channel for `select` usage |

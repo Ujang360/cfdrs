@@ -7,6 +7,8 @@
 
 ## Scope
 
+This catalog spans **both the proxy data and transport control planes** from the configuration perspective — see [proxy-data-taxonomy](../../proxy-data-taxonomy.md). Proxy data config includes ingress rules, WARP routing, and origin timeouts; transport control config includes protocol selection, edge addresses, and retry parameters; out-of-band config includes management service settings and diagnostic configuration.
+
 This catalog documents cloudflared configuration behavior end-to-end: where configuration comes from, how precedence is applied, when values are refreshed, and how updates propagate to runtime components.
 
 For this catalog, config behavior includes:
@@ -81,7 +83,7 @@ sequenceDiagram
 ## Cadence Matrix
 
 | Config source | Trigger model | Cadence contract | Merge or precedence behavior | Evidence |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | Default directories and file discovery | startup path resolution | one-shot per process command invocation | used when explicit config path is absent; finds first available default file | [config/configuration](../../atoms/config/configuration.md) |
 | Config file read and strict warning pass | startup or config path change | lazy load with source-file memoization; rereads when `--config` changes | settings become CLI input source via altsrc; unknown-field warnings surfaced separately | [config/configuration](../../atoms/config/configuration.md), [cmd/cloudflared/cliutil/handler](../../atoms/cmd/cloudflared/cliutil/handler.md) |
 | CLI flags and args | operator invocation | one-shot per command execution | can override file-derived values depending on urfave/altsrc precedence for each command context | [cmd/cloudflared/main](../../atoms/cmd/cloudflared/main.md), [cmd/cloudflared/cliutil/handler](../../atoms/cmd/cloudflared/cliutil/handler.md), [cmd/cloudflared/tunnel/configuration](../../atoms/cmd/cloudflared/tunnel/configuration.md) |
@@ -95,7 +97,7 @@ sequenceDiagram
 ## Domain Map
 
 | Domain | Description | Representative atoms |
-|---|---|---|
+| --- | --- | --- |
 | Base config model and decoding | Root config structures, duration serialization semantics, config file search, and URL or socket validation contracts. | [config/configuration](../../atoms/config/configuration.md), [config/model](../../atoms/config/model.md), [validation/validation](../../atoms/validation/validation.md) |
 | CLI config ingestion and shaping | Root app wrappers, config-file-to-flag binding, warning propagation, and tunnel command config assembly. | [cmd/cloudflared/main](../../atoms/cmd/cloudflared/main.md), [cmd/cloudflared/cliutil/handler](../../atoms/cmd/cloudflared/cliutil/handler.md), [cmd/cloudflared/flags/flags](../../atoms/cmd/cloudflared/flags/flags.md), [cmd/cloudflared/tunnel/configuration](../../atoms/cmd/cloudflared/tunnel/configuration.md) |
 | Credential and cert-backed config | Cert path resolution, cert decode, and user/API client config materialization. | [credentials/origin_cert](../../atoms/credentials/origin_cert.md), [credentials/credentials](../../atoms/credentials/credentials.md), [cmd/cloudflared/tunnel/credential_finder](../../atoms/cmd/cloudflared/tunnel/credential_finder.md), [cmd/cloudflared/tunnel/filesystem](../../atoms/cmd/cloudflared/tunnel/filesystem.md) |
@@ -107,7 +109,7 @@ sequenceDiagram
 ## Precedence and Merge Contracts
 
 | Surface | Contracted behavior |
-|---|---|
+| --- | --- |
 | File-read memoization | Repeated `ReadConfigFile` calls return cached configuration if source path is unchanged; path changes force reread and re-parse. |
 | Config-file-to-flag adaptation | Parsed settings are applied to CLI context through `altsrc.ApplyInputSource`, allowing command actions to read normalized flag values. |
 | Unknown-field warning lane | A strict YAML pass (`KnownFields(true)`) is used for warning generation while preserving broad compatibility in the primary parse pass. |
@@ -160,7 +162,7 @@ _Cross-referenced against [config/configuration.go](https://github.com/cloudflar
 ### File Discovery Constants
 
 | Constant | Value | Source |
-|---|---|---|
+| --- | --- | --- |
 | `DefaultConfigFiles` | `["config.yml", "config.yaml"]` | [config/configuration.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/config/configuration.go) |
 | `DefaultUnixConfigLocation` | `"/usr/local/etc/cloudflared"` | [config/configuration.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/config/configuration.go) |
 | `DefaultUnixLogLocation` | `"/var/log/cloudflared"` | [config/configuration.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/config/configuration.go) |
@@ -198,7 +200,7 @@ This catalog shares 8 atoms with [const-and-env](const-and-env.md) ($J = 0.23$),
 ### Shared Atom Inventory
 
 | Shared atom | Config perspective | Const-and-env perspective |
-|---|---|---|
+| --- | --- | --- |
 | [cmd/cloudflared/flags/flags](../../atoms/cmd/cloudflared/flags/flags.md) | Flag definitions consumed during CLI config ingestion | Stable flag-key constants that define the operator-facing contract |
 | [cmd/cloudflared/main](../../atoms/cmd/cloudflared/main.md) | Root app wrapper that initializes config-file-to-flag binding | Entry point registering flag-key constant namespaces |
 | [cmd/cloudflared/tunnel/configuration](../../atoms/cmd/cloudflared/tunnel/configuration.md) | Tunnel command config assembly and merge logic | Tunnel CLI flag defaults and env-var bindings (TUNNEL_URL, etc.) |
@@ -210,7 +212,7 @@ This catalog shares 8 atoms with [const-and-env](const-and-env.md) ($J = 0.23$),
 
 ### Boundary Scoping
 
-The config catalog owns the *lifecycle* — how configuration values are discovered, parsed, merged, watched, and propagated to runtime components. The const-and-env catalog owns the *vocabulary* — the stable symbolic names (flag keys, env vars, header constants, timeout values) that configuration surfaces reference. When porting to Rust, this boundary matters: config lifecycle maps to builder/loader patterns and async watch loops, while const-and-env maps to `const` blocks and compile-time definitions. Atoms exclusive to config (credential discovery, watcher/notify, config/manager, orchestration/config, validation, RPC config transport) handle runtime config plumbing. Atoms exclusive to const-and-env (protocol constants, header constants, QUIC constants, diagnostic constants, token paths, metrics config) define the fixed values that config plumbing delivers.
+The config catalog owns the *lifecycle* — how configuration values are discovered, parsed, merged, watched, and propagated to runtime components. The const-and-env catalog owns the *vocabulary* — the stable symbolic names (flag keys, env vars, header constants, timeout values) that configuration surfaces reference. This boundary is behavioral: config atoms involve goroutines, channels, and watchers that react to change at runtime, while const-and-env atoms are fixed values resolved at startup or compile time. Atoms exclusive to config (credential discovery, watcher/notify, config/manager, orchestration/config, validation, RPC config transport) handle runtime config plumbing. Atoms exclusive to const-and-env (protocol constants, header constants, QUIC constants, diagnostic constants, token paths, metrics config) define the fixed values that config plumbing delivers.
 
 ## Notes
 

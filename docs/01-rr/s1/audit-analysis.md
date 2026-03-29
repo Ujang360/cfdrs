@@ -37,7 +37,7 @@ $$G = \frac{\sum_{i=1}^{n} \sum_{j=1}^{n} |x_i - x_j|}{2 n \sum_{i=1}^{n} x_i}$$
 ### Thresholds
 
 | Metric | Threshold | Purpose |
-|---|---|---|
+| --- | --- | --- |
 | Depth floor | $\geq 45$ | Minimum depth for all non-test catalogs |
 | Depth ceiling | $\leq 150$ | Maximum depth (excl. tests aggregate) |
 | Overlap alarm | $J \geq 0.25$ | Edge drawn in overlap graph |
@@ -56,7 +56,7 @@ $$G = \frac{\sum_{i=1}^{n} \sum_{j=1}^{n} |x_i - x_j|}{2 n \sum_{i=1}^{n} x_i}$$
 ## 1) Coverage Depth
 
 | Catalog | Atoms | H2 | H3 | Mermaid | Lines | Depth |
-|---|---:|---:|---:|---:|---:|---:|
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
 | [catalogs/cross-cutting/porting-friction](catalogs/cross-cutting/porting-friction/README.md) | 79 | 44 | 110 | 5 | 1406 | 245.0 |
 | [catalogs/cross-cutting/features](catalogs/cross-cutting/features/README.md) | 127 | 16 | 34 | 4 | 614 | 135.5 |
 | [catalogs/cross-cutting/wire-protocol](catalogs/cross-cutting/wire-protocol/README.md) | 76 | 20 | 33 | 5 | 725 | 118.5 |
@@ -93,7 +93,7 @@ $$G = \frac{\sum_{i=1}^{n} \sum_{j=1}^{n} |x_i - x_j|}{2 n \sum_{i=1}^{n} x_i}$$
 ### Depth Tier Classification
 
 | Tier | Depth range | Catalogs |
-|---|---|---|
+| --- | --- | --- |
 | **Broad synthesis** | $\geq 60$ | features, wire-protocol, porting-friction, concurrency, tunnels, error-propagation, deployments, init-teardown, proxying, edge-interactions |
 | **Upper-mid** | 45–59 | shared-state, upstream-api-contracts, platform-substrates, cli, host-interactions, state-machines, observabilities, tunnels-transport, metrics, platforms, capnp-rpc, ingress, sessions, access-policies, overwatch, const-and-env, config, crypto, supervisor |
 | **Mid** | 35–44 | *(none — all catalogs meet the upper-mid floor)* |
@@ -194,7 +194,7 @@ graph LR
 Eight natural catalog clusters emerge from the overlap graph:
 
 | Cluster | Catalogs | Binding pattern |
-|---|---|---|
+| --- | --- | --- |
 | **Tunnel core** | tunnels, proxying, tunnels-transport | Post-overlap-pruning Jaccard ($J = 0.36$ at the center, down from $J = 0.65$). 26 proxy-implementation atoms pruned from tunnels and 14 tunnel-control atoms pruned from proxying. Transport layer splits out at $J = 0.29$–$0.31$. |
 | **Control plane** | capnp-rpc, edge-interactions, upstream-api-contracts | RPC schema and edge discovery bind these; capnp-rpc ↔ edge-interactions $J = 0.34$. |
 | **Concurrency/lifecycle** | shared-state, state-machines, sessions, concurrency, init-teardown | Concurrency ↔ init-teardown $J = 0.41$; concurrency ↔ state-machines $J = 0.35$; concurrency ↔ shared-state $J = 0.34$. Init-teardown binds to shared-state ($J = 0.32$) and state-machines ($J = 0.27$). Sessions ↔ state-machines $J = 0.33$. |
@@ -230,7 +230,7 @@ Unevenness is computed on per-catalog unique atom-link counts across 30 catalogs
 ### Distribution Statistics
 
 | Statistic | Value |
-|---|---:|
+| --- | ---: |
 | Min | 5 |
 | $Q1$ | 24.0 |
 | Median ($Q2$) | 37 |
@@ -247,11 +247,11 @@ Unevenness is computed on per-catalog unique atom-link counts across 30 catalogs
 - The mean (45.1) exceeds the median (37), confirming a right-skewed distribution driven by the high-breadth catalogs (features, tunnels, tests, proxying, porting-friction, wire-protocol, edge-interactions).
 - Most catalogs (16 of 29) sit in the 24–59 atom range, forming a core band of balanced specialization.
 - [catalogs/cross-cutting/features](catalogs/cross-cutting/features/README.md) is now the sole broadest catalog at 127 atoms. [catalogs/domain/tunnels](catalogs/domain/tunnels.md) dropped from 127 to 101 atoms after the rebalancing pass pruned proxy-implementation atoms to [catalogs/domain/proxying](catalogs/domain/proxying.md).
-- [catalogs/cross-cutting/error-propagation](catalogs/cross-cutting/error-propagation/README.md) enters at 52 atoms — above the mean (40.5) — adding no new distribution-distorting outlier. All 52 atoms were already covered by other catalogs.
-- [catalogs/cross-cutting/concurrency](catalogs/cross-cutting/concurrency/README.md) enters at 45 atoms — above the median (32.5) — reinforcing the upper core band without distortion. All 45 atoms were already covered by other catalogs.
+- [catalogs/cross-cutting/error-propagation](catalogs/cross-cutting/error-propagation/README.md) enters at 52 atoms — above the mean (45.1) — adding no new distribution-distorting outlier. All 52 atoms were already covered by other catalogs.
+- [catalogs/cross-cutting/concurrency](catalogs/cross-cutting/concurrency/README.md) enters at 45 atoms — above the median (37) — reinforcing the upper core band without distortion. All 45 atoms were already covered by other catalogs.
 - [catalogs/cross-cutting/init-teardown](catalogs/cross-cutting/init-teardown/README.md) enters at 45 atoms — identical to concurrency and above the mean — with zero impact on the distribution shape. All 45 atoms were already covered by other catalogs.
-- [catalogs/cross-cutting/porting-friction](catalogs/cross-cutting/porting-friction/README.md) enters at 79 atoms — well above the mean (40.5) but below the two broad-coverage outliers. All 79 atoms were already covered by other catalogs.
-- [catalogs/domain/deployments](catalogs/domain/deployments/README.md) enters at 33 atoms — near the median (32.5) — reinforcing the distribution center. All 33 atoms were already covered by other catalogs. Its addition slightly lowers the Gini coefficient (0.35 → 0.34), confirming a mild centralizing effect.
+- [catalogs/cross-cutting/porting-friction](catalogs/cross-cutting/porting-friction/README.md) enters at 79 atoms — well above the mean (45.1) but below the two broad-coverage outliers. All 79 atoms were already covered by other catalogs.
+- [catalogs/domain/deployments](catalogs/domain/deployments/README.md) enters at 33 atoms — below the median (37) — reinforcing the distribution center. All 33 atoms were already covered by other catalogs. Its addition slightly lowers the Gini coefficient (0.35 → 0.34), confirming a mild centralizing effect.
 - [catalogs/cross-cutting/features](catalogs/cross-cutting/features/README.md) enters at 127 atoms — now the sole broadest catalog after the rebalancing pass reduced [catalogs/domain/tunnels](catalogs/domain/tunnels.md) from 127 to 101 atoms. All 127 atoms were already covered by domain catalogs. Its addition raises the Gini coefficient slightly (0.34 → 0.35), reflecting the reinforcement of the high-breadth tail.
 - [catalogs/cross-cutting/wire-protocol](catalogs/cross-cutting/wire-protocol/README.md) enters at 76 atoms — above the mean (45.1) and above the median (37). All 76 atoms were already covered by other catalogs. Its addition has negligible impact on the Gini coefficient, confirming the mid-band placement does not distort the distribution.- [catalogs/cross-cutting/platform-substrates](catalogs/cross-cutting/platform-substrates.md) enters at 37 atoms — at the median (37) — reinforcing the distribution center with zero impact on the shape. All 37 atoms were already covered by other catalogs. Its addition slightly lowers the Gini coefficient (0.3515 → 0.3464), confirming a mild centralizing effect.- Outliers at the low end (overwatch: 5, supervisor: 8) are deliberate — these catalogs earn their depth through structure (H2 sections and Mermaid diagrams) rather than broad atom linkage.
 
@@ -260,7 +260,7 @@ Unevenness is computed on per-catalog unique atom-link counts across 30 catalogs
 All 241 atom docs are now covered. The [catalogs/cross-cutting/tests](catalogs/cross-cutting/tests.md) catalog covers the 3 previously uncovered test/mock atoms:
 
 | Atom | Covered by |
-|---|---|
+| --- | --- |
 | [atoms/internal/test/wstest](atoms/internal/test/wstest.md) | [catalogs/cross-cutting/tests](catalogs/cross-cutting/tests.md) |
 | [atoms/mocks/mock_limiter](atoms/mocks/mock_limiter.md) | [catalogs/cross-cutting/tests](catalogs/cross-cutting/tests.md) |
 | [atoms/mocks/mockgen](atoms/mocks/mockgen.md) | [catalogs/cross-cutting/tests](catalogs/cross-cutting/tests.md) |
@@ -270,7 +270,7 @@ All 241 atom docs are now covered. The [catalogs/cross-cutting/tests](catalogs/c
 Each atom may appear in one or more catalogs. The membership distribution reveals whether catalogs redundantly cover the same atoms or specialize effectively.
 
 | Membership (catalogs) | Atom count | Share |
-|---:|---:|---:|
+| ---: | ---: | ---: |
 | 1 | 8 | 3.3% |
 | 2 | 18 | 7.5% |
 | 3 | 31 | 12.9% |
@@ -299,7 +299,7 @@ Each atom may appear in one or more catalogs. The membership distribution reveal
 The most cross-referenced atoms act as integration hubs across the catalog set. These are the implementation files that naturally bind multiple domains.
 
 | Atom | Catalogs | Role |
-|---|---:|---|
+| --- | ---: | --- |
 | [atoms/cmd/cloudflared/tunnel/configuration](atoms/cmd/cloudflared/tunnel/configuration.md) | 14 | Central tunnel configuration dispatch |
 | [atoms/connection/control](atoms/connection/control.md) | 14 | RPC control stream multiplexer |
 | [atoms/cmd/cloudflared/tunnel/cmd](atoms/cmd/cloudflared/tunnel/cmd.md) | 13 | Primary tunnel CLI command |
@@ -361,7 +361,7 @@ The most cross-referenced atoms act as integration hubs across the catalog set. 
 All 30 catalogs share a consistent structural skeleton:
 
 | Structural element | Catalogs with element | Conformance |
-|---|---:|---|
+| --- | ---: | --- |
 | `## Scope` section | 29 / 30 | 96.7% |
 | `## Notes` section | 25 / 30 | 83.3% |
 | `## Coverage Audit` section | 28 / 30 | 93.3% |
@@ -382,7 +382,7 @@ All 30 catalogs share a consistent structural skeleton:
 Density measures atom coverage efficiency: unique atoms per 100 lines of catalog text.
 
 | Tier | Density range | Catalogs |
-|---|---|---|
+| --- | --- | --- |
 | **High density** | $\geq 40$ atoms/100 lines | _(none after rebalancing)_ |
 | **Medium density** | 20–39 | proxying (35.6), tunnels (31.6), edge-interactions (28.0), host-interactions (24.4), shared-state (22.3), features (21.0) |
 | **Low density** | 10–19 | cli (18.1), metrics (17.7), tunnels-transport (17.7), capnp-rpc (16.3), observabilities (13.7), platforms (13.5), crypto (13.4), porting-friction (12.2), access-policies (10.6), config (10.7), wire-protocol (10.5) |
@@ -403,6 +403,42 @@ Density measures atom coverage efficiency: unique atoms per 100 lines of catalog
 - [catalogs/domain/deployments](catalogs/domain/deployments/README.md) enters the structure-heavy tier at 4.9 atoms per 100 lines. Its 677 lines — the second-longest catalog after concurrency — are dominated by 33 H3 subsections, 5 Mermaid lifecycle diagrams, platform-specific filesystem layout tables, and detailed operational contract analysis. The low density reflects the catalog's emphasis on deployment lifecycle narration over raw atom enumeration.
 - Medium-density catalogs (6 of 30) form the mid-band, confirming balanced prose-to-reference ratios for domain-focused catalogs with moderate breadth. [catalogs/cross-cutting/features](catalogs/cross-cutting/features/README.md) enters the medium-density tier at 21.0 atoms per 100 lines. Its 614 lines are balanced between 34 H3 subsections, 4 Mermaid diagrams, per-stakeholder contract tables, and 127 atom references — producing a density consistent with its analytical (rather than enumerative) intent.
 - [catalogs/cross-cutting/wire-protocol](catalogs/cross-cutting/wire-protocol/README.md) enters the low-density tier at 10.5 atoms per 100 lines. Its 725 lines — the second-longest cross-cutting catalog after concurrency (686) — are dominated by 33 H3 subsections, 5 Mermaid state-machine and architecture diagrams, ASCII-art datagram frame layouts, and extensive wire-constant tables. The low density reflects the catalog's emphasis on precise byte-level framing documentation and state-machine narration rather than atom enumeration.
+
+## 8) Proxy Data Classification
+
+See [proxy-data-taxonomy](proxy-data-taxonomy.md) for the full classification framework.
+
+All 30 catalogs have been annotated with a three-plane classification: **proxy data**, **transport control**, and **out-of-band**. The 47 hub atoms (membership ≥ 8) are classified in the taxonomy's Hub Atom Classification Index.
+
+### Catalog Distribution by Primary Plane
+
+| Primary plane | Count | Catalogs |
+| --- | --- | --- |
+| proxy-data | 3 | proxying, ingress, sessions |
+| transport-control | 2 | supervisor, crypto |
+| out-of-band | 8 | upstream-api-contracts, cli, overwatch, access-policies, platforms, platform-substrates, deployments, host-interactions |
+| mixed (spans multiple) | 17 | tunnels, tunnels-transport, capnp-rpc, edge-interactions, wire-protocol, state-machines, config, const-and-env, metrics, observabilities, shared-state, concurrency, error-propagation, init-teardown, porting-friction, features, tests |
+
+Note: The tests catalog's 4 sub-files map to: tests-sessions-packets (proxy-data), tests-transport (transport-control), tests-infrastructure (out-of-band), tests-proxy-ingress (mixed).
+
+### Jaccard Cluster Reinterpretation
+
+The 8 natural Jaccard clusters from the coverage graph map to the proxy-data taxonomy:
+
+| Cluster | Primary plane |
+| --- | --- |
+| Tunnel core | mixed (transport control + proxy data) |
+| Control plane | transport-control |
+| Concurrency/lifecycle | mixed (cross-cutting lens) |
+| Host/platform/deployment | out-of-band |
+| Error-propagation | mixed (cross-cutting lens) |
+| Wire-format layer | mixed (transport control + proxy data) |
+| Stakeholder contracts | mixed (all three planes) |
+| Independent atoms | varies per atom |
+
+### Key Insight
+
+The proxy-data classification reveals that the majority of cloudflared's behavioral complexity lives at the **boundary between transport control and proxy data** — particularly in the tunnel core, wire-protocol, and RPC clusters. In the Go codebase, the same connection objects (`QUICConnection`, `HTTP2Connection`) carry both transport state machine goroutines and proxy data dispatch goroutines, making this boundary implicit rather than explicit.
 
 ## Upstream Verification Summary
 

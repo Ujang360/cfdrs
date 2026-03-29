@@ -6,6 +6,8 @@
 
 ## Scope
 
+This catalog spans **all three planes** from the metrics perspective — see [proxy-data-taxonomy](../../proxy-data-taxonomy.md). Request/stream metrics are proxy data instrumentation; connection/registration/protocol metrics are transport control instrumentation; management and diagnostic endpoints are out-of-band.
+
 This catalog records metrics instrumentation behavior represented in the baseline atom corpus.
 
 - Direct evidence: behavior atoms that expose `metrics emission`, import Prometheus packages, or belong to the dedicated metrics module.
@@ -14,7 +16,7 @@ This catalog records metrics instrumentation behavior represented in the baselin
 ## Metrics Surfaces
 
 | Surface | Description | Representative atoms |
-|---|---|---|
+| --- | --- | --- |
 | Runtime metrics endpoints | Metrics server wiring and readiness state for scrape surfaces. | [metrics/metrics](../../atoms/metrics/metrics.md), [metrics/readiness](../../atoms/metrics/readiness.md), [management/service](../../atoms/management/service.md) |
 | Transport and tunnel telemetry | Connection, QUIC, datagram, and supervisor metrics counters and gauges. | [connection/metrics](../../atoms/connection/metrics.md), [quic/metrics](../../atoms/quic/metrics.md), [quic/v3/metrics](../../atoms/quic/v3/metrics.md), [supervisor/metrics](../../atoms/supervisor/metrics.md), [datagramsession/metrics](../../atoms/datagramsession/metrics.md) |
 | Flow and ingress telemetry | Flow limiter and ingress-specific metrics families. | [flow/metrics](../../atoms/flow/metrics.md), [ingress/icmp_metrics](../../atoms/ingress/icmp_metrics.md), [ingress/origins/metrics](../../atoms/ingress/origins/metrics.md) |
@@ -67,7 +69,7 @@ _Cross-referenced against [metrics/metrics.go](https://github.com/cloudflare/clo
 ### Metrics Server Constants
 
 | Constant | Value | Source |
-|---|---|---|
+| --- | --- | --- |
 | `startupTime` | 500 ms | [metrics/metrics.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/metrics/metrics.go) |
 | `defaultShutdownTimeout` | 15 s | [metrics/metrics.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/metrics/metrics.go) |
 | HTTP `ReadTimeout` | 10 s | [metrics/metrics.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/metrics/metrics.go) |
@@ -127,7 +129,7 @@ Cloudflared uses two distinct patterns for Prometheus metric registration across
 Most metrics-bearing packages register Prometheus collectors in Go `init()` functions or package-level `var` blocks:
 
 | Package | Registration pattern | Metric types |
-|---|---|---|
+| --- | --- | --- |
 | `supervisor/metrics` | `var` block with `prometheus.NewGaugeVec` | `haConnections` gauge |
 | `connection/metrics` | `var` block with counters and histograms | Connection attempt/success counters, latency histograms |
 | `quic/v3/metrics` | `var` block with `prometheus.NewCounterVec` | Session open/close/error counters |
@@ -140,7 +142,7 @@ Most metrics-bearing packages register Prometheus collectors in Go `init()` func
 The metrics server itself and management endpoints register handlers at server construction time rather than package init:
 
 | Surface | Registration timing | Handler |
-|---|---|---|
+| --- | --- | --- |
 | `/metrics` | Server construction in `ServeMetrics` | `promhttp.Handler()` |
 | `/healthcheck` | Server construction | Static 200 OK |
 | `/ready` | Server construction | `ReadyServer` tracker |
@@ -175,7 +177,7 @@ flowchart TD
 ### Namespace and Subsystem Organization
 
 | Namespace | Subsystem | Example metrics |
-|---|---|---|
+| --- | --- | --- |
 | `cloudflared` | `connection` | `cloudflared_connection_register_success_total` |
 | `cloudflared` | `quic` | `cloudflared_quic_session_total` |
 | `cloudflared` | `supervisor` | `cloudflared_supervisor_ha_connections` |

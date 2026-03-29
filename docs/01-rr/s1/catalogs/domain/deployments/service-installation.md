@@ -47,7 +47,7 @@ Detection: `isSystemd()` checks for `/run/systemd/system` directory existence.
 ### Systemd Path
 
 | Unit file | Path | Purpose |
-|---|---|---|
+| --- | --- | --- |
 | `cloudflared.service` | `/etc/systemd/system/cloudflared.service` | Main daemon unit |
 | `cloudflared-update.service` | `/etc/systemd/system/cloudflared-update.service` | One-shot update unit |
 | `cloudflared-update.timer` | `/etc/systemd/system/cloudflared-update.timer` | Daily update trigger (`OnCalendar=daily`) |
@@ -67,7 +67,7 @@ Exit code `11` = successful update (triggers restart). Exit code `10` = update f
 ### SysV Path
 
 | Artifact | Path | Permissions |
-|---|---|---|
+| --- | --- | --- |
 | Init script | `/etc/init.d/cloudflared` | `0755` |
 | Runlevel start links | `/etc/rc{2,3,4,5}.d/S50et` | Symlinks to init script |
 | Runlevel stop links | `/etc/rc{0,1,6}.d/K02et` | Symlinks to init script |
@@ -92,7 +92,7 @@ When installing via config file mode (not token mode), the installer validates:
 The launchd identifier is `com.cloudflare.cloudflared`.
 
 | Context | Plist path | Log stdout | Log stderr |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Root (daemon) | `/Library/LaunchDaemons/com.cloudflare.cloudflared.plist` | `/Library/Logs/com.cloudflare.cloudflared.out.log` | `/Library/Logs/com.cloudflare.cloudflared.err.log` |
 | User (agent) | `~/Library/LaunchAgents/com.cloudflare.cloudflared.plist` | `~/Library/Logs/com.cloudflare.cloudflared.out.log` | `~/Library/Logs/com.cloudflare.cloudflared.err.log` |
 
@@ -109,7 +109,7 @@ macOS service evidence: [cmd/cloudflared/macos_service](../../../atoms/cmd/cloud
 ## Windows Service Installation
 
 | Property | Value |
-|---|---|
+| --- | --- |
 | Service name | `Cloudflared` |
 | Display name | `Cloudflared agent` |
 | Start type | `StartAutomatic` |

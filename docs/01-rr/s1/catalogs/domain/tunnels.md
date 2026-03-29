@@ -7,7 +7,9 @@
 
 ## Scope
 
-This catalog documents tunnel behavior as a dedicated surface across control plane, data plane, lifecycle orchestration, and protocol contracts.
+This catalog covers **both the proxy data and transport control planes** — see [proxy-data-taxonomy](../../proxy-data-taxonomy.md).
+
+This catalog documents tunnel behavior as a dedicated surface across transport control, proxy data, lifecycle orchestration, and protocol contracts.
 
 For this catalog, tunnel behavior includes:
 
@@ -75,20 +77,28 @@ sequenceDiagram
 
 ## Domain Map
 
+### Transport Control Domains
+
 | Domain | Description | Representative atoms |
-|---|---|---|
+| --- | --- | --- |
 | Control-plane API | Tunnel CRUD, token acquisition, active-client and cleanup APIs. | [cfapi/tunnel](../../atoms/cfapi/tunnel.md), [cfapi/tunnel_filter](../../atoms/cfapi/tunnel_filter.md), [cmd/cloudflared/management/cmd](../../atoms/cmd/cloudflared/management/cmd.md) |
 | Runtime supervision | Multi-connection startup, reconnect loops, protocol fallback, and graceful stop. | [supervisor/supervisor](../../atoms/supervisor/supervisor.md), [supervisor/tunnel](../../atoms/supervisor/tunnel.md), [retry/backoffhandler](../../atoms/retry/backoffhandler.md) |
 | HA and identity | HA index coordination and tunnel ID observability. | [connection/tunnelsforha](../../atoms/connection/tunnelsforha.md), [supervisor/tunnelsforha](../../atoms/supervisor/tunnelsforha.md) |
-| Transport and streams | HTTP2/QUIC and datagram/session transports carrying tunnel traffic. | [connection/http2](../../atoms/connection/http2.md), [connection/quic](../../atoms/connection/quic.md), [quic/v3/session](../../atoms/quic/v3/session.md), [datagramsession/session](../../atoms/datagramsession/session.md) |
-| RPC protocol | Registration/session/configuration RPC contracts and Cap'n Proto schema. | [tunnelrpc/registration_client](../../atoms/tunnelrpc/registration_client.md), [tunnelrpc/quic/protocol](../../atoms/tunnelrpc/quic/protocol.md), [tunnelrpc/proto/tunnelrpc.capnp](../../atoms/tunnelrpc/proto/tunnelrpc.capnp) |
-| Ingress over tunnel | Rule matching and origin dispatch as tunnel entry points; detailed proxy implementation in [proxying](proxying.md). | [ingress/ingress](../../atoms/ingress/ingress.md), [ingress/rule](../../atoms/ingress/rule.md), [ingress/origin_proxy](../../atoms/ingress/origin_proxy.md) |
+| RPC protocol — transport control | Registration, configuration, and graceful-shutdown RPC contracts. | [tunnelrpc/registration_client](../../atoms/tunnelrpc/registration_client.md), [tunnelrpc/quic/protocol](../../atoms/tunnelrpc/quic/protocol.md), [tunnelrpc/proto/tunnelrpc.capnp](../../atoms/tunnelrpc/proto/tunnelrpc.capnp) |
 | Quick tunnel mode | Anonymous quick provisioning and constrained runtime shaping. | [cmd/cloudflared/tunnel/quick_tunnel](../../atoms/cmd/cloudflared/tunnel/quick_tunnel.md) |
+
+### Proxy Data Domains
+
+| Domain | Description | Representative atoms |
+| --- | --- | --- |
+| Transport and streams | HTTP2/QUIC and datagram/session transports carrying proxy data. | [connection/http2](../../atoms/connection/http2.md), [connection/quic](../../atoms/connection/quic.md), [quic/v3/session](../../atoms/quic/v3/session.md), [datagramsession/session](../../atoms/datagramsession/session.md) |
+| RPC protocol — proxy data | Session registration RPCs (`RegisterUdpSession`/`UnregisterUdpSession`) that establish proxy data channels. | [tunnelrpc/quic/session_client](../../atoms/tunnelrpc/quic/session_client.md), [tunnelrpc/quic/session_server](../../atoms/tunnelrpc/quic/session_server.md), [tunnelrpc/pogs/session_manager](../../atoms/tunnelrpc/pogs/session_manager.md) |
+| Ingress over tunnel | Rule matching and origin dispatch as tunnel entry points; detailed proxy implementation in [proxying](proxying.md). | [ingress/ingress](../../atoms/ingress/ingress.md), [ingress/rule](../../atoms/ingress/rule.md), [ingress/origin_proxy](../../atoms/ingress/origin_proxy.md) |
 
 ## Control-Plane Tunnel API Contracts
 
 | Operation | Method | Endpoint | Request semantics | Response semantics |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | Create tunnel | `POST` | `/accounts/{account_tag}/cfd_tunnel` | body includes `name` and `tunnel_secret`; name cannot be UUID string | returns `TunnelWithToken`; `409` indicates tunnel-name conflict |
 | Get tunnel | `GET` | `/accounts/{account_tag}/cfd_tunnel/{tunnel_id}` | UUID path parameter | returns `Tunnel` |
 | Get tunnel token | `GET` | `/accounts/{account_tag}/cfd_tunnel/{tunnel_id}/token` | UUID path parameter | returns token string in envelope `result` |
@@ -103,7 +113,7 @@ Primary evidence: [cfapi/tunnel](../../atoms/cfapi/tunnel.md), [cfapi/tunnel_fil
 ## Runtime Lifecycle Contracts
 
 | Stage | Contract |
-|---|---|
+| --- | --- |
 | Bootstrap | `StartServer` composes config, initializes supervisors, and starts tunnel runtime with signal-handled shutdown coordination. |
 | Supervisor init | `NewSupervisor` and `Run` orchestrate concurrent tunnel workers, connection state, and reconnect channels. |
 | Daemon loop | `StartTunnelDaemon` and `EdgeTunnelServer.Serve` run connection attempts with protocol fallback and edge-address refresh logic. |
@@ -115,7 +125,7 @@ Primary evidence: [cmd/cloudflared/tunnel/cmd](../../atoms/cmd/cloudflared/tunne
 ## Transport and Protocol Selection Contracts
 
 | Surface | Contracted behavior |
-|---|---|
+| --- | --- |
 | Protocol selector | `NewProtocolSelector(protocolFlag, accountTag, tunnelTokenProvided, needPQ, ...)` resolves static/default/remote protocol selection paths. |
 | PQ forcing path | When `needPQ` is true, selection path forces QUIC-oriented behavior instead of HTTP2 fallback-first behavior. |
 | QUIC and HTTP2 serving | Runtime has explicit `serveQUIC` and `serveHTTP2` handlers with shared control-stream wiring and error classification. |
@@ -126,10 +136,10 @@ Primary evidence: [connection/protocol](../../atoms/connection/protocol.md), [co
 ## Tunnel RPC Schema and Stream Contracts
 
 | RPC surface | Contracted behavior |
-|---|---|
-| Registration RPC | `registerConnection(auth, tunnelId, connIndex, options)` establishes per-connection edge binding and returns either connection details or structured connection error (with retry signals). |
-| Configuration RPC | `updateLocalConfiguration(config)` provides remote config update channel to active tunnel runtime. |
-| Session RPC | `registerUdpSession` and `unregisterUdpSession` manage UDP session lifecycle over control streams. |
+| --- | --- |
+| Registration RPC | `registerConnection(auth, tunnelId, connIndex, options)` establishes per-connection edge binding and returns either connection details or structured connection error (with retry signals). [transport-control] |
+| Configuration RPC | `updateLocalConfiguration(config)` provides remote config update channel to active tunnel runtime. [transport-control] |
+| Session RPC | `registerUdpSession` and `unregisterUdpSession` manage UDP session lifecycle over control streams. [proxy-data] |
 | Schema evolution | `tunnelrpc.capnp` retains deprecated legacy registration/authentication structures for protocol compatibility while exposing current `RegistrationServer`, `SessionManager`, and `ConfigurationManager` contracts. |
 | Connection metadata | `ConnectionOptions` includes client identity, origin local IP, replace-existing behavior, compression quality, and previous-attempt counters. |
 
@@ -138,7 +148,7 @@ Primary evidence: [tunnelrpc/registration_client](../../atoms/tunnelrpc/registra
 ## HA and Post-Quantum Contracts
 
 | Surface | Contracted behavior |
-|---|---|
+| --- | --- |
 | HA identity tracking | Tunnel IDs keyed by HA connection index are tracked with synchronization and metrics hooks for runtime observability. |
 | PQ curve preference | `curvePreference(pqMode, fipsEnabled, currentCurve)` maps strict/prefer modes to explicit hybrid PQ curve lists with FIPS-aware behavior. |
 | Non-FIPS PQ mode | Non-FIPS strict/prefer uses `X25519MLKEM768` (`CurveID 0x11ec`). |
@@ -149,7 +159,7 @@ Primary evidence: [supervisor/tunnelsforha](../../atoms/supervisor/tunnelsforha.
 ## Quick Tunnel Contracts
 
 | Contract area | Details |
-|---|---|
+| --- | --- |
 | Provisioning request | `POST {quick-service}/tunnel` with `Content-Type: application/json` and explicit `User-Agent`. |
 | Response schema | Expects JSON envelope with `success`, `result`, `errors`; `result` includes `id`, `name`, `hostname`, `account_tag`, `secret`. |
 | Runtime shaping | Parsed quick tunnel credentials are converted into `connection.Credentials`, protocol defaults to `quic` when unset, and HA connections are forced to `1`. |
@@ -160,7 +170,7 @@ Primary evidence: [cmd/cloudflared/tunnel/quick_tunnel](../../atoms/cmd/cloudfla
 ## Ingress and Origin Routing Over Tunnel
 
 | Surface | Tunnel-related contract |
-|---|---|
+| --- | --- |
 | Rule resolution | Ingress rules define how incoming edge traffic is mapped to local origin services and protocols. |
 | Origin dispatch | Origin proxy module forwards requests over active tunnel transport; detailed origin service contracts in [proxying](proxying.md). |
 
@@ -173,7 +183,7 @@ _Cross-referenced against [cmd/cloudflared/tunnel/cmd.go](https://github.com/clo
 ### Tunnel Runtime Default Constants
 
 | Constant | Value | Source |
-|---|---|---|
+| --- | --- | --- |
 | HA connections | `4` | [cmd/cloudflared/tunnel/cmd.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/cmd/cloudflared/tunnel/cmd.go) |
 | Retries | `5` | [cmd/cloudflared/tunnel/cmd.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/cmd/cloudflared/tunnel/cmd.go) |
 | Max edge addr retries | `8` | [cmd/cloudflared/tunnel/cmd.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/cmd/cloudflared/tunnel/cmd.go) |

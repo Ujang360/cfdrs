@@ -74,7 +74,7 @@ Only fires when _all four conditions_ hold: `EdgeQuicDialError` → `quic.Transp
 Several sites have documented panic _paths_ without recovery:
 
 | Location | Panic Trigger | Recovery | Evidence |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | [connection/header.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/connection/header.go) `mustInitRespMetaHeader()` | Malformed response metadata | None (caught by serveTunnel) | [atoms/connection/header](../../../atoms/connection/header.md) |
 | [connection/http2.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/connection/http2.go) header state | Improper header state | None (caught by serveTunnel) | [atoms/connection/http2](../../../atoms/connection/http2.md) |
 | [connection/header.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/connection/header.go) `DeserializeHeaders()` | Malformed input | None (caught by serveTunnel) | [atoms/connection/header](../../../atoms/connection/header.md) |
@@ -88,7 +88,7 @@ Error absorption occurs where errors are logged or handled locally but _not_ pro
 ### Transport Layer Absorption
 
 | Site | Absorbed Error | Mechanism | Evidence |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `stream.unidirectionalStream` | Copy errors (`io.EOF`, connection close) | Logged at debug; `status.markUniStreamDone()` | [atoms/stream/stream](../../../atoms/stream/stream.md) |
 | `datagramsession.Session.dstToTransport` | Non-close errors from `sendFunc` | Logged with variable severity; continue loop unless `closeSession = true` | [atoms/datagramsession/session](../../../atoms/datagramsession/session.md) |
 | `datagramsession.Session.transportToDst` | Write errors to `dstConn` | Logged via `s.log.Err(err)` but still returns the error | [atoms/datagramsession/session](../../../atoms/datagramsession/session.md) |
@@ -100,7 +100,7 @@ Error absorption occurs where errors are logged or handled locally but _not_ pro
 ### Application Layer Absorption
 
 | Site | Absorbed Error | Mechanism | Evidence |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `proxy.applyIngressMiddleware` | Middleware filter results | When `result.ShouldFilterRequest`, writes status code, returns error as _handled_ (`return nil` at caller) | [atoms/proxy/proxy](../../../atoms/proxy/proxy.md) |
 | `proxy.ProxyHTTP` (middleware filter path) | Filtered errors | `logRequestError` + `return nil` — caller sees success | [atoms/proxy/proxy](../../../atoms/proxy/proxy.md) |
 | `logger.fallbackLogger` | Logger creation failure | Absorbed with fallback to default logger | [atoms/logger/create](../../../atoms/logger/create.md) |
@@ -112,7 +112,7 @@ Error absorption occurs where errors are logged or handled locally but _not_ pro
 ### Error Absorption Variance for Rust Port
 
 | Go Pattern | Rust Concern |
-|---|---|
+| --- | --- |
 | `log + continue` in loops | Must replicate: `tracing::warn!` + `continue` |
 | `_ = expr` ignoring close errors | Explicit `let _ = ...;` required for clarity |
 | `select { default: }` drop | Use `try_send().ok()` on bounded channels |
@@ -126,7 +126,7 @@ Error absorption occurs where errors are logged or handled locally but _not_ pro
 The codebase uses `github.com/pkg/errors` (not `fmt.Errorf %w`) as the primary wrapping library. Key wrapping sites:
 
 | Call Pattern | Purpose | Representative Files |
-|---|---|---|
+| --- | --- | --- |
 | `errors.Wrap(err, "context")` | Add context string to error chain | [proxy/proxy.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/proxy/proxy.go), [carrier/carrier.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/carrier/carrier.go), [stream/stream.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/stream/stream.go) |
 | `errors.Wrapf(err, "format %s", arg)` | Add formatted context | `serveTunnel` panic recovery |
 | `errors.New("msg")` | Create sentinel-like errors | Various |
@@ -136,7 +136,7 @@ The codebase uses `github.com/pkg/errors` (not `fmt.Errorf %w`) as the primary w
 ### Datagram-Specific Wrapping
 
 | Wrapper | Source | Purpose |
-|---|---|---|
+| --- | --- | --- |
 | `wrapMarshalErr(err)` | [quic/v3/datagram_errors.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/quic/v3/datagram_errors.go) | Adds "datagram marshal error:" prefix via `fmt.Errorf("%w")` |
 | `wrapUnmarshalErr(err)` | [quic/v3/datagram_errors.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/quic/v3/datagram_errors.go) | Adds "datagram unmarshal error:" prefix via `fmt.Errorf("%w")` |
 

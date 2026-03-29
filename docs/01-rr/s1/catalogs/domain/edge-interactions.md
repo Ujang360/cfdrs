@@ -7,6 +7,8 @@
 
 ## Scope
 
+This catalog covers **both the proxy data and transport control planes** at the edge interaction boundary — see [proxy-data-taxonomy](../../proxy-data-taxonomy.md). Edge discovery and connection registration are transport control; the actual request/response flow after connection establishment carries proxy data. Management interactions are out-of-band.
+
 This catalog documents cloudflared edge-facing interaction behavior across discovery, transport negotiation, registration and control streams, management streams, and edge API integration points.
 
 For this catalog, edge interactions include:
@@ -93,20 +95,20 @@ stateDiagram-v2
 
 ## Domain Map
 
-| Domain | Description | Representative atoms |
-|---|---|---|
-| Edge API and control-plane REST | REST contracts for tunnel and teamnet resources used to coordinate edge behavior. | [cfapi/base_client](../../atoms/cfapi/base_client.md), [cfapi/tunnel](../../atoms/cfapi/tunnel.md), [cfapi/ip_route](../../atoms/cfapi/ip_route.md), [cfapi/virtual_network](../../atoms/cfapi/virtual_network.md), [cfapi/hostname](../../atoms/cfapi/hostname.md) |
-| Discovery and address rotation | Region and address resolution, edge address pools, and connectivity-error-aware address reuse paths. | [edgediscovery/edgediscovery](../../atoms/edgediscovery/edgediscovery.md), [edgediscovery/allregions/discovery](../../atoms/edgediscovery/allregions/discovery.md), [edgediscovery/dial](../../atoms/edgediscovery/dial.md), [edgediscovery/protocol](../../atoms/edgediscovery/protocol.md) |
-| Protocol negotiation and transport setup | Protocol selection, fallback semantics, and HTTP2/QUIC edge transport setup. | [connection/protocol](../../atoms/connection/protocol.md), [connection/http2](../../atoms/connection/http2.md), [connection/quic](../../atoms/connection/quic.md), [connection/quic_connection](../../atoms/connection/quic_connection.md) |
-| Registration and control streams | Register/unregister, graceful shutdown, and control-stream synchronization to edge. | [connection/control](../../atoms/connection/control.md), [tunnelrpc/registration_client](../../atoms/tunnelrpc/registration_client.md), [tunnelrpc/registration_server](../../atoms/tunnelrpc/registration_server.md), [tunnelrpc/pogs/registration_server](../../atoms/tunnelrpc/pogs/registration_server.md) |
-| Stream RPC protocols | tunnelrpc request/session/configuration stream contracts over QUIC/capnp. | [tunnelrpc/quic/protocol](../../atoms/tunnelrpc/quic/protocol.md), [tunnelrpc/quic/request_client_stream](../../atoms/tunnelrpc/quic/request_client_stream.md), [tunnelrpc/quic/request_server_stream](../../atoms/tunnelrpc/quic/request_server_stream.md), [tunnelrpc/quic/session_client](../../atoms/tunnelrpc/quic/session_client.md), [tunnelrpc/quic/session_server](../../atoms/tunnelrpc/quic/session_server.md), [tunnelrpc/pogs/configuration_manager](../../atoms/tunnelrpc/pogs/configuration_manager.md), [tunnelrpc/proto/tunnelrpc.capnp](../../atoms/tunnelrpc/proto/tunnelrpc.capnp) |
-| Management-edge stream interactions | Edge or dashboard initiated host-details and logs stream interfaces with auth and lifecycle bounds. | [management/service](../../atoms/management/service.md), [management/events](../../atoms/management/events.md), [management/session](../../atoms/management/session.md), [management/middleware](../../atoms/management/middleware.md), [management/token](../../atoms/management/token.md), [cmd/cloudflared/tail/cmd](../../atoms/cmd/cloudflared/tail/cmd.md) |
-| CLI adapters to edge surfaces | CLI command families that shape edge interactions for tunnel runtime and management workflows. | [cmd/cloudflared/tunnel/cmd](../../atoms/cmd/cloudflared/tunnel/cmd.md), [cmd/cloudflared/tunnel/subcommands](../../atoms/cmd/cloudflared/tunnel/subcommands.md), [cmd/cloudflared/management/cmd](../../atoms/cmd/cloudflared/management/cmd.md), [cmd/cloudflared/access/cmd](../../atoms/cmd/cloudflared/access/cmd.md), [cmd/cloudflared/tunnel/quick_tunnel](../../atoms/cmd/cloudflared/tunnel/quick_tunnel.md) |
+| Domain | Plane | Description | Representative atoms |
+| --- | --- | --- | --- |
+| Edge API and control-plane REST | out-of-band | REST contracts for tunnel and teamnet resources used to coordinate edge behavior. | [cfapi/base_client](../../atoms/cfapi/base_client.md), [cfapi/tunnel](../../atoms/cfapi/tunnel.md), [cfapi/ip_route](../../atoms/cfapi/ip_route.md), [cfapi/virtual_network](../../atoms/cfapi/virtual_network.md), [cfapi/hostname](../../atoms/cfapi/hostname.md) |
+| Discovery and address rotation | out-of-band | Region and address resolution, edge address pools, and connectivity-error-aware address reuse paths. | [edgediscovery/edgediscovery](../../atoms/edgediscovery/edgediscovery.md), [edgediscovery/allregions/discovery](../../atoms/edgediscovery/allregions/discovery.md), [edgediscovery/dial](../../atoms/edgediscovery/dial.md), [edgediscovery/protocol](../../atoms/edgediscovery/protocol.md) |
+| Protocol negotiation and transport setup | transport-control | Protocol selection, fallback semantics, and HTTP2/QUIC edge transport setup. | [connection/protocol](../../atoms/connection/protocol.md), [connection/http2](../../atoms/connection/http2.md), [connection/quic](../../atoms/connection/quic.md), [connection/quic_connection](../../atoms/connection/quic_connection.md) |
+| Registration and control streams | transport-control | Register/unregister, graceful shutdown, and control-stream synchronization to edge. | [connection/control](../../atoms/connection/control.md), [tunnelrpc/registration_client](../../atoms/tunnelrpc/registration_client.md), [tunnelrpc/registration_server](../../atoms/tunnelrpc/registration_server.md), [tunnelrpc/pogs/registration_server](../../atoms/tunnelrpc/pogs/registration_server.md) |
+| Stream RPC protocols | mixed | tunnelrpc request/session/configuration stream contracts over QUIC/capnp. | [tunnelrpc/quic/protocol](../../atoms/tunnelrpc/quic/protocol.md), [tunnelrpc/quic/request_client_stream](../../atoms/tunnelrpc/quic/request_client_stream.md), [tunnelrpc/quic/request_server_stream](../../atoms/tunnelrpc/quic/request_server_stream.md), [tunnelrpc/quic/session_client](../../atoms/tunnelrpc/quic/session_client.md), [tunnelrpc/quic/session_server](../../atoms/tunnelrpc/quic/session_server.md), [tunnelrpc/pogs/configuration_manager](../../atoms/tunnelrpc/pogs/configuration_manager.md), [tunnelrpc/proto/tunnelrpc.capnp](../../atoms/tunnelrpc/proto/tunnelrpc.capnp) |
+| Management-edge stream interactions | out-of-band | Edge or dashboard initiated host-details and logs stream interfaces with auth and lifecycle bounds. | [management/service](../../atoms/management/service.md), [management/events](../../atoms/management/events.md), [management/session](../../atoms/management/session.md), [management/middleware](../../atoms/management/middleware.md), [management/token](../../atoms/management/token.md), [cmd/cloudflared/tail/cmd](../../atoms/cmd/cloudflared/tail/cmd.md) |
+| CLI adapters to edge surfaces | out-of-band | CLI command families that shape edge interactions for tunnel runtime and management workflows. | [cmd/cloudflared/tunnel/cmd](../../atoms/cmd/cloudflared/tunnel/cmd.md), [cmd/cloudflared/tunnel/subcommands](../../atoms/cmd/cloudflared/tunnel/subcommands.md), [cmd/cloudflared/management/cmd](../../atoms/cmd/cloudflared/management/cmd.md), [cmd/cloudflared/access/cmd](../../atoms/cmd/cloudflared/access/cmd.md), [cmd/cloudflared/tunnel/quick_tunnel](../../atoms/cmd/cloudflared/tunnel/quick_tunnel.md) |
 
 ## Edge Behavior Contracts
 
 | Surface | Contracted behavior |
-|---|---|
+| --- | --- |
 | Discovery pool resolution | Address and region discovery returns candidate edge addresses and supports error-aware alternate address selection paths. |
 | Protocol selection evolution | Auto protocol mode can use fetched percentages and TTL-based refresh windows; fallback semantics govern downgrade on protocol-specific failures. |
 | Registration lifecycle | Registration RPC exchanges tunnel auth/options and yields either connection details or typed failure/retry paths. |
@@ -203,7 +205,7 @@ Primary evidence: [edgediscovery/edgediscovery](../../atoms/edgediscovery/edgedi
 The `Edge` object in [edgediscovery/edgediscovery.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/edgediscovery/edgediscovery.go) uses a mutex-guarded region pool with three distinct allocation paths:
 
 | Method | Semantics | Stickiness |
-|---|---|---|
+| --- | --- | --- |
 | `GetAddr(connIndex)` | Returns same address previously used by this index; falls back to unused pool | Connection-sticky |
 | `GetDifferentAddr(connIndex, hasConnectivityError)` | Gives back old address (with connectivity error flag) and allocates a new unused one | Rotation with error tracking |
 | `GetAddrForRPC()` | Returns any available address without connection affinity | Non-sticky |
@@ -215,7 +217,7 @@ Quirk — **Exhaustion recovery**: `GetDifferentAddr` may return `ErrNoAddresses
 ### Edge Construction Modes
 
 | Mode | Constructor | Input |
-|---|---|---|
+| --- | --- | --- |
 | Dynamic discovery | `ResolveEdge(log, region, edgeIpVersion)` | SRV/TXT record resolution against Cloudflare edge |
 | Static edge | `StaticEdge(log, hostnames)` | User-provided `--edge` hostname list (mainly for testing) |
 

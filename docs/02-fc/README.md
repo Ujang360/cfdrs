@@ -1,6 +1,6 @@
 # FC — Feature Complete
 
-Phase 2 of the cfdrs program: completing functionality left unscoped
+Phase 2 of the [cfdrs](../../README.md) program: completing functionality left unscoped
 by [RR](../01-rr/README.md).
 
 **Purpose:** Complete what RR deliberately left unscoped. Everything

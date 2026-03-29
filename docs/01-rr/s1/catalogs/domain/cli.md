@@ -7,6 +7,8 @@
 
 ## Scope
 
+This catalog primarily covers **out-of-band** infrastructure — see [proxy-data-taxonomy](../../proxy-data-taxonomy.md). CLI command dispatch, flag parsing, service lifecycle management, and token workflows operate outside the tunnel wire. The CLI orchestrates tunnel creation (transport control) and configures ingress rules (proxy data) but the CLI itself is an out-of-band interface.
+
 This catalog documents cloudflared CLI behavior surfaces that define command routing, flag/config ingestion, command-family entrypoints, operator output, service-mode actions, and update/management token workflows.
 
 For this catalog, CLI behavior includes:
@@ -97,7 +99,7 @@ flowchart TD
 ## Domain Map
 
 | Domain | Description | Representative atoms |
-|---|---|---|
+| --- | --- | --- |
 | Root bootstrap and command graph | Constructs root CLI app, global flags, action wrapper, and top-level command wiring. | [cmd/cloudflared/main](../../atoms/cmd/cloudflared/main.md), [cmd/cloudflared/flags/flags](../../atoms/cmd/cloudflared/flags/flags.md) |
 | Shared CLI utility layer | Config-file flag overlay, error wrapping, deprecated command handling, logger and build metadata helpers, management-token helper. | [cmd/cloudflared/cliutil/handler](../../atoms/cmd/cloudflared/cliutil/handler.md), [cmd/cloudflared/cliutil/errors](../../atoms/cmd/cloudflared/cliutil/errors.md), [cmd/cloudflared/cliutil/deprecated](../../atoms/cmd/cloudflared/cliutil/deprecated.md), [cmd/cloudflared/cliutil/logger](../../atoms/cmd/cloudflared/cliutil/logger.md), [cmd/cloudflared/cliutil/build_info](../../atoms/cmd/cloudflared/cliutil/build_info.md), [cmd/cloudflared/cliutil/management](../../atoms/cmd/cloudflared/cliutil/management.md) |
 | Tunnel command family | Named/quick tunnel run/create/list/delete/info/token/route/diagnostic paths and shared subcommand context. | [cmd/cloudflared/tunnel/cmd](../../atoms/cmd/cloudflared/tunnel/cmd.md), [cmd/cloudflared/tunnel/subcommands](../../atoms/cmd/cloudflared/tunnel/subcommands.md), [cmd/cloudflared/tunnel/subcommand_context](../../atoms/cmd/cloudflared/tunnel/subcommand_context.md), [cmd/cloudflared/tunnel/configuration](../../atoms/cmd/cloudflared/tunnel/configuration.md), [cmd/cloudflared/tunnel/quick_tunnel](../../atoms/cmd/cloudflared/tunnel/quick_tunnel.md), [cmd/cloudflared/tunnel/ingress_subcommands](../../atoms/cmd/cloudflared/tunnel/ingress_subcommands.md), [cmd/cloudflared/tunnel/login](../../atoms/cmd/cloudflared/tunnel/login.md) |
@@ -111,7 +113,7 @@ flowchart TD
 ## Command Family Matrix
 
 | Command family | Core behavior contracts | Primary evidence |
-|---|---|---|
+| --- | --- | --- |
 | Root `cloudflared` | Builds command tree, parses global flags, dispatches action, and routes service-mode calls. | [cmd/cloudflared/main](../../atoms/cmd/cloudflared/main.md) |
 | `cloudflared tunnel` | Implements tunnel lifecycle commands, route/teamnet/vnet operations, login/token/diag flows, and runtime startup orchestration. | [cmd/cloudflared/tunnel/cmd](../../atoms/cmd/cloudflared/tunnel/cmd.md), [cmd/cloudflared/tunnel/subcommands](../../atoms/cmd/cloudflared/tunnel/subcommands.md) |
 | `cloudflared access` | Performs access login/curl/token/ssh flows and edge token validation with command argument parsing. | [cmd/cloudflared/access/cmd](../../atoms/cmd/cloudflared/access/cmd.md), [cmd/cloudflared/access/validation](../../atoms/cmd/cloudflared/access/validation.md) |
@@ -124,7 +126,7 @@ flowchart TD
 ## Lifecycle and Failure Contracts
 
 | Surface | Contract |
-|---|---|
+| --- | --- |
 | Config and flag ingestion | Command actions can be wrapped through `cliutil` handlers that merge config-file inputs and normalize usage-error behavior before command-specific execution. |
 | Command dispatch determinism | Root app dispatches to explicit command families; empty invocations and service-mode routing are handled before normal command execution branches. |
 | Credential/token resolution | Tunnel/access/management commands perform credential and token lookup/derivation with explicit parse/validation branches and typed error exits. |
@@ -213,12 +215,39 @@ _Cross-referenced against [cmd/cloudflared/tunnel/cmd.go](https://github.com/clo
 
 - **Quirk — stdin-control reconnect.** When `--stdin-control` is enabled, the `stdinControl` goroutine reads commands from stdin. Only `reconnect [delay]` is supported; any unknown command triggers a help message.
 
+### Access Forwarder Listener Type
+
+_Cross-referenced against
+[cmd/cloudflared/access/carrier.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/cmd/cloudflared/access/carrier.go)
+and
+[carrier/carrier.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/carrier/carrier.go)
+at tag `2026.3.0`._
+
+- **Plain TCP, not SOCKS5.** `cloudflared access tcp` (and its
+  aliases `rdp`, `ssh`, `smb`) opens a **plain TCP listener** via
+  `net.Listen("tcp", address)` in `carrier.StartForwarder()`.
+  Accepted connections are wrapped in a WebSocket to the Cloudflare
+  edge. No SOCKS5 negotiation occurs on the client side.
+
+- **Intentional omission comment.** Both `StartForwarder()` and
+  `ssh()` in `cmd/cloudflared/access/carrier.go` contain:
+  `// we could add a cmd line variable for this bool if we want the
+  SOCK5 server to be on the client side` — confirming SOCKS5 was
+  considered but not implemented for the access path.
+
+- **Implication for proxy variant taxonomy.** SOCKS5 exists only on
+  the tunnel/ingress side (inbound proxy via `socks` origin service).
+  The access path is a plain TCP-to-WebSocket forwarder. This means
+  there is **one** SOCKS5 server surface (tunnel-side), not two.
+  See [proxy-data-taxonomy](../../proxy-data-taxonomy.md) and
+  [config/model](../../atoms/config/model.md) for struct field evidence.
+
 ### Hostname Default Ports
 
 `hostnameFromURI` maps schemes to default ports for tunnel access paths:
 
 | Scheme | Default port |
-|---|---|
+| --- | --- |
 | `ssh` | 22 |
 | `rdp` | 3389 |
 | `smb` | 445 |

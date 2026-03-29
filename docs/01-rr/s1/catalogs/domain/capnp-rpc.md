@@ -7,6 +7,8 @@
 
 ## Scope
 
+This catalog covers **both the proxy data and transport control planes** at the RPC layer — see [proxy-data-taxonomy](../../proxy-data-taxonomy.md). Registration, configuration, and graceful-shutdown RPCs are session-based proxy data that travel through the tunnel transport; request/response stream framing is also proxy data. Connection bootstrap and RPC transport mechanics (stream establishment, framing, teardown) are transport control.
+
 This catalog is the dedicated Cap'n Proto RPC view for cloudflared baseline behavior.
 
 For this catalog, Cap'n Proto RPC behavior includes:
@@ -70,20 +72,20 @@ sequenceDiagram
 
 ## Surface Map
 
-| Surface family | Contracted behavior | Representative atoms |
-|---|---|---|
-| Schema contracts | Defines wire-level types and RPC methods for registration, session, configuration, connect request/response, and metadata. | [tunnelrpc/proto/tunnelrpc.capnp](../../atoms/tunnelrpc/proto/tunnelrpc.capnp.md), [tunnelrpc/proto/quic_metadata_protocol.capnp](../../atoms/tunnelrpc/proto/quic_metadata_protocol.capnp.md) |
-| Connection bootstrap | Wraps stream transport, temporary-read handling, and client/server RPC conn constructors. | [tunnelrpc/utils](../../atoms/tunnelrpc/utils.md) |
-| Registration RPC | Connection registration, local configuration push, unregister/graceful-shutdown paths. | [tunnelrpc/registration_client](../../atoms/tunnelrpc/registration_client.md), [tunnelrpc/registration_server](../../atoms/tunnelrpc/registration_server.md), [tunnelrpc/pogs/registration_server](../../atoms/tunnelrpc/pogs/registration_server.md) |
-| Session RPC | UDP session register/unregister control contracts and client/server wrappers. | [tunnelrpc/quic/session_client](../../atoms/tunnelrpc/quic/session_client.md), [tunnelrpc/quic/session_server](../../atoms/tunnelrpc/quic/session_server.md), [tunnelrpc/pogs/session_manager](../../atoms/tunnelrpc/pogs/session_manager.md) |
-| Configuration RPC | Remote config update contracts with versioned payload handling. | [tunnelrpc/quic/cloudflared_client](../../atoms/tunnelrpc/quic/cloudflared_client.md), [tunnelrpc/quic/cloudflared_server](../../atoms/tunnelrpc/quic/cloudflared_server.md), [tunnelrpc/pogs/configuration_manager](../../atoms/tunnelrpc/pogs/configuration_manager.md) |
-| Request stream framing | Connect request/response encode/decode path and protocol preamble/version signaling. | [tunnelrpc/quic/request_client_stream](../../atoms/tunnelrpc/quic/request_client_stream.md), [tunnelrpc/quic/request_server_stream](../../atoms/tunnelrpc/quic/request_server_stream.md), [tunnelrpc/quic/protocol](../../atoms/tunnelrpc/quic/protocol.md), [tunnelrpc/pogs/quic_metadata_protocol](../../atoms/tunnelrpc/pogs/quic_metadata_protocol.md) |
-| Error and observability | Retryable and RPC error wrappers plus per-method handler and latency metrics hooks. | [tunnelrpc/pogs/errors](../../atoms/tunnelrpc/pogs/errors.md), [tunnelrpc/metrics/metrics](../../atoms/tunnelrpc/metrics/metrics.md) |
+| Surface family | Plane | Contracted behavior | Representative atoms |
+| --- | --- | --- | --- |
+| Schema contracts | mixed | Defines wire-level types and RPC methods for registration, session, configuration, connect request/response, and metadata. | [tunnelrpc/proto/tunnelrpc.capnp](../../atoms/tunnelrpc/proto/tunnelrpc.capnp.md), [tunnelrpc/proto/quic_metadata_protocol.capnp](../../atoms/tunnelrpc/proto/quic_metadata_protocol.capnp.md) |
+| Connection bootstrap | transport-control | Wraps stream transport, temporary-read handling, and client/server RPC conn constructors. | [tunnelrpc/utils](../../atoms/tunnelrpc/utils.md) |
+| Registration RPC | proxy-data | Connection registration, local configuration push, unregister/graceful-shutdown paths. | [tunnelrpc/registration_client](../../atoms/tunnelrpc/registration_client.md), [tunnelrpc/registration_server](../../atoms/tunnelrpc/registration_server.md), [tunnelrpc/pogs/registration_server](../../atoms/tunnelrpc/pogs/registration_server.md) |
+| Session RPC | proxy-data | UDP session register/unregister control contracts and client/server wrappers. | [tunnelrpc/quic/session_client](../../atoms/tunnelrpc/quic/session_client.md), [tunnelrpc/quic/session_server](../../atoms/tunnelrpc/quic/session_server.md), [tunnelrpc/pogs/session_manager](../../atoms/tunnelrpc/pogs/session_manager.md) |
+| Configuration RPC | proxy-data | Remote config update contracts with versioned payload handling. | [tunnelrpc/quic/cloudflared_client](../../atoms/tunnelrpc/quic/cloudflared_client.md), [tunnelrpc/quic/cloudflared_server](../../atoms/tunnelrpc/quic/cloudflared_server.md), [tunnelrpc/pogs/configuration_manager](../../atoms/tunnelrpc/pogs/configuration_manager.md) |
+| Request stream framing | proxy-data | Connect request/response encode/decode path and protocol preamble/version signaling. | [tunnelrpc/quic/request_client_stream](../../atoms/tunnelrpc/quic/request_client_stream.md), [tunnelrpc/quic/request_server_stream](../../atoms/tunnelrpc/quic/request_server_stream.md), [tunnelrpc/quic/protocol](../../atoms/tunnelrpc/quic/protocol.md), [tunnelrpc/pogs/quic_metadata_protocol](../../atoms/tunnelrpc/pogs/quic_metadata_protocol.md) |
+| Error and observability | mixed | Retryable and RPC error wrappers plus per-method handler and latency metrics hooks. | [tunnelrpc/pogs/errors](../../atoms/tunnelrpc/pogs/errors.md), [tunnelrpc/metrics/metrics](../../atoms/tunnelrpc/metrics/metrics.md) |
 
 ## RPC Contract Matrix
 
 | Contract area | Method-level behavior | Primary evidence |
-|---|---|---|
+| --- | --- | --- |
 | Registration | Client sends auth/tunnel/options and receives `ConnectionDetails` or mapped connection errors (including retryable forms). | [tunnelrpc/registration_client](../../atoms/tunnelrpc/registration_client.md), [tunnelrpc/pogs/registration_server](../../atoms/tunnelrpc/pogs/registration_server.md) |
 | Local config update | Runtime pushes `config []byte` with version semantics through configuration manager contracts. | [tunnelrpc/quic/cloudflared_client](../../atoms/tunnelrpc/quic/cloudflared_client.md), [tunnelrpc/pogs/configuration_manager](../../atoms/tunnelrpc/pogs/configuration_manager.md) |
 | Session control | Session registration/unregistration carries session ID, destination, idle hints, and trace context. | [tunnelrpc/quic/session_client](../../atoms/tunnelrpc/quic/session_client.md), [tunnelrpc/pogs/session_manager](../../atoms/tunnelrpc/pogs/session_manager.md) |
@@ -93,14 +95,14 @@ sequenceDiagram
 ## Schema-to-Implementation Matrix
 
 | Schema | Primary entities | Implementation adapters |
-|---|---|---|
+| --- | --- | --- |
 | `tunnelrpc.capnp` | `RegistrationServer`, `SessionManager`, `ConfigurationManager`, `ConnectionOptions`, `ConnectionDetails`, connection error envelopes | [tunnelrpc/pogs/registration_server](../../atoms/tunnelrpc/pogs/registration_server.md), [tunnelrpc/pogs/session_manager](../../atoms/tunnelrpc/pogs/session_manager.md), [tunnelrpc/pogs/configuration_manager](../../atoms/tunnelrpc/pogs/configuration_manager.md), [tunnelrpc/quic/cloudflared_server](../../atoms/tunnelrpc/quic/cloudflared_server.md) |
 | `quic_metadata_protocol.capnp` | `ConnectRequest`, `ConnectResponse`, metadata key/value list, `ConnectionType` enum | [tunnelrpc/pogs/quic_metadata_protocol](../../atoms/tunnelrpc/pogs/quic_metadata_protocol.md), [tunnelrpc/quic/request_client_stream](../../atoms/tunnelrpc/quic/request_client_stream.md), [tunnelrpc/quic/request_server_stream](../../atoms/tunnelrpc/quic/request_server_stream.md) |
 
 ## Integration Overlap (Tunnels and Proxying)
 
 | Overlap catalog | Why overlap exists | Representative overlap atoms |
-|---|---|---|
+| --- | --- | --- |
 | [tunnels](tunnels.md) | Tunnel lifecycle and HA connection startup require registration/config/session RPC control surfaces. | [connection/control](../../atoms/connection/control.md), [connection/connection](../../atoms/connection/connection.md), [supervisor/tunnel](../../atoms/supervisor/tunnel.md), [orchestration/orchestrator](../../atoms/orchestration/orchestrator.md) |
 | [proxying](proxying.md) | Request/session relay paths call tunnelrpc stream/session abstractions to carry traffic and metadata. | [connection/quic_connection](../../atoms/connection/quic_connection.md), [connection/quic_datagram_v2](../../atoms/connection/quic_datagram_v2.md), [connection/quic_datagram_v3](../../atoms/connection/quic_datagram_v3.md), [proxy/proxy](../../atoms/proxy/proxy.md) |
 | [config](config.md) | Runtime configuration and tag propagation cross Cap'n Proto configuration manager and tag contracts. | [client/config](../../atoms/client/config.md), [cmd/cloudflared/tunnel/configuration](../../atoms/cmd/cloudflared/tunnel/configuration.md), [cmd/cloudflared/tunnel/tag](../../atoms/cmd/cloudflared/tunnel/tag.md) |
@@ -108,7 +110,7 @@ sequenceDiagram
 ## Error and Retry Semantics
 
 | Pattern | Cap'n Proto RPC behavior |
-|---|---|
+| --- | --- |
 | Retryable failures | RPC layer includes explicit retryable error wrappers with delay semantics for backoff-aware callers. |
 | Structured connection errors | Registration adapters map wire errors into structured local error forms while preserving retry/fatal distinctions. |
 | Temporary transport reads | Safe transport wrapper treats temporary read errors as recoverable transport behavior rather than immediate fatal teardown. |
@@ -163,7 +165,7 @@ Primary evidence: [tunnelrpc/pogs/errors](../../atoms/tunnelrpc/pogs/errors.md),
 Two distinct RPC client types coexist for session management:
 
 | Client | File | Methods | Use context |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `CloudflaredClient` | [tunnelrpc/quic/cloudflared_client.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/tunnelrpc/quic/cloudflared_client.go) | `RegisterUdpSession`, `UnregisterUdpSession`, `UpdateConfiguration`, `Close` | Full tunnel control: session management + configuration updates |
 | `SessionClient` | [tunnelrpc/quic/session_client.go](https://github.com/cloudflare/cloudflared/blob/2026.3.0/tunnelrpc/quic/session_client.go) | `RegisterUdpSession`, `UnregisterUdpSession`, `Close` | Session-only control: no configuration update capability |
 
@@ -174,7 +176,7 @@ Both clients accept a `requestTimeout` parameter at construction and wrap a `io.
 The `RegisterUdpSession` RPC signature carries these wire parameters:
 
 | Parameter | Type | Role |
-|---|---|---|
+| --- | --- | --- |
 | `sessionID` | `uuid.UUID` | Unique session identifier |
 | `dstIP` | `net.IP` | Destination IP for the proxied session |
 | `dstPort` | `uint16` | Destination port |

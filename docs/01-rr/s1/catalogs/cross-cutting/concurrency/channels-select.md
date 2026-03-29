@@ -7,7 +7,7 @@
 ### Shutdown and Signaling Channels
 
 | Channel | Type | Buffer | Producers | Consumers | Mechanism | Evidence |
-|---|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- | --- |
 | `graceShutdownC` | `chan struct{}` | 0 | OS signal handler | all `Serve` loops, `listenReconnect` | close-broadcast | [atoms/cmd/cloudflared/tunnel/signal](../../../atoms/cmd/cloudflared/tunnel/signal.md) |
 | `reconnectCh` | `chan ReconnectSignal` | 0 | external control, management | `listenReconnect` per connection | value send | [atoms/supervisor/external_control](../../../atoms/supervisor/external_control.md) |
 | `tunnelErrors` | `chan tunnelError` | 0 | `startFirstTunnel`, `startTunnel` | `Supervisor.Run` select loop | value send | [atoms/supervisor/supervisor](../../../atoms/supervisor/supervisor.md) |
@@ -18,7 +18,7 @@
 ### Data Flow Channels
 
 | Channel | Type | Buffer | Producers | Consumers | Evidence |
-|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- |
 | `datagrams` (v3) | `chan []byte` | 16 | `pollDatagrams` | `datagramConn.Serve` main loop | [atoms/quic/v3/muxer](../../../atoms/quic/v3/muxer.md) |
 | `icmpDatagramChan` (v3) | `chan *ICMPDatagram` | 128 | `handleICMPPacket` | `processICMPDatagrams` | [atoms/quic/v3/muxer](../../../atoms/quic/v3/muxer.md) |
 | `readErrors` (v3) | `chan error` | 2 | `pollDatagrams` | `datagramConn.Serve` main loop | [atoms/quic/v3/muxer](../../../atoms/quic/v3/muxer.md) |
@@ -39,7 +39,7 @@
 ### System Service Channels (Windows)
 
 | Channel | Type | Buffer | Producers | Consumers | Evidence |
-|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- |
 | `r` (svc requests) | `chan svc.ChangeRequest` | OS-provided | Windows SCM | `Execute()` loop | [atoms/cmd/cloudflared/windows_service](../../../atoms/cmd/cloudflared/windows_service.md) |
 | `statusChan` | `chan svc.Status` | OS-provided | `Execute()` | Windows SCM | [atoms/cmd/cloudflared/windows_service](../../../atoms/cmd/cloudflared/windows_service.md) |
 
@@ -48,7 +48,7 @@
 ### Supervisor Select Loops
 
 | Location | Branches | Purpose | Evidence |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `Supervisor.Run` main loop | `ctx.Done`, `tunnelErrors`, `backoffTimer`, `nextConnectedSignal` | Coordinate HA tunnel lifecycle: error handling, backoff retry, connection success | [atoms/supervisor/supervisor](../../../atoms/supervisor/supervisor.md) |
 | `listenReconnect()` | `reconnectCh`, `gracefulShutdownCh`, `ctx.Done` | Wait for reconnect signal or shutdown | [atoms/supervisor/tunnel](../../../atoms/supervisor/tunnel.md) |
 | `EdgeTunnelServer.Serve` retry | `ctx.Done`, `gracefulShutdownC`, `protocolFallback.BackoffTimer()` | Backoff wait between retry attempts | [atoms/supervisor/tunnel](../../../atoms/supervisor/tunnel.md) |
@@ -56,7 +56,7 @@
 ### Datagram v3 Select Loops
 
 | Location | Branches | Purpose | Evidence |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `datagramConn.Serve` main loop | `ctx.Done`, `connCtx.Done`, `readErrors`, `datagrams` | Demux incoming datagrams by type | [atoms/quic/v3/muxer](../../../atoms/quic/v3/muxer.md) |
 | `processICMPDatagrams` | `ctx.Done`, `icmpDatagramChan` | Write ICMP packets to origin | [atoms/quic/v3/muxer](../../../atoms/quic/v3/muxer.md) |
 | `session.waitForCloseCondition` | `connCtx.Done`, `contextChan`, `errChan`, `checkIdleTimer.C`, `activeAtChan` | Idle timeout, migration, error, close | [atoms/quic/v3/session](../../../atoms/quic/v3/session.md) |
@@ -65,7 +65,7 @@
 ### Datagram v2 Select Loops
 
 | Location | Branches | Purpose | Evidence |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `manager.Serve` | `ctx.Done`, `receiveChan`, `registrationChan`, `unregistrationChan` | Session lifecycle management | [atoms/datagramsession/manager](../../../atoms/datagramsession/manager.md) |
 | `Session.waitForCloseCondition` | `ctx.Done`, `closeChan`, `checkIdleTicker.C`, `activeAtChan` | Idle timeout and close | [atoms/datagramsession/session](../../../atoms/datagramsession/session.md) |
 | `manager.RegisterSession` | `ctx.Done`, `registrationChan`, `closedChan` | Timeout-guarded registration | [atoms/datagramsession/manager](../../../atoms/datagramsession/manager.md) |
@@ -74,13 +74,13 @@
 ### Management Select Loop
 
 | Location | Branches | Purpose | Evidence |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `logs()` handler | `ctx.Done`, `events`, `StartStreaming` / `StopStreaming`, `ping.C`, `idle.C` | WebSocket session orchestration with idle timeout and keepalive | [atoms/management/service](../../../atoms/management/service.md) |
 
 ### Command-Level Select Loops
 
 | Location | Branches | Purpose | Evidence |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `Supervisor.Run` initial wait | `ctx.Done`, `tunnelErrors`, `gracefulShutdownC`, `connectedSignal.Wait()` | Wait for first tunnel to connect before spawning HA goroutines | [atoms/supervisor/supervisor](../../../atoms/supervisor/supervisor.md) |
 | `waitToShutdown()` | `errC`, `graceShutdownC`, signal handler | Top-level exit coordination | [atoms/cmd/cloudflared/tunnel/cmd](../../../atoms/cmd/cloudflared/tunnel/cmd.md) |
 | `windowsService.Execute` | `r` (service requests), internal state | Windows service control | [atoms/cmd/cloudflared/windows_service](../../../atoms/cmd/cloudflared/windows_service.md) |
