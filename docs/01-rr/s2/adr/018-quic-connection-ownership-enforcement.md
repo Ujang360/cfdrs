@@ -1,4 +1,4 @@
-# ADR-018 - QUIC Thread-Affinity Enforcement
+# ADR-018 - QUIC Connection Ownership Enforcement
 
 | | |
 | --- | --- |
@@ -10,11 +10,16 @@
 
 ## Question
 
-How should [cfdrs](../../../../README.md) enforce thread-affinity constraints for QUIC connection objects that are not safe to move across threads?
+How should [cfdrs](../../../../README.md) enforce that QUIC connection objects, which are
+`!Send`, never cross thread boundaries?
 
 ## Decision
 
-Enforce QUIC connection affinity at the transport boundary using non-transferable wrapper types and explicit ownership rules. Connection handles must not cross thread boundaries.
+Enforce QUIC connection ownership at the transport boundary using
+`!Send` wrapper types and explicit ownership rules. No manual CPU
+affinity (`sched_setaffinity`) is performed by cfdrs. `tokio-quiche`
+manages its own thread scheduling internally. CPU affinity policy is
+the operator's concern.
 
 ## Alternatives Considered
 

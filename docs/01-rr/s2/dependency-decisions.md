@@ -80,8 +80,8 @@ Same pattern applies to `cli-native` / `cli-compat`.
 
 ### 1.1 Async Runtime ✅
 
-**[tokio](https://crates.io/crates/tokio)** — selected. `new_multi_thread()`, all threads pinned via
-`sched_setaffinity` in `on_thread_start`. No `LocalSet`. No
+**[tokio](https://crates.io/crates/tokio)** — selected. `new_multi_thread()`, all threads use
+`on_thread_start` hook for initialization. No `LocalSet`. No
 `new_current_thread` runtimes. Single multi-thread runtime for both
 Transport worker group and Proxy worker group threads. Everything `Send`.
 
@@ -512,7 +512,7 @@ No Windows/macOS in this phase.
 
 | Capability | Decision |
 | --- | --- |
-| Unix syscall wrapper | IN — `sched_setaffinity`, signal handling, general socket options, ping-group detection, DF bit |
+| Unix syscall wrapper | IN — signal handling, general socket options, ping-group detection, DF bit |
 | ICMP raw socket path | IN — [socket2](https://crates.io/crates/socket2)-based implementation, with all unsafe operations isolated in a dedicated unsafe crate; no [nix](https://crates.io/crates/nix) usage for ICMP |
 | Raw FFI bindings | IN — where the safe wrapper does not cover, and only inside the dedicated unsafe crate |
 | Systemd readiness | **[sd-notify](https://crates.io/crates/sd-notify)** — READY=1 and STOPPING=1 only. Minimal. ADR-009 closed. |
@@ -540,7 +540,7 @@ Expanded decisions tracked in [ADR index](adr/README.md):
 
 | ADR | Decision focus | Origin |
 | --- | --- | --- |
-| [ADR-018](adr/018-quic-thread-affinity-enforcement.md) | QUIC thread-affinity enforcement | R2.6 / Layer 1.1 and 3.1 |
+| [ADR-018](adr/018-quic-connection-ownership-enforcement.md) | QUIC connection ownership enforcement | R2.6 / Layer 1.1 and 3.1 |
 | [ADR-019](adr/019-cancellation-timeout-propagation-contract.md) | Cancellation and timeout propagation contract | R1.2 |
 | [ADR-012](adr/012-error-taxonomy-and-recoverability-policy.md) | Error taxonomy and recoverability policy | R3.1 |
 | [ADR-013](adr/013-customduration-dual-format-contract.md) | CustomDuration dual-format serialization contract | R1.6 |

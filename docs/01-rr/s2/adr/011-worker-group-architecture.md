@@ -19,11 +19,10 @@ Two worker groups, both owned by `tunnel-transport::workers`:
 
 | Worker group | Threads | Pinning | Hosts |
 | --- | --- | --- | --- |
-| Transport worker group | 4 | `sched_setaffinity` via `common-sys::cpu` | QUIC connection serve loops |
-| Proxy worker group | Remaining cores | `sched_setaffinity` via `common-sys::cpu` | Session serve loops, proxy dispatch |
+| Transport worker group | 4 | tokio `on_thread_start` | QUIC connection serve loops |
+| Proxy worker group | Remaining cores | tokio `on_thread_start` | Session serve loops, proxy dispatch |
 
 Single multi-thread [tokio](https://crates.io/crates/tokio) runtime.
-All threads pinned via `sched_setaffinity` in `on_thread_start`.
 `quiche::Connection` is `!Send` — pinned to birth thread forever.
 No connection migration after assignment.
 
@@ -46,7 +45,7 @@ Full crate-level formalization in
 
 - S3.0 foundation work depends on the worker boundary types being
   locked. This ADR is now decided.
-- `tunnel-transport::workers` module owns thread construction and
-  pinning logic.
+- `tunnel-transport::workers` module owns thread construction
+  logic.
 - `tunnel-core` owns the typed boundary handles.
 - No `LocalSet` or `new_current_thread` runtimes anywhere.

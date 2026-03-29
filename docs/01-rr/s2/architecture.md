@@ -4,7 +4,7 @@
 | --- | --- |
 | Baseline | cloudflare/cloudflared @ tag `2026.3.0` |
 | Phase | 01-RR / S2 - SUBSTRATE |
-| S2.6 status | Active |
+| S2.6 status | Closed |
 | Consumes | [scope](scope.md), [dependency-decisions](dependency-decisions.md), [adr/](adr/README.md), [invariants](invariants.md), [risks](risks.md) |
 | Produces | Crate boundary map, dependency graph, worker group ownership model, ADR-011 resolution |
 
@@ -61,6 +61,189 @@ in the workspace — they are not crates themselves.
 | `app/` | Assembly, binary, test boundary | 1 |
 
 **Total: 26 crates.**
+
+### Group-level dependency direction
+
+```mermaid
+graph TD
+    subgraph "common/ (8 crates)"
+        COMMON["common-error · common-signal · common-retry<br/>common-wire-primitives · common-sys<br/>common-observability · common-cfapi · common-token"]
+    end
+
+    subgraph "config/ (2 crates)"
+        CONFIG["config-core · config-runtime"]
+    end
+
+    subgraph "tunnel/ (9 crates)"
+        TUNNEL["tunnel-core · tunnel-transport · tunnel-rpc<br/>tunnel-connection · tunnel-session<br/>tunnel-ingress-proxy · tunnel-supervisor<br/>tunnel-management · tunnel-metrics"]
+    end
+
+    subgraph "host/ (2 crates)"
+        HOST["host-service · host-diagnostic"]
+    end
+
+    subgraph "operator/ (4 crates)"
+        OPERATOR["operator-cli-common · operator-cli-native<br/>operator-cli-compat · operator-cli"]
+    end
+
+    subgraph "app/ (1 crate)"
+        APP["app (binary)"]
+    end
+
+    CONFIG -->|one-way: tunnel-core| TUNNEL
+    CONFIG --> COMMON
+    TUNNEL --> COMMON
+    HOST --> COMMON
+    OPERATOR --> COMMON
+    APP --> CONFIG
+    APP --> TUNNEL
+    APP --> HOST
+    APP --> OPERATOR
+    APP --> COMMON
+
+    style COMMON fill:#e8f5e9,stroke:#2e7d32
+    style CONFIG fill:#e3f2fd,stroke:#1565c0
+    style TUNNEL fill:#fff3e0,stroke:#e65100
+    style HOST fill:#fce4ec,stroke:#c62828
+    style OPERATOR fill:#f3e5f5,stroke:#6a1b9a
+    style APP fill:#fffde7,stroke:#f57f17
+```
+
+### Full crate dependency graph
+
+```mermaid
+graph TD
+    %% common/ group
+    CE[common-error]
+    CS[common-signal]
+    CR[common-retry]
+    CWP[common-wire-primitives]
+    CSYS[common-sys]
+    CO[common-observability]
+    CCFAPI[common-cfapi]
+    CT[common-token]
+
+    %% common/ internal deps
+    CS --> CE
+    CR --> CE
+    CR --> CS
+
+    %% config/ group
+    CC[config-core]
+    CRT[config-runtime]
+
+    CC --> CWP
+    CRT --> CC
+    CRT --> TC
+    CRT --> CS
+    CRT --> CO
+
+    %% tunnel/ group
+    TC[tunnel-core]
+    TT[tunnel-transport]
+    TRPC[tunnel-rpc]
+    TCONN[tunnel-connection]
+    TS[tunnel-session]
+    TIP[tunnel-ingress-proxy]
+    TSUP[tunnel-supervisor]
+    TM[tunnel-management]
+    TMET[tunnel-metrics]
+
+    %% tunnel/ deps on common/
+    TT --> TC
+    TT --> CSYS
+    TT --> CWP
+    TT --> CO
+
+    TRPC --> TC
+
+    TCONN --> TC
+    TCONN --> TT
+    TCONN --> TRPC
+    TCONN --> CR
+    TCONN --> CS
+    TCONN --> CO
+
+    TS --> TC
+    TS --> CWP
+    TS --> CS
+    TS --> CO
+
+    TIP --> TC
+    TIP --> TS
+    TIP --> CWP
+    TIP --> CO
+
+    TSUP --> TC
+    TSUP --> TCONN
+    TSUP --> CR
+    TSUP --> CS
+    TSUP --> CO
+
+    TM --> TC
+    TM --> CWP
+    TM --> CO
+
+    TMET --> CO
+
+    %% host/ group
+    HS[host-service]
+    HD[host-diagnostic]
+
+    HS --> CSYS
+    HD --> CSYS
+    HD --> CO
+
+    %% operator/ group
+    OCC[operator-cli-common]
+    OCN[operator-cli-native]
+    OCCOMPAT[operator-cli-compat]
+    OC[operator-cli]
+
+    OCN --> OCC
+    OCCOMPAT --> OCC
+    OC --> OCN
+    OC --> OCCOMPAT
+
+    %% app/
+    APP2[app]
+    APP2 --> OC
+    APP2 --> CRT
+    APP2 --> TSUP
+    APP2 --> TM
+    APP2 --> TMET
+    APP2 --> TIP
+    APP2 --> HS
+    APP2 --> HD
+
+    %% Styling
+    style CE fill:#e8f5e9,stroke:#2e7d32
+    style CS fill:#e8f5e9,stroke:#2e7d32
+    style CR fill:#e8f5e9,stroke:#2e7d32
+    style CWP fill:#e8f5e9,stroke:#2e7d32
+    style CSYS fill:#e8f5e9,stroke:#2e7d32
+    style CO fill:#e8f5e9,stroke:#2e7d32
+    style CCFAPI fill:#e8f5e9,stroke:#2e7d32
+    style CT fill:#e8f5e9,stroke:#2e7d32
+    style CC fill:#e3f2fd,stroke:#1565c0
+    style CRT fill:#e3f2fd,stroke:#1565c0
+    style TC fill:#fff3e0,stroke:#e65100
+    style TT fill:#fff3e0,stroke:#e65100
+    style TRPC fill:#fff3e0,stroke:#e65100
+    style TCONN fill:#fff3e0,stroke:#e65100
+    style TS fill:#fff3e0,stroke:#e65100
+    style TIP fill:#fff3e0,stroke:#e65100
+    style TSUP fill:#fff3e0,stroke:#e65100
+    style TM fill:#fff3e0,stroke:#e65100
+    style TMET fill:#fff3e0,stroke:#e65100
+    style HS fill:#fce4ec,stroke:#c62828
+    style HD fill:#fce4ec,stroke:#c62828
+    style OCC fill:#f3e5f5,stroke:#6a1b9a
+    style OCN fill:#f3e5f5,stroke:#6a1b9a
+    style OCCOMPAT fill:#f3e5f5,stroke:#6a1b9a
+    style OC fill:#f3e5f5,stroke:#6a1b9a
+    style APP2 fill:#fffde7,stroke:#f57f17
+```
 
 ---
 
@@ -130,6 +313,29 @@ is a convenience match on the top-level variant.
 **Discipline:** If a domain error type needs to import from a behavioral
 crate, the type is misplaced — move the data extraction to the behavioral
 crate's `From` impl and pass primitives into `common-error`.
+
+```mermaid
+graph TD
+    ERR["Error"]
+    ERR --> UNREC["Unrecoverable"]
+    ERR --> REC["Recoverable"]
+
+    UNREC --> REG["Registration"]
+    UNREC --> AUTH["Auth"]
+    UNREC --> CFG["Config"]
+    UNREC --> PLAT["Platform"]
+    UNREC --> PROTO["Protocol"]
+
+    REC --> TRANS["Transport"]
+    REC --> RPC2["RPC"]
+    REC --> SESS["Session"]
+    REC --> BACK["Backoff"]
+    REC --> EDGED["EdgeDiscovery"]
+
+    style ERR fill:#fffde7,stroke:#f57f17
+    style UNREC fill:#ffebee,stroke:#c62828
+    style REC fill:#e8f5e9,stroke:#2e7d32
+```
 
 **ADR linkage:**
 [ADR-012](adr/012-error-taxonomy-and-recoverability-policy.md)
@@ -211,14 +417,12 @@ isolated here per ARCH-2.
 
 | Module | Contents | Unsafe |
 | --- | --- | --- |
-| `cpu` | `sched_setaffinity`, core pinning for worker group threads | Yes |
 | `network` | `socket2::Socket` raw socket, UDP buffer tuning, DF bit, ping-group detection | Yes |
 | `signal` | nix signal registration (SIGINT, SIGTERM, SIGUSR1) | Yes |
 | `file` | File descriptor locking for credential and token files | Yes |
 
 **ADR linkage:**
-[ADR-008](adr/008-icmp-raw-socket.md),
-[ADR-018](adr/018-quic-thread-affinity-enforcement.md)
+[ADR-008](adr/008-icmp-raw-socket.md)
 
 **S1 evidence:**
 [atoms/ingress/icmp_linux](../s1/atoms/ingress/icmp_linux.md),
@@ -359,6 +563,44 @@ config writes.
 [atoms/features/features](../s1/atoms/features/features.md),
 [atoms/watcher/file](../s1/atoms/watcher/file.md)
 
+#### Configuration authority negotiation flow
+
+```mermaid
+flowchart LR
+    subgraph Sources
+        CLI["CLI flags"]
+        FILE["Config file<br/>(inotify watch)"]
+        EDGE["Edge RPC push<br/>(UpdateConfiguration)"]
+        DNS["DNS TXT<br/>(feature flags)"]
+    end
+
+    subgraph "config-runtime"
+        ORCH["Orchestrator<br/>(single task, serialized)"]
+        MERGE["4-layer precedence<br/>merge"]
+        SWAP["arc-swap<br/>atomic publish"]
+    end
+
+    CLI --> MERGE
+    FILE -->|"ConfigDidUpdate"| ORCH
+    EDGE -->|"UpdateConfigurationRequest"| ORCH
+    DNS -->|"hourly FNV refresh"| ORCH
+    ORCH --> MERGE
+    MERGE --> SWAP
+
+    subgraph Consumers
+        PROXY["tunnel-ingress-proxy<br/>(OriginProxy swap)"]
+        CONN["tunnel-connection<br/>(GetConfigJSON)"]
+    end
+
+    SWAP -->|"atomic load<br/>(zero contention)"| PROXY
+    SWAP --> CONN
+
+    style ORCH fill:#e3f2fd,stroke:#1565c0
+    style SWAP fill:#e8f5e9,stroke:#2e7d32
+    style PROXY fill:#fff3e0,stroke:#e65100
+    style CONN fill:#fff3e0,stroke:#e65100
+```
+
 ---
 
 ## `tunnel/` Group
@@ -420,7 +662,7 @@ proxy behavior.
 | `http2` | HTTP/2 transport — deferred implementation, trait stub only |
 | `edge` | Edge address discovery (DNS SRV + cfapi fallback), address pool, HAConnections clamping |
 | `tls` | BoringSSL config, PQ curve priority (`X25519MLKEM768:X25519Kyber768Draft00:X25519`), ALPN, cert reloader |
-| `workers` | Worker group thread construction and pinning via `common-sys::cpu`. Transport worker group (4 threads) + Proxy worker group (remaining cores). Atomic counter assignment. |
+| `workers` | Worker group thread construction via tokio runtime builder `on_thread_start` hook. Transport worker group (4 threads) + Proxy worker group (remaining cores). Atomic counter assignment. |
 
 **Worker group ownership:** Transport worker group hosts QUIC connection
 serve loops. Proxy worker group hosts session serve loops and proxy
@@ -437,13 +679,13 @@ channels used internally within tasks only.
 ([dependency-decisions](dependency-decisions.md) L1.8) used for edge
 address pool caching.
 
-**Imports:** `tunnel-core`, `common-sys` (cpu + network),
+**Imports:** `tunnel-core`, `common-sys` (network),
 `common-wire-primitives`, `common-observability`.
 
 **ADR linkage:**
 [ADR-001](adr/001-quic-transport.md),
 [ADR-011](adr/011-worker-group-architecture.md),
-[ADR-018](adr/018-quic-thread-affinity-enforcement.md)
+[ADR-018](adr/018-quic-connection-ownership-enforcement.md)
 
 **S1 evidence:**
 [atoms/connection/quic_connection](../s1/atoms/connection/quic_connection.md),
@@ -485,6 +727,21 @@ in-flight streams to complete), `UpdateConfiguration` dispatch to
 `ConfigManager`, `registerConnection` RPC, connection observer event
 emission, PQ fallback state per connection. 0-RTT deferred —
 `registerConnection` is unsafe for early data (no forward secrecy).
+
+```mermaid
+stateDiagram-v2
+    [*] --> Connecting: registerConnection RPC
+
+    Connecting --> Registered: registration success
+    Connecting --> Stopped: unrecoverable error
+
+    Registered --> Unregistering: graceful shutdown /<br/>control stream error
+    Registered --> Registered: UpdateConfiguration /<br/>stream serve loop
+
+    Unregistering --> Stopped: grace period elapsed /<br/>in-flight streams drained
+
+    Stopped --> [*]: report to supervisor
+```
 
 **Imports:** `tunnel-core`, `tunnel-transport`, `tunnel-rpc`,
 `common-retry`, `common-signal`, `common-observability`.
@@ -570,6 +827,15 @@ deadline control.
 
 **Implements** `OriginProxy` from `tunnel-core`.
 
+**S3 note — buffer pool policy:** The proxy data path involves at
+least two buffer copies per request (edge → proxy, proxy → origin).
+`tokio-quiche`'s `BufFactory` covers QUIC frame buffers. The bump
+arena (ARCH-5) covers session temporaries. Origin-facing TCP/HTTP
+read buffers are neither — they outlive individual operations but are
+not QUIC frames. S3 must decide: reuse pool (e.g. `bytes::BytesMut`
+pool), `BufFactory` extension, or per-request allocation. Wrong
+choice here is expensive to retrofit.
+
 **Imports:** `tunnel-core`, `tunnel-session` (for UDP session dispatch),
 `common-wire-primitives`, `common-observability`.
 
@@ -582,6 +848,41 @@ deadline control.
 [atoms/carrier/websocket](../s1/atoms/carrier/websocket.md),
 [atoms/validation/validation](../s1/atoms/validation/validation.md),
 [atoms/websocket/connection](../s1/atoms/websocket/connection.md)
+
+#### Request data flow (edge → origin)
+
+```mermaid
+sequenceDiagram
+    participant Edge as Cloudflare Edge
+    participant QC as tunnel-transport<br/>(QUIC conn, !Send)
+    participant MPMC as Bounded MPMC<br/>(crossbeam-channel)
+    participant Proxy as tunnel-ingress-proxy<br/>(proxy worker)
+    participant Origin as Origin Server
+
+    Edge->>QC: QUIC stream (HTTP/3 frame)
+    Note over QC: Transport worker group<br/>(4 pinned threads)
+    QC->>MPMC: SessionAssignment
+    MPMC->>Proxy: Dispatch to proxy worker
+    Note over Proxy: Proxy worker group<br/>(remaining cores)
+
+    alt HTTP request
+        Proxy->>Proxy: Ingress rule match<br/>(hostname glob, path regex)
+        Proxy->>Proxy: Fat enum dispatch (ARCH-4)<br/>(http|https|tcp|unix|socks|...)
+        Proxy->>Origin: TCP/HTTP request
+        Origin-->>Proxy: HTTP response
+    else WebSocket upgrade
+        Proxy->>Origin: HTTP Upgrade: websocket
+        Origin-->>Proxy: 101 Switching Protocols
+        Note over Proxy,Origin: Bidirectional stream relay
+    else UDP datagram (v3)
+        Proxy->>Proxy: tunnel-session<br/>session manager dispatch
+        Proxy->>Origin: UDP datagram relay
+        Origin-->>Proxy: UDP response
+    end
+
+    Proxy-->>QC: Response via QUIC stream
+    QC-->>Edge: QUIC frame (zero-copy send)
+```
 
 ---
 
@@ -612,6 +913,45 @@ used directly for supervision tree — no standalone actor crate.
 [atoms/tunnelstate/conntracker](../s1/atoms/tunnelstate/conntracker.md),
 [atoms/supervisor/fuse](../s1/atoms/supervisor/fuse.md),
 [atoms/connection/tunnelsforha](../s1/atoms/connection/tunnelsforha.md)
+
+#### Supervisor HA connection lifecycle
+
+```mermaid
+stateDiagram-v2
+    [*] --> Start_Conn0: supervisor.Run()
+
+    Start_Conn0 --> WaitConnected: start connection 0
+    WaitConnected --> StaggerRemaining: connectedSignal received
+
+    state StaggerRemaining {
+        [*] --> Conn1: 1s registrationInterval
+        Conn1 --> Conn2: 1s
+        Conn2 --> ConnN: 1s
+        ConnN --> [*]
+    }
+
+    StaggerRemaining --> Supervising: all N connections started
+
+    state Supervising {
+        [*] --> Healthy
+        Healthy --> ConnFailed: connection error
+        ConnFailed --> ClassifyError: tunnelErrors channel
+
+        state ClassifyError {
+            [*] --> Recoverable
+            [*] --> Unrecoverable
+        }
+
+        Recoverable --> Backoff: exponential + jitter
+        Backoff --> Reconnect: selectNextProtocol
+        Reconnect --> Healthy
+
+        Unrecoverable --> [*]: abort
+    }
+
+    Supervising --> GracefulShutdown: graceShutdownC / SIGTERM
+    GracefulShutdown --> [*]: all connections drained
+```
 
 ---
 
@@ -648,9 +988,9 @@ IP via 1s TCP dial, hostname).
 **Contents:** `prometheus::Registry` owner, `/metrics` HTTP endpoint
 (`promhttp::Handler`), `/ready` readiness endpoint (200 when
 `ConnTracker` active, 503 when not), Prometheus adapter implementing
-`MetricsRegistrar` from `common-observability`, active flow counter
-(concurrent connection ceiling enforcement, not rate-based — from
-`flow/limiter` atom), metrics server lifecycle (500ms startup guard,
+`MetricsRegistrar` from `common-observability`, GCRA rate limiter ([governor](https://crates.io/crates/governor) crate, token-bucket algorithm, 64-bit
+atomic state — replaces `flow/limiter` per
+[dependency-decisions](dependency-decisions.md) Layer 1.7), metrics server lifecycle (500ms startup guard,
 15s shutdown timeout, `ErrServerClosed` = success quirk), port binding
 with known-address fallback.
 
@@ -714,6 +1054,24 @@ CLI surface and credential flows. Diamond dependency pattern:
 feature flag.
 
 ### Dependency graph
+
+```mermaid
+graph TD
+    OCC["operator-cli-common<br/>(shared flags, formatters)"]
+    OCN["operator-cli-native<br/>(clap derive, Rust-idiomatic)"]
+    OCCOMPAT["operator-cli-compat<br/>(FC-deferred, skeleton)"]
+    OC["operator-cli<br/>(feature-flag diamond resolver)"]
+
+    OCN --> OCC
+    OCCOMPAT --> OCC
+    OC -->|"#[cfg(feature = 'native')]"| OCN
+    OC -->|"#[cfg(feature = 'compat')]"| OCCOMPAT
+
+    style OCC fill:#f3e5f5,stroke:#6a1b9a
+    style OCN fill:#f3e5f5,stroke:#6a1b9a
+    style OCCOMPAT fill:#e0e0e0,stroke:#9e9e9e,stroke-dasharray: 5 5
+    style OC fill:#f3e5f5,stroke:#6a1b9a
+```
 
 ```text
 operator-cli-common
@@ -790,6 +1148,29 @@ that sees all 25 other crates simultaneously.
 | `registry.rs` | `prometheus::Registry` construction, `Registerer` injection |
 | `wire.rs` | Dependency injection — constructs every crate with its deps |
 
+#### Graceful shutdown sequence
+
+```mermaid
+sequenceDiagram
+    participant OS as Linux (SIGTERM)
+    participant App as app/shutdown.rs
+    participant Sup as tunnel-supervisor
+    participant Conn as tunnel-connection
+    participant Trans as tunnel-transport
+    participant Host as host-service
+
+    OS->>App: SIGTERM / SIGINT
+    App->>App: ShutdownPhase::Graceful
+    App->>Sup: CancellationToken::cancel()
+    Sup->>Conn: unregisterConnection() per slot
+    Conn->>Conn: control stream grace period<br/>(drain in-flight streams)
+    Conn->>Trans: close QUIC connections
+    Trans->>Trans: drain worker groups
+    App->>Host: sd-notify STOPPING=1
+    Note over App: Timeout: if not done → ShutdownPhase::Hard
+    App->>App: process exit
+```
+
 ### Test boundary
 
 ```text
@@ -820,6 +1201,41 @@ app/tests/
 12. sd-notify — `READY=1` sent after first successful connection
 13. Wait — `waitToShutdown` blocks on error channel or `graceShutdownC`
 
+```mermaid
+graph TD
+    L["1. Logger<br/>(tracing, journald)"]
+    M["2. Metrics<br/>(Registry, Registerer)"]
+    C["3. Config<br/>(file parse, orchestrator)"]
+    PL["4. Platform<br/>(host-service, diagnostic)"]
+    TR["5. Transport<br/>(worker groups, QUIC)"]
+    RPC["6. RPC<br/>(Cap'n Proto init)"]
+    CN["7. Connection<br/>(registration client)"]
+    SE["8. Session<br/>(session manager)"]
+    IP["9. Ingress/Proxy<br/>(fat enum, rules)"]
+    SU["10. Supervisor<br/>(HA fan-out)"]
+    MG["11. Management<br/>(HTTP server)"]
+    SD["12. sd-notify<br/>(READY=1)"]
+    W["13. Wait<br/>(shutdown block)"]
+
+    L --> M --> C --> PL --> TR --> RPC --> CN --> SE --> IP --> SU --> MG
+    SU -->|"first connected"| SD
+    MG --> W
+
+    style L fill:#e8f5e9,stroke:#2e7d32
+    style M fill:#fff3e0,stroke:#e65100
+    style C fill:#e3f2fd,stroke:#1565c0
+    style PL fill:#fce4ec,stroke:#c62828
+    style TR fill:#fff3e0,stroke:#e65100
+    style RPC fill:#fff3e0,stroke:#e65100
+    style CN fill:#fff3e0,stroke:#e65100
+    style SE fill:#fff3e0,stroke:#e65100
+    style IP fill:#fff3e0,stroke:#e65100
+    style SU fill:#fff3e0,stroke:#e65100
+    style MG fill:#fff3e0,stroke:#e65100
+    style SD fill:#e8f5e9,stroke:#2e7d32
+    style W fill:#e0e0e0,stroke:#424242
+```
+
 **ADR linkage:**
 [ADR-014](adr/014-startup-dag-contract.md),
 [ADR-015](adr/015-graceful-shutdown-contract.md)
@@ -834,12 +1250,45 @@ app/tests/
 
 The worker group architecture is formalized as follows:
 
+```mermaid
+graph LR
+    subgraph "tokio multi-thread runtime"
+        subgraph TW["Transport Worker Group (4 threads)"]
+            T1["Thread 0<br/>QUIC conn serve"]
+            T2["Thread 1<br/>QUIC conn serve"]
+            T3["Thread 2<br/>QUIC conn serve"]
+            T4["Thread 3<br/>QUIC conn serve"]
+        end
+
+        MPMC["Bounded MPMC<br/>crossbeam-channel<br/>SessionAssignment"]
+
+        subgraph PW["Proxy Worker Group (remaining cores)"]
+            P1["Thread 4<br/>proxy dispatch"]
+            P2["Thread 5<br/>proxy dispatch"]
+            P3["Thread ...<br/>proxy dispatch"]
+            PN["Thread N<br/>proxy dispatch"]
+        end
+
+        TW -->|"!Send boundary"| MPMC
+        MPMC --> PW
+    end
+
+    EDGE["Cloudflare Edge"] -->|"QUIC"| TW
+    PW -->|"TCP/HTTP/WS"| ORIGIN["Origin Servers"]
+
+    style TW fill:#fff3e0,stroke:#e65100
+    style PW fill:#e3f2fd,stroke:#1565c0
+    style MPMC fill:#fce4ec,stroke:#c62828
+    style EDGE fill:#e0e0e0,stroke:#424242
+    style ORIGIN fill:#e0e0e0,stroke:#424242
+```
+
 **Two worker group types, owned by `tunnel-transport::workers` module:**
 
 | Worker group | Threads | Pinning | Hosts |
 | --- | --- | --- | --- |
-| Transport worker group | 4 | `sched_setaffinity` via `common-sys::cpu` | QUIC connection serve loops |
-| Proxy worker group | Remaining cores | `sched_setaffinity` via `common-sys::cpu` | Session serve loops, proxy dispatch |
+| Transport worker group | 4 | tokio `on_thread_start` | QUIC connection serve loops |
+| Proxy worker group | Remaining cores | tokio `on_thread_start` | Session serve loops, proxy dispatch |
 
 **Assignment:** `min_by_key` on atomic counter per proxy worker group
 thread. No migration after assignment. `quiche::Connection` is `!Send`
@@ -916,6 +1365,9 @@ the exit gate artifact for atom coverage.
 | `edgediscovery/allregions/usedby` | `tunnel-transport` |
 | `edgediscovery/dial` | `tunnel-transport` |
 | `edgediscovery/edgediscovery` | `tunnel-transport` |
+| `overwatch/app_manager` | `app` |
+| `overwatch/manager` | `app` |
+| `signal/safe_signal` | `common-signal` |
 
 ### Hub atoms (membership ≥ 10)
 
@@ -954,7 +1406,7 @@ the exit gate artifact for atom coverage.
 | ADR-003 metrics facade satisfied via `common-observability` | ✅ |
 | ADR-007 SOCKS5 placed in `tunnel-ingress-proxy` | ✅ |
 | ADR-008 ICMP raw socket in `common-sys::network` + `tunnel-session` | ✅ |
-| ADR-018 thread-affinity in `tunnel-transport::workers` + `common-sys::cpu` | ✅ |
+| ADR-018 connection ownership in `tunnel-transport::workers` | ✅ |
 | Dependency direction invariants documented | ✅ |
 | HTTP/2 extensibility preserved via `tunnel-transport::http2` module stub | ✅ |
 | `operator-cli-compat` FC-deferred, skeleton only | ✅ |

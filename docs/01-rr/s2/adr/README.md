@@ -4,7 +4,8 @@
 | --- | --- |
 | Baseline | cloudflare/cloudflared @ tag `2026.3.0` |
 | Phase | 01-RR / S2 - SUBSTRATE |
-| Artifact | ADR corpus for phase 2.4 |
+| S2.4 status | Closed |
+| Consumes | [dependency-decisions](../dependency-decisions.md) S2.1, [scope](../scope.md) S2.2, [risks](../risks.md) S2.3 |
 | Produces | Inputs to [invariants](../invariants.md) S2.5 and S2.6 [architecture](../architecture.md) |
 
 This directory stores phase 2.4 architecture decision records.
@@ -41,5 +42,5 @@ This directory stores phase 2.4 architecture decision records.
 | [ADR-015](015-graceful-shutdown-contract.md) | Graceful shutdown contract | R4.2 | Decided |
 | [ADR-016](016-session-migration-lifecycle.md) | Session migration lifecycle contract | R2.2, R5.3 | Decided |
 | [ADR-017](017-access-s4-drop-in-contract.md) | Access S4 drop-in replacement contract | R6.6 | Decided |
-| [ADR-018](018-quic-thread-affinity-enforcement.md) | QUIC thread-affinity enforcement | R2.6 | Decided |
+| [ADR-018](018-quic-connection-ownership-enforcement.md) | QUIC connection ownership enforcement | R2.6 | Decided |
 | [ADR-019](019-cancellation-timeout-propagation-contract.md) | Cancellation and timeout propagation contract | R1.2 | Decided |

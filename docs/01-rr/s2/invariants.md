@@ -4,7 +4,7 @@
 | --- | --- |
 | Baseline | cloudflare/cloudflared @ tag `2026.3.0` |
 | Phase | 01-RR / S2 - SUBSTRATE |
-| S2.5 status | Active |
+| S2.5 status | Closed |
 | Consumes | [scope](scope.md) Must-tier, [dependency-decisions](dependency-decisions.md), [adr](adr/README.md), [risks](risks.md) |
 | Produces | S2.6 architecture invariants map, S3 property-test skeletons |
 | Testing approach | Natural language contracts plus `proptest` pseudocode stubs; S3 supplies compilable code |
@@ -97,7 +97,7 @@ proptest! {
 }
 ```
 
-### ARCH-2 - Thread-Affinity Invariant
+### ARCH-2 - Connection-Ownership Invariant
 
 **Statement:** A `quiche::Connection` handle must never leave the thread it was
 created on. No channel send, no `Arc` clone, and no lock release may result in
@@ -105,7 +105,7 @@ the handle being observed from a different thread. Ownership remains pinned to
 the birth thread for the lifetime of the connection.
 
 **Evidence:** [dependency-decisions](dependency-decisions.md) Sections 1.1 and
-3.1, [ADR-018](adr/018-quic-thread-affinity-enforcement.md), [risks](risks.md)
+3.1, [ADR-018](adr/018-quic-connection-ownership-enforcement.md), [risks](risks.md)
 R2.6.
 
 **Test kind:** compile-time + property
@@ -1048,7 +1048,7 @@ proptest! {
 | ID | Name | Domain | Test kind |
 | --- | --- | --- | --- |
 | ARCH-1 | Proxy Data Boundary | Architectural | property |
-| ARCH-2 | Thread Affinity | Architectural | compile-time + property |
+| ARCH-2 | Connection Ownership | Architectural | compile-time + property |
 | ARCH-3 | Worker Group Boundary Error | Architectural | compile-time + property |
 | ARCH-4 | Fat Enum Dispatch | Architectural | compile-time + property |
 | ARCH-5 | Bump Arena Discipline | Architectural | property |

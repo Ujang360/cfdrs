@@ -17,7 +17,7 @@ or a custom implementation using [socket2](https://crates.io/crates/socket2) plu
 
 Custom implementation using [socket2](https://crates.io/crates/socket2), with ICMP raw socket operations
 isolated inside a dedicated unsafe crate. Same build-not-buy logic as
-ADR-007 (SOCKS5). [nix](https://crates.io/crates/nix) remains in scope for `sched_setaffinity`, signal
+ADR-007 (SOCKS5). [nix](https://crates.io/crates/nix) remains in scope for signal
 handling, and general socket options, but not for ICMP raw sockets.
 
 ## Rationale and Evidence
@@ -31,7 +31,7 @@ primitives. The implementation boundary in Rust is explicit: all unsafe code
 (including ICMP raw socket handling) lives in a dedicated unsafe crate, while
 safe orchestration code stays in ingress/session crates. [socket2](https://crates.io/crates/socket2) provides the
 socket-level surface for this path. [nix](https://crates.io/crates/nix) remains Layer 9 baseline for
-`sched_setaffinity`, signal handling, and general socket options. macOS and
+signal handling, and general socket options. macOS and
 Windows ICMP paths are FC-deferred per
 [scope](../scope.md). Evidence:
 
@@ -46,6 +46,6 @@ Windows ICMP paths are FC-deferred per
 - S3.6 ingress implementation must use [socket2](https://crates.io/crates/socket2)-based ICMP raw socket plumbing
   through the dedicated unsafe crate boundary. No ICMP library may be introduced
   without a new ADR.
-- [nix](https://crates.io/crates/nix) usage stays for `sched_setaffinity`, signals, and general socket options,
+- [nix](https://crates.io/crates/nix) usage stays for signals and general socket options,
   but ICMP raw socket code must not use [nix](https://crates.io/crates/nix).
 - Platform-specific ICMP behavior for macOS and Windows remains FC-deferred.

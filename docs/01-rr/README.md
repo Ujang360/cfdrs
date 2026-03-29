@@ -61,12 +61,12 @@ pass) + GPT 5.4 (verification pass).
 
 | Phase | Description | Artifact | Status |
 | --- | --- | --- | --- |
-| 2.1 | Dependencies vetting — 9 capability layers, T/M/S scored | [shopping cart](s2/dependency-shopping-cart.md), [decisions](s2/dependency-decisions.md) | Done |
-| 2.2 | Scoping — platform matrix, MoSCoW, explicit non-ports | [scope](s2/scope.md) | Done |
-| 2.3 | Risk register — probability × impact from 6 catalog domains | [risks](s2/risks.md) | Done |
-| 2.4 | ADRs — architecture decisions, referenced to catalog evidence | [ADR index](s2/adr/README.md) | Active |
-| 2.5 | Invariants — behavioral invariants → proptest properties | [invariants](s2/invariants.md) | Active |
-| 2.6 | Architecture — crate boundaries from Jaccard clusters | [architecture](s2/architecture.md) | Active |
+| 2.1 | Dependencies vetting — 9 capability layers, T/M/S scored | [shopping cart](s2/dependency-shopping-cart.md), [decisions](s2/dependency-decisions.md) | Closed |
+| 2.2 | Scoping — platform matrix, MoSCoW, explicit non-ports | [scope](s2/scope.md) | Closed |
+| 2.3 | Risk register — probability × impact from 6 catalog domains | [risks](s2/risks.md) | Closed |
+| 2.4 | ADRs — architecture decisions, referenced to catalog evidence | [ADR index](s2/adr/README.md) | Closed |
+| 2.5 | Invariants — behavioral invariants → proptest properties | [invariants](s2/invariants.md) | Closed |
+| 2.6 | Architecture — crate boundaries from Jaccard clusters | [architecture](s2/architecture.md) | Closed |
 | 2.7 | Parity harness — TOML contracts, oracle, red-by-default | `s2/parity-design.md` | — |
 | 2.8 | Stages plan — phased from critical path + dep graph | `s2/stages/phase-*.md` | — |
 | 2.9 | Environment + guardrails — workspace, style, CI/CD | `s2/environment.md` | — |
