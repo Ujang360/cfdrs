@@ -68,7 +68,7 @@ pass) + GPT 5.4 (verification pass).
 | 2.5 | Invariants — behavioral invariants → proptest properties | [invariants](s2/invariants.md) | Closed |
 | 2.6 | Architecture — crate boundaries from Jaccard clusters | [architecture](s2/architecture.md) | Closed |
 | 2.7 | Parity harness — TOML contracts, oracle, red-by-default | [parity-design](s2/parity-design.md) | Closed |
-| 2.8 | Stages plan — phased from critical path + dep graph | [stages](s2/stages/README.md) | Active |
+| 2.8 | Stages plan — phased from critical path + dep graph | [stages](s2/stages/README.md) | Closed |
 | 2.9 | Environment + guardrails — workspace, style, CI/CD | `s2/environment.md` | — |
 | 2.10 | Coherency audit — full traceability chain | `s2/coherency-report.md` | — |
 
@@ -85,7 +85,7 @@ trustworthy/maturity/security axes. Research and alternatives are in the
 | L2 | Serialization and Data | serde, capnp 0.25.x, prost |
 | L3 | Transport | tokio-quiche (primary), hyper 1.x, h2 0.4.x, tower, BoringSSL |
 | L4 | Observability | tracing, prometheus-client, opentelemetry |
-| L5 | Error Handling | thiserror (lib), anyhow (binary only) |
+| L5 | Error Handling | thiserror — all library crates. anyhow — OUT entirely. |
 | L6 | CLI and Configuration | clap derive, chrono, dirs |
 | L7 | Domain-Specific | backon, ipnet, regex, axum, ractor, flate2/zip |
 | L8 | Crypto and Security | RustCrypto suite, jsonwebtoken, crypto_box |
@@ -153,18 +153,24 @@ progressively.
 Opus 4.6 (verification). One crate per session. Parity TOML written
 before implementation.
 
-| Stage | Scope | Entry condition |
-| --- | --- | --- |
-| 3.0 | Foundation — shared types, error taxonomy, trait interfaces | S2 exit gate |
-| 3.1 | Independent crates — cli, config, const-and-env, crypto, overwatch, metrics | 3.0 |
-| 3.2 | Control plane — capnp-rpc, tunnelrpc, registration client | 3.0 |
-| 3.3 | Transport — connection/http2, connection/quic, tunnels-transport | 3.0 + 3.2 |
-| 3.4 | Session + datagram — datagramsession, quic/v3, sessions | 3.3 |
-| 3.5 | Supervisor + orchestration | 3.3 + 3.4 |
-| 3.6 | Ingress + proxy — ingress, proxy, carrier, socks | 3.3 + 3.5 |
-| 3.7 | Management + access — management, access-policies, token | 3.5 + 3.6 |
-| 3.8 | CLI + binary assembly | All prior |
-| 3.9 | Platform + service variants — FIPS, systemd, launchd, Windows | 3.8 |
+| Stage | Scope | Crates | Must | Should | Skip | Fuzz | Total | Phase doc |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 3.0 | Foundation | 3 | 6 | 0 | 0 | 0 | 6 | [phase-3.0](s2/stages/phase-3.0.md) |
+| 3.1 | Independent crates | 7 | 6 | 46 | 11 | 1 | 64 | [phase-3.1](s2/stages/phase-3.1.md) |
+| 3.2 | Control plane | 1 | 10 | 0 | 0 | 0 | 10 | [phase-3.2](s2/stages/phase-3.2.md) |
+| 3.3 | Transport | 2 | 30 | 8 | 6 | 0 | 44 | [phase-3.3](s2/stages/phase-3.3.md) |
+| 3.4 | Sessions | 1 | 52 | 11 | 0 | 6 | 69 | [phase-3.4](s2/stages/phase-3.4.md) |
+| 3.5 | Config runtime + supervisor | 2 | 1 | 19 | 0 | 0 | 20 | [phase-3.5](s2/stages/phase-3.5.md) |
+| 3.6 | Ingress proxy | 1 | 37 | 26 | 0 | 1 | 64 | [phase-3.6](s2/stages/phase-3.6.md) |
+| 3.7 | Management + diagnostics | 2 | 6 | 32 | 1 | 0 | 39 | [phase-3.7](s2/stages/phase-3.7.md) |
+| 3.8 | Application + CLI | 5 | 9 | 2 | 0 | 0 | 11 | [phase-3.8](s2/stages/phase-3.8.md) |
+| 3.9 | Platform integration | 1 | 0 | 0 | 0 | 0 | 0 | [phase-3.9](s2/stages/phase-3.9.md) |
+| **Total** | | **25** | **157** | **144** | **18** | **8** | **327** | |
+
+> **Note:** `common-sys` (the 26th crate) is consumed transitively by stages 3.3,
+> 3.4, and 3.7 but has no standalone parity contracts — its safe API surface is
+> verified through its consumer crates. Authoritative source:
+> [s2/stages/README.md](s2/stages/README.md).
 
 **Exit gate:** All parity TOMLs for every stage are green.
 

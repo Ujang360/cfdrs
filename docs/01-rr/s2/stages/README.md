@@ -4,7 +4,7 @@
 | --- | --- |
 | Baseline | cloudflare/cloudflared @ tag `2026.3.0` |
 | Phase | 01-RR / S2 - SUBSTRATE |
-| S2.8 status | Active |
+| S2.8 status | Closed |
 | Consumes | [architecture](../architecture.md), [parity-design](../parity-design.md), [scope](../scope.md), [risks](../risks.md), [invariants](../invariants.md) |
 | Produces | Per-stage implementation plans with entry/exit gates, crate ordering, parity gates, risk callouts. Inputs to S2.9 environment and S2.10 coherency audit |
 
@@ -45,6 +45,7 @@ graph TD
     S35 --> S37
     S36 --> S37
 
+    S31 --> S35
     S31 --> S38
     S32 --> S38
     S33 --> S38
