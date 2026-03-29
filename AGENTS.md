@@ -29,6 +29,33 @@ Always identify which stratum the current task belongs to.
 Never perform S3 work (writing Rust code) until S2 exit gate is passed.
 Never perform S4 work until S3 exit gate is passed.
 
+### Stratum Isolation Principle
+
+Each stratum distills the one before it. Once a stratum is
+complete, downstream work reads only that stratum — never the
+raw source above it.
+
+| Active stratum | Primary reads         | S1 access              |
+|----------------|-----------------------|------------------------|
+| S2 (current)   | S1 targeted + S2 docs | Allowed for gap-fill   |
+| S3             | S2 docs only          | **Exceptional only**   |
+| S4             | S2 + S3 artifacts     | **Exceptional only**   |
+
+**Why this matters:** S1 is ~415K tokens (lethal for every agent).
+S2 is ~45K tokens total (fits comfortably). The entire purpose of
+S2/SUBSTRATE is to distill S1 into a self-sufficient design layer
+so that S3 implementation never needs to touch S1.
+
+**When S1 access is exceptional (S3/S4):** Only read S1 when a
+specific incoherence or doubt arises that S2 cannot resolve. Log
+the gap, fix S2 to cover it, then continue from S2. Never leave
+S1 knowledge un-distilled — if you read S1, update S2 to capture
+what was missing.
+
+**When S2 is missing something:** The fix is always to add the
+missing information to S2 — never to bypass S2 and work from S1
+directly. This keeps S2 as the single source of truth for S3.
+
 ## Session Scope
 
 **One deliverable. One session. One concern.**
@@ -40,8 +67,9 @@ review). Cross-crate reasoning is expected in S2.
 Signs of context blowup — stop immediately if you observe these:
 
 - Contradicting decisions made earlier in the session
-- Losing track of which S2 phase the current work belongs to
-- Making design claims without S1 atom references
+- Losing track of which stratum/phase the current work belongs to
+- Reaching for S1 docs during S3 work (read S2 instead)
+- Reading more than 3 S2 docs in one session
 
 Recovery: stop, start a fresh session, re-read only the specific
 deliverable being worked on.
@@ -83,29 +111,51 @@ definitions, and conversation history overhead (~40%).
 1. **Never bulk-read S1 atoms or catalogs.** Use targeted search
    (grep/semantic) to find the specific atom, then read only that
    file. Each atom averages ~600 tokens.
-2. **Never read `dependency-shopping-cart.md` in full.** It is a
+2. **During S3/S4: read S2, not S1.** S2 is the self-sufficient
+   design layer. Only fall back to S1 for exceptional gaps, and
+   update S2 immediately after.
+3. **Never read `dependency-shopping-cart.md` in full.** It is a
    research artifact. Use
    [dependency-decisions.md](docs/01-rr/s2/dependency-decisions.md)
    as the authoritative summary (~6K tokens).
-3. **Cap S2 reads to ≤3 docs per session.** If you need more than
+4. **Cap S2 reads to ≤3 docs per session.** If you need more than
    architecture + scope + one ADR, you are likely violating
    "one deliverable, one session."
-4. **Prefer search over read.** When verifying a claim, grep for the
+5. **Prefer search over read.** When verifying a claim, grep for the
    keyword instead of reading the entire document.
-5. **Budget check before large reads.** Before opening any file
+6. **Budget check before large reads.** Before opening any file
    >10K tokens, confirm the read is necessary for the current
    deliverable.
 
 ## S1 Reference Policy
 
-S1/RAW is the behavioral oracle for all design and implementation
-decisions. Before making any behavioral claim, verify it against:
+S1/RAW is the behavioral oracle — but access depends on the
+active stratum.
+
+### During S2 (current)
+
+S1 is the primary source. Before making any behavioral claim,
+verify it against:
 
 1. The relevant atom in `docs/01-rr/s1/atoms/`
 2. The relevant catalog in `docs/01-rr/s1/catalogs/`
-3. The hub atom list in `docs/01-rr/s1/audit-analysis.md`
+3. The hub atom list in
+   [audit-analysis.md](docs/01-rr/s1/audit-analysis.md)
 
 Never infer behavior that is not visible in S1 atom docs.
+Distill every finding into the appropriate S2 deliverable.
+
+### During S3/S4 (future)
+
+S2 is the primary source. Do **not** read S1 unless:
+
+1. An S2 doc is ambiguous or contradictory on a specific point
+2. A parity test reveals behavior not covered by S2
+3. A human explicitly requests S1 verification
+
+When any of these occur, read only the specific S1 atom needed
+(~600 tokens each), resolve the gap, and **update S2** so the
+same lookup is never needed again.
 
 ## Critical Path
 
@@ -124,14 +174,33 @@ supervisor/tunnel      (12) — supervisor loop
 
 ## What You Must Never Do
 
-- Make behavioral claims not traceable to S1 atoms
-- Skip the S2 exit gate (phase 2.10 coherency audit)
-- Produce S2 deliverables that contradict S1 catalog evidence
+- Skip a stratum's exit gate (S2: phase 2.10, S3: parity green)
+- **During S2:** make behavioral claims not traceable to S1 atoms
+- **During S2:** produce deliverables that contradict S1 evidence
+- **During S3/S4:** bulk-read S1 instead of reading S2
+- **During S3/S4:** leave an S1 gap un-distilled into S2
 
 ## S3 Rules (activate when S3 is ACTIVE)
 
 These rules are dormant while S2 is the active stratum.
 They apply once S3/COOK becomes ACTIVE.
+
+### S3 Context Discipline
+
+**Read S2. Not S1.** All implementation decisions derive from S2
+docs. The S2 deliverables are the contract:
+
+- [architecture.md](docs/01-rr/s2/architecture.md) — crate map
+- [scope.md](docs/01-rr/s2/scope.md) — MoSCoW tiers
+- [invariants.md](docs/01-rr/s2/invariants.md) — behavioral rules
+- [dependency-decisions.md](docs/01-rr/s2/dependency-decisions.md)
+  — approved libraries
+- [risks.md](docs/01-rr/s2/risks.md) — known hazards
+- [ADRs](docs/01-rr/s2/adr/) — architectural decisions
+
+If an S2 doc does not answer a question needed for implementation,
+do not guess or read S1. Instead: flag the gap, add a TODO in the
+S2 doc, and work with a human to fill it.
 
 ### S3 Session Scope
 
