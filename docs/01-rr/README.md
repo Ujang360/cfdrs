@@ -56,8 +56,8 @@ Go behavior becomes Rust architecture.
 
 **Location:** [s2/](s2/)
 
-**Methodology:** Two-model handoff on all prompts — Sonnet 4.6 (first
-pass) + GPT 5.4 (verification pass).
+**Methodology:** AI-assisted — first-pass generation + verification pass
+on all prompts.
 
 | Phase | Description | Artifact | Status |
 | --- | --- | --- | --- |
@@ -149,9 +149,8 @@ progressively.
 
 **Location:** `s3/` + codebase
 
-**Methodology:** Two-model handoff — GPT 5.3 Codex (first pass) +
-Opus 4.6 (verification). One crate per session. Parity TOML written
-before implementation.
+**Methodology:** AI-assisted — first-pass generation + verification.
+One crate per session. Parity TOML written before implementation.
 
 | Stage | Scope | Crates | Must | Should | Skip | Fuzz | Total | Phase doc |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
