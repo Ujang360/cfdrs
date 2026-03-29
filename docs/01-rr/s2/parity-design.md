@@ -23,7 +23,7 @@ red-by-default parity tests.
 - [Coverage Matrix](#coverage-matrix)
 - [Fuzz Parity Strategy](#fuzz-parity-strategy)
 - [S4 Execution Model](#s4-execution-model)
-- [Exit Gate](#exit-gate)
+- [S2.7 Exit Gate](#s27-exit-gate)
 
 ---
 
@@ -987,18 +987,18 @@ is designed in S2.7 but implemented in S4.
 
 ```text
 ┌─────────────────────────────────────────────────────────┐
-│                    S4 Parity Runner                      │
+│                    S4 Parity Runner                     │
 │                                                         │
-│  ┌───────────┐  ┌──────────────┐  ┌──────────────────┐ │
-│  │ TOML      │  │ Oracle       │  │ Rust Binary      │ │
-│  │ Contract  │→ │ Subprocess   │→ │ Under Test       │ │
-│  │ Reader    │  │ Runner       │  │ Runner           │ │
-│  └───────────┘  └──────────────┘  └──────────────────┘ │
+│  ┌───────────┐  ┌──────────────┐  ┌──────────────────┐  │
+│  │ TOML      │  │ Oracle       │  │ Rust Binary      │  │
+│  │ Contract  │→ │ Subprocess   │→ │ Under Test       │  │
+│  │ Reader    │  │ Runner       │  │ Runner           │  │
+│  └───────────┘  └──────────────┘  └──────────────────┘  │
 │        │              │                    │            │
 │        ▼              ▼                    ▼            │
-│  ┌──────────────────────────────────────────────┐      │
-│  │              Diff & Report Engine             │      │
-│  └──────────────────────────────────────────────┘      │
+│  ┌──────────────────────────────────────────────┐       │
+│  │              Diff & Report Engine            │       │
+│  └──────────────────────────────────────────────┘       │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -1114,24 +1114,20 @@ S4 exit gate requires all of the following:
 
 ---
 
-## Exit Gate
+## S2.7 Exit Gate
 
-S2.7 exit gate checklist:
-
-- [x] TOML contract schema covers all fields for S3 lifecycle and S4
-      execution
-- [x] Oracle interaction model handles 4 comparison modes
-- [x] Red-by-default lifecycle has clear state transitions and CI rules
-- [x] All 6 ADR parity obligations documented with fixtures
-- [x] Scope exclusions complete: Won't (8), Could (18), RR-deferred
-      (12), permanent (6)
-- [x] Access parity boundary explicit ([ADR-017](adr/017-access-s4-drop-in-contract.md))
-- [x] Contract catalog: 327 contracts (157 must + 144 should + 18 skip
-      + 8 fuzz)
-- [x] All 33 Must-tier atoms have >=1 contract
-- [x] All 29 invariants covered (4 supplementary noted)
-- [x] All 8 fuzz targets mapped with implementation patterns
-- [x] Fuzz framework selected (`cargo fuzz` / libFuzzer)
-- [x] S4 execution model defined (oracle runner, comparison engine,
-      gate criteria)
-- [x] Coverage matrix verified across all 9 verification criteria
+| Criterion | Status |
+| --- | --- |
+| TOML contract schema covers all fields for S3 lifecycle and S4 execution | ✅ |
+| Oracle interaction model handles 4 comparison modes | ✅ |
+| Red-by-default lifecycle has clear state transitions and CI rules | ✅ |
+| All 6 ADR parity obligations documented with fixtures | ✅ |
+| Scope exclusions complete: Won't (8), Could (18), RR-deferred (12), permanent (6) | ✅ |
+| Access parity boundary explicit ([ADR-017](adr/017-access-s4-drop-in-contract.md)) | ✅ |
+| Contract catalog: 327 contracts (157 must + 144 should + 18 skip + 8 fuzz) | ✅ |
+| All 33 Must-tier atoms have >=1 contract | ✅ |
+| All 29 invariants covered (4 supplementary noted) | ✅ |
+| All 8 fuzz targets mapped with implementation patterns | ✅ |
+| Fuzz framework selected (`cargo fuzz` / libFuzzer) | ✅ |
+| S4 execution model defined (oracle runner, comparison engine, gate criteria) | ✅ |
+| Coverage matrix verified across all 9 verification criteria | ✅ |
