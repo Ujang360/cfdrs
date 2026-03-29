@@ -91,13 +91,13 @@ are overlaid below.
 
 | Criterion | Status |
 | --- | --- |
-| Every risk has direct S1 or S2 evidence links | Yes |
-| Probability x impact assigned for every risk | Yes |
-| Mitigation or acceptance strategy recorded for every risk | Yes |
-| ADR-linked dependency risks mapped (ADR-003/004/005/006) | Yes |
-| Critical-path overlay includes all 7 load-bearing atoms | Yes |
-| Scope-boundary risks from S2.2 are explicitly represented | Yes |
-| Matrix is coherent with S2.1 dependency decisions | Yes |
+| Every risk has direct S1 or S2 evidence links | ✅ |
+| Probability x impact assigned for every risk | ✅ |
+| Mitigation or acceptance strategy recorded for every risk | ✅ |
+| ADR-linked dependency risks mapped (ADR-003/004/005/006) | ✅ |
+| Critical-path overlay includes all 7 load-bearing atoms | ✅ |
+| Scope-boundary risks from S2.2 are explicitly represented | ✅ |
+| Matrix is coherent with S2.1 dependency decisions | ✅ |
 
 ## Notes
 

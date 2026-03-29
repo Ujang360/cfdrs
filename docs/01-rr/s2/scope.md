@@ -449,15 +449,15 @@ later phases; excluded items are architectural decisions for [cfdrs](../../../RE
 
 | Criterion | Status |
 | --- | --- |
-| Platform matrix stays coherent with Layer 9 of [dependency-decisions](dependency-decisions.md) | Yes |
-| macOS, Windows, and FreeBSD exclusions are explicitly documented | Yes |
-| Stage 3.9 impact is recorded for later S2.8 planning | Yes |
-| Every Must atom remains traceable to S1 evidence or S2.1 decisions | Yes |
-| Every Should atom remains traceable to S1 evidence | Yes |
-| Won't and non-port entries stay anchored to S1 findings or S2.1 decisions | Yes |
-| Two non-port buckets are complete: deferred and permanently excluded | Yes |
-| SOCKS5 outbound exclusion is justified with explicit Go evidence | Yes |
-| Auto-update and `update` command exclusions are justified as [cfdrs](../../../README.md) design decisions | Yes |
+| Platform matrix stays coherent with Layer 9 of [dependency-decisions](dependency-decisions.md) | ✅ |
+| macOS, Windows, and FreeBSD exclusions are explicitly documented | ✅ |
+| Stage 3.9 impact is recorded for later S2.8 planning | ✅ |
+| Every Must atom remains traceable to S1 evidence or S2.1 decisions | ✅ |
+| Every Should atom remains traceable to S1 evidence | ✅ |
+| Won't and non-port entries stay anchored to S1 findings or S2.1 decisions | ✅ |
+| Two non-port buckets are complete: deferred and permanently excluded | ✅ |
+| SOCKS5 outbound exclusion is justified with explicit Go evidence | ✅ |
+| Auto-update and `update` command exclusions are justified as [cfdrs](../../../README.md) design decisions | ✅ |
 
 ## Notes
 

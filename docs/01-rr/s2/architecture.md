@@ -1335,64 +1335,64 @@ the exit gate artifact for atom coverage.
 
 | Atom | Crate |
 | --- | --- |
-| `cmd/cloudflared/flags/flags` | `operator-cli-native` |
-| `cmd/cloudflared/tunnel/cmd` | `operator-cli-native` |
-| `cmd/cloudflared/tunnel/configuration` | `operator-cli-native` |
-| `cmd/cloudflared/tunnel/credential_finder` | `operator-cli-native` |
-| `config/configuration` | `config-core` |
-| `config/model` | `config-core` |
-| `credentials/credentials` | `common-token` |
-| `connection/control` | `tunnel-connection` |
-| `connection/protocol` | `tunnel-connection` |
-| `tunnelrpc/pogs/registration_server` | `tunnel-rpc` |
-| `tunnelrpc/registration_client` | `tunnel-rpc` |
-| `tunnelrpc/registration_server` | `tunnel-rpc` |
-| `supervisor/supervisor` | `tunnel-supervisor` |
-| `supervisor/tunnel` | `tunnel-supervisor` |
-| `management/service` | `tunnel-management` |
-| `ingress/config` | `tunnel-ingress-proxy` |
-| `ingress/ingress` | `tunnel-ingress-proxy` |
-| `ingress/origin_connection` | `tunnel-ingress-proxy` |
-| `ingress/origin_dialer` | `tunnel-ingress-proxy` |
-| `ingress/origin_proxy` | `tunnel-ingress-proxy` |
-| `ingress/origin_service` | `tunnel-ingress-proxy` |
-| `ingress/rule` | `tunnel-ingress-proxy` |
-| `proxy/proxy` | `tunnel-ingress-proxy` |
-| `edgediscovery/allregions/address` | `tunnel-transport` |
-| `edgediscovery/allregions/discovery` | `tunnel-transport` |
-| `edgediscovery/allregions/region` | `tunnel-transport` |
-| `edgediscovery/allregions/regions` | `tunnel-transport` |
-| `edgediscovery/allregions/usedby` | `tunnel-transport` |
-| `edgediscovery/dial` | `tunnel-transport` |
-| `edgediscovery/edgediscovery` | `tunnel-transport` |
-| `overwatch/app_manager` | `app` |
-| `overwatch/manager` | `app` |
-| `signal/safe_signal` | `common-signal` |
+| [cmd/cloudflared/flags/flags](../s1/atoms/cmd/cloudflared/flags/flags.md) | `operator-cli-native` |
+| [cmd/cloudflared/tunnel/cmd](../s1/atoms/cmd/cloudflared/tunnel/cmd.md) | `operator-cli-native` |
+| [cmd/cloudflared/tunnel/configuration](../s1/atoms/cmd/cloudflared/tunnel/configuration.md) | `operator-cli-native` |
+| [cmd/cloudflared/tunnel/credential_finder](../s1/atoms/cmd/cloudflared/tunnel/credential_finder.md) | `operator-cli-native` |
+| [config/configuration](../s1/atoms/config/configuration.md) | `config-core` |
+| [config/model](../s1/atoms/config/model.md) | `config-core` |
+| [credentials/credentials](../s1/atoms/credentials/credentials.md) | `common-token` |
+| [connection/control](../s1/atoms/connection/control.md) | `tunnel-connection` |
+| [connection/protocol](../s1/atoms/connection/protocol.md) | `tunnel-connection` |
+| [tunnelrpc/pogs/registration_server](../s1/atoms/tunnelrpc/pogs/registration_server.md) | `tunnel-rpc` |
+| [tunnelrpc/registration_client](../s1/atoms/tunnelrpc/registration_client.md) | `tunnel-rpc` |
+| [tunnelrpc/registration_server](../s1/atoms/tunnelrpc/registration_server.md) | `tunnel-rpc` |
+| [supervisor/supervisor](../s1/atoms/supervisor/supervisor.md) | `tunnel-supervisor` |
+| [supervisor/tunnel](../s1/atoms/supervisor/tunnel.md) | `tunnel-supervisor` |
+| [management/service](../s1/atoms/management/service.md) | `tunnel-management` |
+| [ingress/config](../s1/atoms/ingress/config.md) | `tunnel-ingress-proxy` |
+| [ingress/ingress](../s1/atoms/ingress/ingress.md) | `tunnel-ingress-proxy` |
+| [ingress/origin_connection](../s1/atoms/ingress/origin_connection.md) | `tunnel-ingress-proxy` |
+| [ingress/origin_dialer](../s1/atoms/ingress/origin_dialer.md) | `tunnel-ingress-proxy` |
+| [ingress/origin_proxy](../s1/atoms/ingress/origin_proxy.md) | `tunnel-ingress-proxy` |
+| [ingress/origin_service](../s1/atoms/ingress/origin_service.md) | `tunnel-ingress-proxy` |
+| [ingress/rule](../s1/atoms/ingress/rule.md) | `tunnel-ingress-proxy` |
+| [proxy/proxy](../s1/atoms/proxy/proxy.md) | `tunnel-ingress-proxy` |
+| [edgediscovery/allregions/address](../s1/atoms/edgediscovery/allregions/address.md) | `tunnel-transport` |
+| [edgediscovery/allregions/discovery](../s1/atoms/edgediscovery/allregions/discovery.md) | `tunnel-transport` |
+| [edgediscovery/allregions/region](../s1/atoms/edgediscovery/allregions/region.md) | `tunnel-transport` |
+| [edgediscovery/allregions/regions](../s1/atoms/edgediscovery/allregions/regions.md) | `tunnel-transport` |
+| [edgediscovery/allregions/usedby](../s1/atoms/edgediscovery/allregions/usedby.md) | `tunnel-transport` |
+| [edgediscovery/dial](../s1/atoms/edgediscovery/dial.md) | `tunnel-transport` |
+| [edgediscovery/edgediscovery](../s1/atoms/edgediscovery/edgediscovery.md) | `tunnel-transport` |
+| [overwatch/app_manager](../s1/atoms/overwatch/app_manager.md) | `app` |
+| [overwatch/manager](../s1/atoms/overwatch/manager.md) | `app` |
+| [signal/safe_signal](../s1/atoms/signal/safe_signal.md) | `common-signal` |
 
 ### Hub atoms (membership ≥ 10)
 
 | Atom | Membership | Crate |
 | --- | --- | --- |
-| `cmd/cloudflared/tunnel/configuration` | 14 | `operator-cli-native` |
-| `connection/control` | 14 | `tunnel-connection` |
-| `cmd/cloudflared/tunnel/cmd` | 13 | `operator-cli-native` |
-| `connection/protocol` | 13 | `tunnel-connection` |
-| `management/service` | 12 | `tunnel-management` |
-| `quic/v3/session` | 12 | `tunnel-session` |
-| `supervisor/tunnel` | 12 | `tunnel-supervisor` |
-| `carrier/carrier` | 10 | `tunnel-ingress-proxy` |
-| `connection/http2` | 10 | `tunnel-transport` |
-| `connection/observer` | 10 | `tunnel-connection` |
-| `connection/quic_connection` | 10 | `tunnel-connection` |
-| `connection/quic_datagram_v2` | 10 | `tunnel-session` |
-| `connection/quic_datagram_v3` | 10 | `tunnel-session` |
-| `orchestration/orchestrator` | 10 | `config-runtime` |
-| `quic/v3/muxer` | 10 | `tunnel-session` |
-| `supervisor/supervisor` | 10 | `tunnel-supervisor` |
-| `tunnelrpc/quic/cloudflared_client` | 10 | `tunnel-rpc` |
-| `tunnelrpc/quic/session_client` | 10 | `tunnel-rpc` |
-| `tunnelrpc/registration_client` | 10 | `tunnel-rpc` |
-| `config/configuration` | 10 | `config-core` |
+| [cmd/cloudflared/tunnel/configuration](../s1/atoms/cmd/cloudflared/tunnel/configuration.md) | 14 | `operator-cli-native` |
+| [connection/control](../s1/atoms/connection/control.md) | 14 | `tunnel-connection` |
+| [cmd/cloudflared/tunnel/cmd](../s1/atoms/cmd/cloudflared/tunnel/cmd.md) | 13 | `operator-cli-native` |
+| [connection/protocol](../s1/atoms/connection/protocol.md) | 13 | `tunnel-connection` |
+| [management/service](../s1/atoms/management/service.md) | 12 | `tunnel-management` |
+| [quic/v3/session](../s1/atoms/quic/v3/session.md) | 12 | `tunnel-session` |
+| [supervisor/tunnel](../s1/atoms/supervisor/tunnel.md) | 12 | `tunnel-supervisor` |
+| [carrier/carrier](../s1/atoms/carrier/carrier.md) | 10 | `tunnel-ingress-proxy` |
+| [connection/http2](../s1/atoms/connection/http2.md) | 10 | `tunnel-transport` |
+| [connection/observer](../s1/atoms/connection/observer.md) | 10 | `tunnel-connection` |
+| [connection/quic_connection](../s1/atoms/connection/quic_connection.md) | 10 | `tunnel-connection` |
+| [connection/quic_datagram_v2](../s1/atoms/connection/quic_datagram_v2.md) | 10 | `tunnel-session` |
+| [connection/quic_datagram_v3](../s1/atoms/connection/quic_datagram_v3.md) | 10 | `tunnel-session` |
+| [orchestration/orchestrator](../s1/atoms/orchestration/orchestrator.md) | 10 | `config-runtime` |
+| [quic/v3/muxer](../s1/atoms/quic/v3/muxer.md) | 10 | `tunnel-session` |
+| [supervisor/supervisor](../s1/atoms/supervisor/supervisor.md) | 10 | `tunnel-supervisor` |
+| [tunnelrpc/quic/cloudflared_client](../s1/atoms/tunnelrpc/quic/cloudflared_client.md) | 10 | `tunnel-rpc` |
+| [tunnelrpc/quic/session_client](../s1/atoms/tunnelrpc/quic/session_client.md) | 10 | `tunnel-rpc` |
+| [tunnelrpc/registration_client](../s1/atoms/tunnelrpc/registration_client.md) | 10 | `tunnel-rpc` |
+| [config/configuration](../s1/atoms/config/configuration.md) | 10 | `config-core` |
 
 ---
 
